@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Farnaz Nasehi - Data Scientist & Developer</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        /* Your CSS styles */
+        .container {
+            padding-top: 2rem;
+        }
+        .navbar {
+            margin-bottom: 30px;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container">
+            <a class="navbar-brand" href="#" id="brandLink">Farnaz Nasehi</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" id="aboutLink">About</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" id="resumeLink">Resume</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" id="portfolioLink">Portfolio</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" id="contactLink">Contact</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    
+    <div class="container" id="mainContent">
+        <!-- The main page content goes here -->
+        <h1>Welcome</h1>
+        <p>This is the main page. Click the links above to see more information.</p>
+    </div>
+
+    <footer class="footer py-3 bg-light">
+        <div class="container text-center">
+            <span class="text-muted">Copyright © 2024 Farnaz Nasehi</span>
+        </div>
+    </footer>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Event listeners for nav links
+            document.getElementById('brandLink').addEventListener('click', resetMainContent);
+            document.getElementById('aboutLink').addEventListener('click', () => loadContent('about'));
+            document.getElementById('resumeLink').addEventListener('click', () => loadContent('resume'));
+            document.getElementById('portfolioLink').addEventListener('click', () => loadContent('portfolio'));
+            document.getElementById('contactLink').addEventListener('click', () => loadContent('contact'));
+
+            function loadContent(section) {
+                // Placeholder content - replace with your actual content
+                const content = {
+                    'about': '<h1>About Me</h1><p>Expert Python developer with over 3 years of experience...</p>',
+                    'resume': '<h1>Resume</h1><p>Detailed descriptions of past job roles and significant achievements...</p>',
+                    'portfolio': '<h1>Portfolio</h1><p>Interactive gallery of projects or links to live applications...</p>',
+                    'contact': '<h1>Contact</h1><p>Interactive contact form and links to professional profiles...</p>',
+                };
+                // Set the mainContent div to the content of the clicked section
+                document.getElementById('mainContent').innerHTML = content[section] || '';
+            }
+
+            function resetMainContent(event) {
+                event.preventDefault();
+                // Reset the main content to the default welcome message
+                const welcomeMessage = '<h1>Welcome</h1><p>This is the main page.</p>';
+                document.getElementById('mainContent').innerHTML = welcomeMessage;
+            }
+        });
+    </script>
+</body>
+</html>
