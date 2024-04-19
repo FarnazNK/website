@@ -1,17 +1,33 @@
+/* 
+    CSS Styles for Enhanced Web Presentation
+    Author: [Your Name]
+    Date: [Date]
+
+    Base styles for the webpage body
+*/
 body {
-    font-family: 'Calibri', Tahoma, Geneva, Verdana, sans-serif;
-    color: #333;
+    font-family: 'Calibri', Tahoma, Geneva, Verdana, sans-serif; /* Font stack prioritizing readability and cross-platform consistency */
+    color: #333; /* Set default text color for better readability */
 }
 
+/* 
+    Styles for heading elements, emphasizing readability and aesthetics
+*/
 h1, h2 {
-    color: #445668;
+    color: #445668; /* Define heading text color for clear visibility and elegance */
 }
 
+/* 
+    Styles for the navigation bar, enhancing user experience
+*/
 .navbar {
-    box-shadow: 0 2px 4px rgba(0,0,0,.1);
+    box-shadow: 0 2px 4px rgba(0,0,0,.1); /* Introduce subtle shadow for navbar depth, improving visual hierarchy */
 }
 
+/* 
+    Styles for the footer, providing a polished and cohesive design
+*/
 .footer {
-    background-color: #f8f9fa;
-    color: #6c757d;
+    background-color: #f8f9fa; /* Utilize soft background color for footer, ensuring content stands out */
+    color: #6c757d; /* Set footer text color to maintain harmony with overall design */
 }
