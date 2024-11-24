@@ -20,17 +20,8 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log('Portfolio website interactions ready');
 });
 
-// Toggle details function for expanding/collapsing content sections
 function toggleDetails(card) {
-    console.log('Toggle function called'); // Debugging line
-    const details = card.querySelector('.details-content, .skill-details, .resume-details');
-    
-    if (details) {
-        details.classList.toggle('show'); // Add or remove the 'show' class for smooth transition
-    }
-}
-function toggleDetails(card) {
-    const details = card.querySelector('.experience-details');
+    const details = card.querySelector('.details-content, .skill-details, .resume-details, .experience-details');
     if (details) {
         details.classList.toggle('show');
         if (details.classList.contains('show')) {
@@ -40,3 +31,4 @@ function toggleDetails(card) {
         }
     }
 }
+

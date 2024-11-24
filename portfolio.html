@@ -8,10 +8,10 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+    <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top shadow-sm">
         <div class="container">
             <a class="navbar-brand" href="index.html">Farnaz Nasehi</a>
-
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -26,19 +26,56 @@
         </div>
     </nav>
 
-    <div class="container" style="padding-top: 80px;">
-        <h1>Portfolio</h1>
-        <div class="row">
-            <div class="col-md-4">
-                <div class="card">
-                    <div class="card-body">
-                        <h5 class="card-title">Ethereum Wallet Labeling</h5>
-                        <p class="card-text">Applied Julia for labeling and analyzing Ethereum wallet data.</p>
+    <!-- Spacer for Fixed Navbar -->
+    <div style="padding-top: 80px;"></div>
+
+    <!-- Portfolio Section -->
+    <section id="portfolio" class="portfolio-section text-center text-light py-5" style="background: linear-gradient(45deg, #6dcfe7, #333);">
+        <div class="container">
+            <h1 class="mb-4">My Work</h1>
+            <p class="text-muted mb-5">Check out some of my recent projects below!</p>
+            <div class="row">
+                <!-- Project 1 -->
+                <div class="col-md-4 mb-4">
+                    <div class="card bg-dark text-light shadow-sm">
+                        <div class="card-body">
+                            <h5 class="card-title">Ethereum Wallet Labeling</h5>
+                            <p class="card-text">A project focused on labeling and analyzing Ethereum blockchain data.</p>
+                        </div>
+                    </div>
+                </div>
+                <!-- Project 2 -->
+                <div class="col-md-4 mb-4">
+                    <div class="card bg-dark text-light shadow-sm">
+                        <div class="card-body">
+                            <h5 class="card-title">Hyperspectral Data Analysis</h5>
+                            <p class="card-text">Advanced geospatial data visualization and processing.</p>
+                        </div>
+                    </div>
+                </div>
+                <!-- Project 3 -->
+                <div class="col-md-4 mb-4">
+                    <div class="card bg-dark text-light shadow-sm">
+                        <div class="card-body">
+                            <h5 class="card-title">Blockchain Trading Analytics</h5>
+                            <p class="card-text">Token tracking and trading fee analytics for DeFi.</p>
+                            <a href="portfolio.html" class="btn btn-secondary">Learn More</a>
+                        </div>
                     </div>
                 </div>
             </div>
-            <!-- Add more project cards as needed -->
         </div>
-    </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="text-center text-light py-3 bg-dark">
+        <p>&copy; 2024 Farnaz Nasehi. All rights reserved.</p>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>

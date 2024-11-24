@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>About - Farnaz Nasehi</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -12,7 +13,6 @@
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top shadow-sm">
         <div class="container">
             <a class="navbar-brand" href="index.html">Farnaz Nasehi</a>
-
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -28,21 +28,55 @@
     </nav>
 
     <!-- Spacer for fixed navbar -->
-    <div style="padding-top: 60px;"></div>
+    <div style="padding-top: 80px;"></div>
 
     <!-- About Section -->
-    <section class="about-section text-center text-light">
+    <section class="about-section text-light py-5" style="background: linear-gradient(115deg, #6dcfe7, #1e1e1e);">
         <div class="container">
-            <h1>About Me</h1>
-            <p>I am a Software Developer with over three years of experience in software developemnt and analysis the data. Skilled in Python, SQL, and data visualization, I am passionate about building scalable, efficient software solutions.</p>
+            <h1 class="text-center mb-5">About Me</h1>
+            <div class="row align-items-center">
+                <!-- Profile Image -->
+                <div class="col-md-5 text-center mb-4">
+                    <img src="me.jpg" 
+                         alt="Farnaz Nasehi" 
+                         class="rounded-circle shadow-lg img-fluid" 
+                         style="width: 250px; height: 250px; object-fit: cover; border: 5px solid #ffffff;">
+                </div>
+                <!-- About Text -->
+                <div class="col-md-7">
+                    <p class="lead">
+                        Hello! I'm <span class="text-warning font-weight-bold">Farnaz Nasehi</span>, a <strong>Software Developer</strong> with over three years of experience in crafting modern, scalable, and user-friendly software solutions.
+                    </p>
+                    <p>
+                        My expertise lies in <span class="text-info">web development</span> and <span class="text-info">data-driven solutions</span>. I thrive on building impactful applications that simplify complex challenges, with a focus on clean, maintainable code and seamless user experiences.
+                    </p>
+                    <div class="mt-3">
+                        <strong>What drives me:</strong>
+                        <ul class="list-unstyled mt-2">
+                            <li><i class="fas fa-cogs text-primary"></i> Turning ideas into functional, elegant applications</li>
+                            <li><i class="fas fa-lightbulb text-warning"></i> Solving complex problems with creativity</li>
+                            <li><i class="fas fa-chart-line text-success"></i> Continuous growth and pushing boundaries in tech</li>
+                        </ul>
+                    </div>
+                    <p class="mt-3">
+                        When I'm not coding, you'll find me exploring innovative tools, contributing to open-source projects, or sharing my knowledge with the community.
+                    </p>
+                    <a href="portfolio.html" class="btn btn-primary mt-4">
+                        <i class="fas fa-briefcase"></i> See My Work
+                    </a>
+                </div>
+            </div>
         </div>
     </section>
+
+    <!-- Footer -->
+    <footer class="text-center text-light py-3" style="background-color: #333;">
+        <p>&copy; 2024 Farnaz Nasehi. All rights reserved.</p>
+    </footer>
 
     <!-- Scripts -->
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-    <script src="script.js"></script>
-
 </body>
 </html>
