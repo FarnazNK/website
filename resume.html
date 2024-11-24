@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resume - Farnaz Nasehi</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top shadow-sm">
+        <div class="container">
+            <a class="navbar-brand" href="index.html">Farnaz Nasehi</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item"><a class="nav-link" href="about.html">About</a></li>
+                    <li class="nav-item"><a class="nav-link" href="resume.html">Work Experience </a></li>
+                    <li class="nav-item"><a class="nav-link" href="portfolio.html">Portfolio</a></li>
+                    <li class="nav-item"><a class="nav-link" href="skills.html">Skills</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container" style="padding-top: 80px;">
+        <h1>Work Experience</h1>
+
+        <!-- Experience Cards -->
+        <div class="experience-card" onclick="toggleDetails(this)">
+            <h3>Software Developer</h3>
+            <p>Aug 2024 – Present | Hyperspectral Intelligence Inc, Gibsons, BC, Canada</p>
+            <div class="experience-details">
+                <p>Continuing advanced development and maintenance of a Python-based software framework for processing hyperspectral imaging data, focusing on modular architecture and OOP practices.</p>
+                <p>Enhancing geospatial data visualization tools using Tkinter.</p>
+                <p>Managing project delivery and cloud infrastructure operations via Azure DevOps.</p>
+                <p>Implementing data management systems with ETL processes and JSON data structures.</p>
+                <p>Expanding hyperspectral image analysis capabilities using PCA, K-means, SVM.</p>
+                <p>Building a robust data caching system to dynamically manage spectral data and metadata.</p>
+            </div>
+        </div>
+
+        <div class="experience-card" onclick="toggleDetails(this)">
+            <h3>Data Visualization Specialist</h3>
+            <p>Feb 2024 – July 2024 | Hyperspectral Intelligence Inc, Gibsons, BC, Canada</p>
+            <div class="experience-details">
+                <p>Developed a modular Python-based framework for hyperspectral imaging data, enhancing UI with Tkinter and Balsamiq.</p>
+                <p>Led geospatial visualization projects and streamlined project management with Azure DevOps.</p>
+                <p>Architected data management solutions with ETL processes and JSON structures.</p>
+                <p>Implemented advanced image analysis techniques (PCA, K-means, SVM).</p>
+            </div>
+        </div>
+
+        <div class="experience-card" onclick="toggleDetails(this)">
+            <h3>Data Analyst</h3>
+            <p>May 2023 – Aug 2023 | Finance Department, University of Calgary, Calgary, AB, Canada</p>
+            <div class="experience-details">
+                <p>Engineered SQL queries within a Julia environment to analyze Ethereum blockchain data.</p>
+                <p>Developed models to track and calculate changes in token balances and fee income for liquidity providers.</p>
+                <p>Administered large-scale Linux server environments, optimizing configurations for financial analyses.</p>
+            </div>
+        </div>
+
+        <div class="experience-card" onclick="toggleDetails(this)">
+            <h3>Data Analyst</h3>
+            <p>Sep 2014 – Sep 2020 | Physics Department, University of Tabriz, Tabriz, Iran</p>
+            <div class="experience-details">
+                <p>Streamlined Spark SQL and ETL with machine learning for research efficiency.</p>
+                <p>Developed Power BI dashboards for data trend analysis, integrating Spark SQL and Power BI to save 25% analysis time.</p>
+                <p>Led SQL and Power BI workshops for team skill enhancement.</p>
+            </div>
+        </div>
+
+        <div class="experience-card" onclick="toggleDetails(this)">
+            <h3>Data Research Analyst</h3>
+            <p>May 2012 – Aug 2012 | Economics Department, University of Tabriz, Tabriz, Iran</p>
+            <div class="experience-details">
+                <p>Used machine learning and SQL for precise data cleaning and transformation.</p>
+                <p>Employed machine learning to uncover key patterns in consumer behavior.</p>
+                <p>Utilized Power BI for data visualization, creating actionable reports.</p>
+            </div>
+        </div>
+
+        <div class="experience-card" onclick="toggleDetails(this)">
+            <h3>Research Assistant</h3>
+            <p>Sep 2021 – April 2024 | Physics Department, University of Calgary, Calgary, AB, Canada</p>
+            <div class="experience-details">
+                <p>Handled data extraction, validation, and cleaning for stable isotope data.</p>
+                <p>Performed statistical analyses using PySpark and Excel.</p>
+                <p>Created data visualizations and presentations using Python and Power BI.</p>
+                <p>Developed machine learning models to predict sample origins based on isotope concentration.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>

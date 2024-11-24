@@ -1,33 +1,255 @@
-/* 
-    CSS Styles for Enhanced Web Presentation
-    Author: [Your Name]
-    Date: [Date]
+/* General Layout */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
 
-    Base styles for the webpage body
-*/
 body {
-    font-family: 'Calibri', Tahoma, Geneva, Verdana, sans-serif; /* Font stack prioritizing readability and cross-platform consistency */
-    color: #333; /* Set default text color for better readability */
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+    background-color: #121212;
+    color: #ffffff;
 }
 
-/* 
-    Styles for heading elements, emphasizing readability and aesthetics
-*/
-h1, h2 {
-    color: #445668; /* Define heading text color for clear visibility and elegance */
-}
-
-/* 
-    Styles for the navigation bar, enhancing user experience
-*/
+/* Navbar */
 .navbar {
-    box-shadow: 0 2px 4px rgba(0,0,0,.1); /* Introduce subtle shadow for navbar depth, improving visual hierarchy */
+    transition: box-shadow 0.3s;
 }
 
-/* 
-    Styles for the footer, providing a polished and cohesive design
-*/
-.footer {
-    background-color: #f8f9fa; /* Utilize soft background color for footer, ensuring content stands out */
-    color: #6c757d; /* Set footer text color to maintain harmony with overall design */
+.navbar.shadow-sm {
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Profile Section */
+.profile-section {
+    padding: 80px 20px;
+    text-align: center;
+}
+
+.profile-section h1 {
+    font-size: 2.5em;
+    font-weight: bold;
+}
+
+.profile-section h2 {
+    font-size: 1.5em;
+    color: #9f9fff;
+}
+
+.profile-section p {
+    font-size: 1em;
+    color: #cccccc;
+    margin-top: 10px;
+    line-height: 1.6;
+}
+
+.profile-section .btn-primary {
+    background-color: #6a5acd;
+    border: none;
+    padding: 10px 20px;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+}
+
+.profile-section .btn-primary:hover {
+    background-color: #7a6fff;
+}
+
+/* Social Icons */
+.social-icons {
+    margin-top: 20px;
+}
+
+.social-icons a {
+    color: #9f9fff;
+    font-size: 1.5em;
+    margin: 0 10px;
+    transition: color 0.3s ease;
+}
+
+.social-icons a:hover {
+    color: #ffffff;
+}
+
+/* Profile Image */
+.profile-image img {
+    border-radius: 50%;
+    width: 200px;
+    height: 200px;
+    object-fit: cover;
+    margin-top: 20px;
+}
+
+/* Footer */
+footer {
+    text-align: center;
+    padding: 20px;
+    background-color: #b3a6a6;
+    color: #342222;
+}
+
+/* Skills Section */
+.skills-section {
+    padding: 80px 20px;
+    background-color: #121212;
+}
+
+.skills-section h1 {
+    font-size: 2.5em;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+/* Skill Card */
+.skill-card {
+    background-color: #1e1e1e;
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: transform 0.3s, background-color 0.3s;
+}
+
+.skill-card:hover {
+    transform: translateY(-5px);
+    background-color: #333333;
+}
+
+.skill-card i {
+    font-size: 2em;
+    color: #6a5acd;
+    margin-bottom: 10px;
+}
+
+.skill-card h3 {
+    font-size: 1.3em;
+    color: #ffffff;
+    margin-bottom: 10px;
+}
+
+/* Toggle Section Smooth Transition */
+.details-content, .skill-details, .resume-details {
+    display: none; /* Hidden by default */
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    transition: max-height 0.5s ease, opacity 0.5s ease;
+}
+
+.details-content.show, .skill-details.show, .resume-details.show {
+    display: block;
+    max-height: 500px; /* Adjust as needed */
+    opacity: 1;
+}
+
+/* Resume Section */
+.resume-section {
+    padding: 80px 20px;
+    background-color: #121212;
+}
+
+.resume-section h1 {
+    font-size: 2.5em;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.resume-card {
+    background-color: #1e1e1e;
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 20px;
+    text-align: left;
+    cursor: pointer;
+    transition: transform 0.3s, background-color 0.3s;
+}
+
+.resume-card:hover {
+    transform: translateY(-5px);
+    background-color: #333333;
+}
+
+.resume-card h3 {
+    font-size: 1.3em;
+    color: #ffffff;
+    margin-bottom: 5px;
+}
+
+.resume-card p {
+    font-size: 1.1em;
+    color: #cccccc;
+    margin-bottom: 15px;
+}
+
+.resume-details ul {
+    list-style-type: none;
+    padding-left: 0;
+}
+
+.resume-details ul li {
+    margin-bottom: 10px;
+}
+
+.experience-card {
+    background-color: #222;
+    color: #ddd;
+    padding: 15px;
+    margin-bottom: 15px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.experience-details {
+    display: none;
+    margin-top: 10px;
+}
+
+.experience-card:hover {
+    background-color: #333;
+}
+
+.experience-card h3 {
+    margin: 0;
+}
+
+.experience-card p {
+    margin: 5px 0;
+}
+
+/* General Section Styling */
+section {
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    padding: 80px 20px; /* Adjust padding as needed */
+    color: #fff; /* Ensure text is readable */
+}
+
+/* Main Page (Hero Section) */
+.hero-section {
+    background-image: url('images/background-main.jpg'); /* Replace with the image for the main page */
+}
+
+/* About Section */
+.about-section {
+    background-image: url('images/background-about.jpg'); /* Replace with the image for the About section */
+}
+
+/* Skills Section */
+.skills-section {
+    background-image: url('C:\Users\gradu\Web_Development\Web_Development\images'); /* Replace with the image for the Skills section */
+}
+
+/* Portfolio Section */
+.portfolio-section {
+    background-image: url('images/background-portfolio.jpg'); /* Replace with the image for the Portfolio section */
+}
+
+/* Work Experience Section */
+.work-experience-section {
+    background-image: url('images/background-work-experience.jpg'); /* Replace with the image for the Work Experience section */
 }
