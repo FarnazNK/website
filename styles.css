@@ -349,6 +349,28 @@ footer {
 }
 
 
+.table-container {
+    max-height: 400px; /* Set a fixed height for the table */
+    overflow-y: auto; /* Enable vertical scrolling */
+    border: 1px solid #444;
+    border-radius: 8px;
+    padding: 10px;
+    background-color: #1e1e2f; /* Dark theme background */
+}
+
+.table {
+    width: 100%;
+    margin-bottom: 0; /* No extra margin for the table */
+    color: #ffffff;
+}
+
+.table th {
+    position: sticky;
+    top: 0;
+    background-color: #2a2a3b; /* Sticky header background */
+}
+
+
 /* Main Page (Hero Section) */
 .hero-section {
     background-image: url('images/background-main.jpg');
