@@ -200,3 +200,72 @@ function implementPlotFunctionality() {
         });
     });
 }
+
+
+// Correlation Analysis Button Handler
+document.getElementById('toolbar-correlation').addEventListener('click', () => {
+    dynamicContent.innerHTML = `
+        <section style="background: linear-gradient(115deg, #6dcfe7, #1e1e1e);">
+            <div class="container py-4">
+                <h2 class="text-center text-light">Correlation Analysis</h2>
+                <p class="text-center text-light">Select two numerical columns to compute the correlation coefficient.</p>
+                <label>Select X-Axis:</label>
+                <select id="correlationXAxis" class="form-control mb-3"></select>
+                <label>Select Y-Axis:</label>
+                <select id="correlationYAxis" class="form-control mb-3"></select>
+                <button class="btn btn-primary w-100" id="calculateCorrelation">Calculate Correlation</button>
+                <div id="correlationResult" class="mt-3 text-light"></div>
+            </div>
+        </section>
+    `;
+    populateCorrelationSelectors();
+    implementCorrelationFunctionality();
+});
+
+// Populate column selectors for correlation analysis
+function populateCorrelationSelectors() {
+    const xAxisSelect = document.getElementById('correlationXAxis');
+    const yAxisSelect = document.getElementById('correlationYAxis');
+    xAxisSelect.innerHTML = sharedDataset.headers.map(header => `<option value="${header}">${header}</option>`).join('');
+    yAxisSelect.innerHTML = sharedDataset.headers.map(header => `<option value="${header}">${header}</option>`).join('');
+}
+
+// Correlation Functionality
+function implementCorrelationFunctionality() {
+    document.getElementById('calculateCorrelation').addEventListener('click', () => {
+        if (sharedDataset.headers.length === 0 || sharedDataset.rows.length === 0) {
+            alert('No data loaded. Please upload data in the Data section first.');
+            return;
+        }
+
+        const xAxisColumn = document.getElementById('correlationXAxis').value;
+        const yAxisColumn = document.getElementById('correlationYAxis').value;
+
+        const xAxisIndex = sharedDataset.headers.indexOf(xAxisColumn);
+        const yAxisIndex = sharedDataset.headers.indexOf(yAxisColumn);
+
+        const xData = sharedDataset.rows.map(row => parseFloat(row[xAxisIndex]));
+        const yData = sharedDataset.rows.map(row => parseFloat(row[yAxisIndex]));
+
+        const correlation = calculatePearsonCorrelation(xData, yData);
+
+        document.getElementById('correlationResult').innerHTML = `
+            <h4 class="text-center">Correlation Coefficient: ${correlation.toFixed(3)}</h4>
+        `;
+    });
+}
+
+// Pearson Correlation Function
+function calculatePearsonCorrelation(x, y) {
+    const n = x.length;
+    const meanX = x.reduce((sum, val) => sum + val, 0) / n;
+    const meanY = y.reduce((sum, val) => sum + val, 0) / n;
+
+    const numerator = x.reduce((sum, val, i) => sum + (val - meanX) * (y[i] - meanY), 0);
+    const denominator = Math.sqrt(
+        x.reduce((sum, val) => sum + Math.pow(val - meanX, 2), 0) *
+        y.reduce((sum, val) => sum + Math.pow(val - meanY, 2), 0)
+    );
+
+    return numerator / denominator;
+}
