@@ -20,9 +20,10 @@ document.addEventListener('DOMContentLoaded', () => {
 let sharedDataset = { headers: [], rows: [] };
 
 // Toolbar Logic
-const dynamicContent = document.getElementById('dynamic-content');
+const dynamicContent = document.getElementById('dynamicMenuContent');
 const toolbarButtons = document.querySelectorAll('.btn');
 
+// Update toolbar button states
 toolbarButtons.forEach(button => {
     button.addEventListener('click', () => {
         toolbarButtons.forEach(btn => {
@@ -34,13 +35,13 @@ toolbarButtons.forEach(button => {
     });
 });
 
-// Data Button Handler
+// Data Section
 document.getElementById('toolbar-data').addEventListener('click', () => {
     dynamicContent.innerHTML = `
         <section style="background: linear-gradient(115deg, #6dcfe7, #1e1e1e);">
             <div class="container py-4">
-                <h2 class="text-center text-light">Data</h2>
-                <p class="text-center text-light">Upload your dataset to view it in a professional data table.</p>
+                <h4 class="text-light">Data Section</h4>
+                <p class="text-light">Upload your dataset to view it in a professional data table.</p>
                 <input type="file" id="dataFileInput" class="form-control mb-3" accept=".csv">
                 <div class="table-container bg-dark rounded p-3">
                     <table class="table table-dark table-striped">
@@ -54,7 +55,6 @@ document.getElementById('toolbar-data').addEventListener('click', () => {
     implementDataLoadingFunctionality();
 });
 
-// Data Loading Functionality
 function implementDataLoadingFunctionality() {
     const fileInput = document.getElementById('dataFileInput');
     fileInput.addEventListener('change', () => {
@@ -94,8 +94,13 @@ function implementDataLoadingFunctionality() {
     });
 }
 
-// Plot Button Handler
+// Plot Section
 document.getElementById('toolbar-plots').addEventListener('click', () => {
+    if (!sharedDataset.headers.length) {
+        alert('No data available. Please upload data in the Data section.');
+        return;
+    }
+
     dynamicContent.innerHTML = `
         <section style="background: linear-gradient(115deg, #6dcfe7, #1e1e1e);">
             <div class="container py-4 d-flex">
@@ -112,16 +117,6 @@ document.getElementById('toolbar-plots').addEventListener('click', () => {
                         <option value="scatter">Scatter Plot</option>
                         <option value="pie">Pie Chart</option>
                     </select>
-                    <label for="chartColor">Choose Plot Color:</label>
-                    <input type="color" id="chartColor" class="form-control mb-3" value="#4bc0c0">
-                    <label for="canvasWidth">Width (px):</label>
-                    <input type="number" id="canvasWidth" class="form-control mb-3" value="800" min="100">
-                    <label for="canvasHeight">Height (px):</label>
-                    <input type="number" id="canvasHeight" class="form-control mb-3" value="400" min="100">
-                    <div class="form-check mb-3">
-                        <input class="form-check-input" type="checkbox" id="toggleLegend" checked>
-                        <label class="form-check-label" for="toggleLegend">Show Legend</label>
-                    </div>
                     <button class="btn btn-primary w-100" id="generateChart">Generate Chart</button>
                 </div>
                 <div class="col-9">
@@ -134,7 +129,6 @@ document.getElementById('toolbar-plots').addEventListener('click', () => {
     implementPlotFunctionality();
 });
 
-// Populate column selectors for X and Y axes
 function populateColumnSelectors() {
     const xAxisSelect = document.getElementById('xAxisColumn');
     const yAxisSelect = document.getElementById('yAxisColumn');
@@ -142,130 +136,147 @@ function populateColumnSelectors() {
     yAxisSelect.innerHTML = sharedDataset.headers.map(header => `<option value="${header}">${header}</option>`).join('');
 }
 
-// Plot Functionality
 function implementPlotFunctionality() {
     let chart;
+
     document.getElementById('generateChart').addEventListener('click', () => {
-        if (sharedDataset.headers.length === 0 || sharedDataset.rows.length === 0) {
-            alert('No data loaded. Please upload data in the Data section first.');
+        const xAxisColumn = document.getElementById('xAxisColumn').value;
+        const yAxisColumn = document.getElementById('yAxisColumn').value;
+
+        if (!xAxisColumn || !yAxisColumn) {
+            alert('Please select both X and Y axes.');
             return;
         }
 
-        const xAxisColumn = document.getElementById('xAxisColumn').value;
-        const yAxisColumn = document.getElementById('yAxisColumn').value;
-        const chartType = document.getElementById('chartType').value;
-        const chartColor = document.getElementById('chartColor').value;
-        const canvasWidth = parseInt(document.getElementById('canvasWidth').value);
-        const canvasHeight = parseInt(document.getElementById('canvasHeight').value);
-        const showLegend = document.getElementById('toggleLegend').checked;
-
-        const chartCanvas = document.getElementById('chartCanvas');
-        chartCanvas.width = canvasWidth;
-        chartCanvas.height = canvasHeight;
-        const ctx = chartCanvas.getContext('2d');
-
-        const xAxisIndex = sharedDataset.headers.indexOf(xAxisColumn);
-        const yAxisIndex = sharedDataset.headers.indexOf(yAxisColumn);
-
-        const labels = sharedDataset.rows.map(row => row[xAxisIndex]);
-        const data = sharedDataset.rows.map(row => parseFloat(row[yAxisIndex]));
+        const chartCanvas = document.getElementById('chartCanvas').getContext('2d');
+        const labels = sharedDataset.rows.map(row => row[sharedDataset.headers.indexOf(xAxisColumn)]);
+        const data = sharedDataset.rows.map(row => parseFloat(row[sharedDataset.headers.indexOf(yAxisColumn)]));
 
         if (chart) chart.destroy();
 
-        chart = new Chart(ctx, {
-            type: chartType,
+        chart = new Chart(chartCanvas, {
+            type: document.getElementById('chartType').value,
             data: {
                 labels: labels,
                 datasets: [{
                     label: `${yAxisColumn} vs ${xAxisColumn}`,
                     data: data,
-                    backgroundColor: chartColor,
-                    borderColor: chartColor,
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
                     borderWidth: 1
                 }]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        display: showLegend
-                    }
-                },
                 scales: {
                     x: { title: { display: true, text: xAxisColumn } },
                     y: { title: { display: true, text: yAxisColumn } }
                 }
             }
         });
+
+        console.log('Chart generated successfully.');
     });
 }
 
+// Statistics Section
+document.getElementById('toolbar-statistics').addEventListener('click', () => {
+    if (!sharedDataset.headers.length) {
+        alert('No data available. Please upload data in the Data section.');
+        return;
+    }
 
-// Correlation Analysis Button Handler
-document.getElementById('toolbar-correlation').addEventListener('click', () => {
     dynamicContent.innerHTML = `
         <section style="background: linear-gradient(115deg, #6dcfe7, #1e1e1e);">
             <div class="container py-4">
-                <h2 class="text-center text-light">Correlation Analysis</h2>
-                <p class="text-center text-light">Select two numerical columns to compute the correlation coefficient.</p>
-                <label>Select X-Axis:</label>
-                <select id="correlationXAxis" class="form-control mb-3"></select>
-                <label>Select Y-Axis:</label>
-                <select id="correlationYAxis" class="form-control mb-3"></select>
-                <button class="btn btn-primary w-100" id="calculateCorrelation">Calculate Correlation</button>
-                <div id="correlationResult" class="mt-3 text-light"></div>
+                <h4 class="text-light">Statistics Section</h4>
+                <div class="row">
+                    <div class="col-md-4 bg-dark text-light p-3 rounded shadow-sm">
+                        <h5>Summary Statistics</h5>
+                        <select id="statsColumn" class="form-control mb-3">
+                            <option value="">Select Column</option>
+                        </select>
+                        <button class="btn btn-primary mb-3" id="generateStats">Generate Statistics</button>
+                        <div id="statsResult" class="text-light"></div>
+                    </div>
+                    <div class="col-md-4 bg-dark text-light p-3 rounded shadow-sm">
+                        <h5>Correlation</h5>
+                        <label>Select Column 1:</label>
+                        <select id="correlationColumn1" class="form-control mb-3"></select>
+                        <label>Select Column 2:</label>
+                        <select id="correlationColumn2" class="form-control mb-3"></select>
+                        <button class="btn btn-primary mb-3" id="calculateCorrelation">Calculate Correlation</button>
+                        <div id="correlationResult" class="text-light"></div>
+                    </div>
+                </div>
             </div>
         </section>
     `;
-    populateCorrelationSelectors();
-    implementCorrelationFunctionality();
+
+    populateStatsSelectors();
+    implementStatisticsFunctionality();
 });
 
-// Populate column selectors for correlation analysis
-function populateCorrelationSelectors() {
-    const xAxisSelect = document.getElementById('correlationXAxis');
-    const yAxisSelect = document.getElementById('correlationYAxis');
-    xAxisSelect.innerHTML = sharedDataset.headers.map(header => `<option value="${header}">${header}</option>`).join('');
-    yAxisSelect.innerHTML = sharedDataset.headers.map(header => `<option value="${header}">${header}</option>`).join('');
+function populateStatsSelectors() {
+    const columnOptions = sharedDataset.headers.map(header => `<option value="${header}">${header}</option>`).join('');
+    document.getElementById('statsColumn').innerHTML = `<option value="">Select Column</option>${columnOptions}`;
+    document.getElementById('correlationColumn1').innerHTML = columnOptions;
+    document.getElementById('correlationColumn2').innerHTML = columnOptions;
 }
 
-// Correlation Functionality
-function implementCorrelationFunctionality() {
-    document.getElementById('calculateCorrelation').addEventListener('click', () => {
-        if (sharedDataset.headers.length === 0 || sharedDataset.rows.length === 0) {
-            alert('No data loaded. Please upload data in the Data section first.');
+function implementStatisticsFunctionality() {
+    // Generate Summary Statistics
+    document.getElementById('generateStats').addEventListener('click', () => {
+        const column = document.getElementById('statsColumn').value;
+        if (!column) {
+            alert('Please select a column.');
             return;
         }
 
-        const xAxisColumn = document.getElementById('correlationXAxis').value;
-        const yAxisColumn = document.getElementById('correlationYAxis').value;
+        const columnIndex = sharedDataset.headers.indexOf(column);
+        const values = sharedDataset.rows.map(row => parseFloat(row[columnIndex])).filter(val => !isNaN(val));
 
-        const xAxisIndex = sharedDataset.headers.indexOf(xAxisColumn);
-        const yAxisIndex = sharedDataset.headers.indexOf(yAxisColumn);
+        const mean = values.reduce((sum, val) => sum + val, 0) / values.length;
+        const median = values.sort((a, b) => a - b)[Math.floor(values.length / 2)];
+        const variance = values.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) / values.length;
+        const stdDev = Math.sqrt(variance);
 
-        const xData = sharedDataset.rows.map(row => parseFloat(row[xAxisIndex]));
-        const yData = sharedDataset.rows.map(row => parseFloat(row[yAxisIndex]));
-
-        const correlation = calculatePearsonCorrelation(xData, yData);
-
-        document.getElementById('correlationResult').innerHTML = `
-            <h4 class="text-center">Correlation Coefficient: ${correlation.toFixed(3)}</h4>
+        document.getElementById('statsResult').innerHTML = `
+            <p>Mean: ${mean.toFixed(2)}</p>
+            <p>Median: ${median.toFixed(2)}</p>
+            <p>Variance: ${variance.toFixed(2)}</p>
+            <p>Standard Deviation: ${stdDev.toFixed(2)}</p>
         `;
     });
-}
 
-// Pearson Correlation Function
-function calculatePearsonCorrelation(x, y) {
-    const n = x.length;
-    const meanX = x.reduce((sum, val) => sum + val, 0) / n;
-    const meanY = y.reduce((sum, val) => sum + val, 0) / n;
+    // Calculate Correlation
+    document.getElementById('calculateCorrelation').addEventListener('click', () => {
+        const column1 = document.getElementById('correlationColumn1').value;
+        const column2 = document.getElementById('correlationColumn2').value;
 
-    const numerator = x.reduce((sum, val, i) => sum + (val - meanX) * (y[i] - meanY), 0);
-    const denominator = Math.sqrt(
-        x.reduce((sum, val) => sum + Math.pow(val - meanX, 2), 0) *
-        y.reduce((sum, val) => sum + Math.pow(val - meanY, 2), 0)
-    );
+        if (!column1 || !column2) {
+            alert('Please select both columns.');
+            return;
+        }
 
-    return numerator / denominator;
+        const columnIndex1 = sharedDataset.headers.indexOf(column1);
+        const columnIndex2 = sharedDataset.headers.indexOf(column2);
+
+        const values1 = sharedDataset.rows.map(row => parseFloat(row[columnIndex1])).filter(val => !isNaN(val));
+        const values2 = sharedDataset.rows.map(row => parseFloat(row[columnIndex2])).filter(val => !isNaN(val));
+
+        const mean1 = values1.reduce((sum, val) => sum + val, 0) / values1.length;
+        const mean2 = values2.reduce((sum, val) => sum + val, 0) / values2.length;
+
+        const numerator = values1.reduce((sum, val, i) => sum + (val - mean1) * (values2[i] - mean2), 0);
+        const denominator = Math.sqrt(
+            values1.reduce((sum, val) => sum + Math.pow(val - mean1, 2), 0) *
+            values2.reduce((sum, val) => sum + Math.pow(val - mean2, 2), 0)
+        );
+
+        const correlation = numerator / denominator;
+
+        document.getElementById('correlationResult').innerHTML = `<p>Correlation: ${correlation.toFixed(2)}</p>`;
+    });
 }

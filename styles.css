@@ -370,6 +370,35 @@ footer {
     background-color: #2a2a3b; /* Sticky header background */
 }
 
+.data-menu-section {
+    margin-top: 20px;
+}
+
+.menu-item {
+    cursor: pointer;
+    text-align: left;
+}
+
+.menu-item:hover {
+    background-color: #6dcfe7;
+    color: #fff;
+}
+
+#dynamicMenuContent {
+    min-height: 300px;
+}
+
+.list-group-item {
+    background-color: #333;
+    color: #fff;
+    border: none;
+    margin-bottom: 5px;
+}
+
+.list-group-item:hover {
+    background-color: #444;
+    color: #6dcfe7;
+}
 
 /* Main Page (Hero Section) */
 .hero-section {
