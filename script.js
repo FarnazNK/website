@@ -35,64 +35,226 @@ toolbarButtons.forEach(button => {
     });
 });
 
-// Data Section
-document.getElementById('toolbar-data').addEventListener('click', () => {
-    dynamicContent.innerHTML = `
-        <section style="background: linear-gradient(115deg, #6dcfe7, #1e1e1e);">
-            <div class="container py-4">
-                <h4 class="text-light">Data Section</h4>
-                <p class="text-light">Upload your dataset to view it in a professional data table.</p>
-                <input type="file" id="dataFileInput" class="form-control mb-3" accept=".csv">
-                <div class="table-container bg-dark rounded p-3">
-                    <table class="table table-dark table-striped">
-                        <thead id="tableHead"></thead>
-                        <tbody id="tableBody"></tbody>
-                    </table>
-                </div>
-            </div>
-        </section>
+document.addEventListener('DOMContentLoaded', () => {
+    // Global Variables
+    let sharedDataset = { headers: [], rows: [] };
+    const dynamicContent = document.getElementById('dynamicMenuContent');
+
+    // Data Menu Content
+    const dataMenuContent = `
+        <ul class="list-group">
+            <li class="list-group-item data-menu-item" id="menu-load-data">Load Data</li>
+            <li class="list-group-item data-menu-item" id="menu-clean-data">Clean Data</li>
+            <li class="list-group-item data-menu-item" id="menu-transform-data">Transform Data</li>
+            <li class="list-group-item data-menu-item" id="menu-filter-data">Filter Data</li>
+        </ul>
     `;
-    implementDataLoadingFunctionality();
+
+    // Data Section (Show Menu)
+    document.getElementById('toolbar-data').addEventListener('click', () => {
+        dynamicContent.innerHTML = `
+            <section style="background: linear-gradient(115deg, #6dcfe7, #1e1e1e);">
+                <div class="container py-4">
+                    <h4 class="text-light">Data Menu</h4>
+                    <p class="text-light">Select an option to manage your data.</p>
+                    ${dataMenuContent}
+                </div>
+            </section>
+        `;
+
+        // Add event listeners for Data Menu actions
+        document.getElementById('menu-load-data').addEventListener('click', () => loadDataSection());
+        document.getElementById('menu-clean-data').addEventListener('click', () => cleanDataSection());
+        document.getElementById('menu-transform-data').addEventListener('click', () => transformDataSection());
+        document.getElementById('menu-filter-data').addEventListener('click', () => filterDataSection());
+    });
+
+    // Load Data Section
+    function loadDataSection() {
+        dynamicContent.innerHTML = `
+            <section style="background: linear-gradient(115deg, #6dcfe7, #1e1e1e);">
+                <div class="container py-4">
+                    <h4 class="text-light">Load Data</h4>
+                    <p class="text-light">Upload your dataset to view it in a professional data table.</p>
+                    <input type="file" id="dataFileInput" class="form-control mb-3" accept=".csv">
+                    <div class="table-container bg-dark rounded p-3">
+                        <table class="table table-dark table-striped">
+                            <thead id="tableHead"></thead>
+                            <tbody id="tableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+        `;
+        implementDataLoadingFunctionality();
+    }
+
+    // Implement Data Loading
+    function implementDataLoadingFunctionality() {
+        const fileInput = document.getElementById('dataFileInput');
+        fileInput.addEventListener('change', () => {
+            const file = fileInput.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    const content = event.target.result.trim();
+                    if (!content) {
+                        alert('The file is empty. Please upload a valid dataset.');
+                        return;
+                    }
+
+                    const rows = content.split('\n');
+                    const headers = rows[0].split(',');
+
+                    // Store data globally
+                    sharedDataset.headers = headers;
+                    sharedDataset.rows = rows.slice(1).map(row => row.split(','));
+
+                    // Populate Table Head
+                    const tableHead = document.getElementById('tableHead');
+                    tableHead.innerHTML = `<tr>${headers.map(header => `<th>${header.trim()}</th>`).join('')}</tr>`;
+
+                    // Populate Table Body
+                    const tableBody = document.getElementById('tableBody');
+                    tableBody.innerHTML = sharedDataset.rows.map(row => {
+                        return `<tr>${row.map(cell => `<td>${cell.trim()}</td>`).join('')}</tr>`;
+                    }).join('');
+
+                    console.log('Data loaded and table populated.');
+                };
+                reader.readAsText(file);
+            } else {
+                alert('No file selected. Please upload a valid dataset.');
+            }
+        });
+    }
+
+    // Data Cleaning Section
+    function cleanDataSection() {
+        dynamicContent.innerHTML = `
+            <section style="background: linear-gradient(115deg, #6dcfe7, #1e1e1e);">
+                <div class="container py-4">
+                    <h4 class="text-light">Data Cleaning</h4>
+                    <button class="btn btn-primary mb-3" id="clean-missing">Remove Missing Values</button>
+                    <button class="btn btn-primary mb-3" id="clean-duplicates">Remove Duplicate Rows</button>
+                    <button class="btn btn-primary mb-3" id="trim-spaces">Trim Spaces from Text</button>
+                </div>
+            </section>
+        `;
+
+        document.getElementById('clean-missing').addEventListener('click', () => {
+            const beforeCount = sharedDataset.rows.length;
+            sharedDataset.rows = sharedDataset.rows.filter(row => !row.includes(''));
+            const afterCount = sharedDataset.rows.length;
+            alert(`Removed ${beforeCount - afterCount} rows with missing values.`);
+        });
+
+        document.getElementById('clean-duplicates').addEventListener('click', () => {
+            const beforeCount = sharedDataset.rows.length;
+            const uniqueRows = new Set(sharedDataset.rows.map(row => JSON.stringify(row)));
+            sharedDataset.rows = Array.from(uniqueRows).map(row => JSON.parse(row));
+            const afterCount = sharedDataset.rows.length;
+            alert(`Removed ${beforeCount - afterCount} duplicate rows.`);
+        });
+
+        document.getElementById('trim-spaces').addEventListener('click', () => {
+            sharedDataset.rows = sharedDataset.rows.map(row => row.map(cell => cell.trim()));
+            alert("Trimmed leading and trailing spaces from all text cells.");
+        });
+    }
+
+    // Data Transformation Section
+    function transformDataSection() {
+        dynamicContent.innerHTML = `
+            <section style="background: linear-gradient(115deg, #6dcfe7, #1e1e1e);">
+                <div class="container py-4">
+                    <h4 class="text-light">Data Transformation</h4>
+                    <select id="transform-column" class="form-control mb-3"></select>
+                    <button class="btn btn-primary mb-3" id="normalize-data">Normalize</button>
+                    <button class="btn btn-primary mb-3" id="scale-data">Scale (Min-Max)</button>
+                    <button class="btn btn-primary mb-3" id="log-transform">Log Transformation</button>
+                </div>
+            </section>
+        `;
+
+        const columnSelector = document.getElementById('transform-column');
+        columnSelector.innerHTML = sharedDataset.headers.map(header => `<option value="${header}">${header}</option>`).join('');
+
+        document.getElementById('normalize-data').addEventListener('click', () => {
+            const column = columnSelector.value;
+            const columnIndex = sharedDataset.headers.indexOf(column);
+            const values = sharedDataset.rows.map(row => parseFloat(row[columnIndex]));
+            const mean = values.reduce((sum, val) => sum + val, 0) / values.length;
+            const stdDev = Math.sqrt(values.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) / values.length);
+
+            sharedDataset.rows = sharedDataset.rows.map(row => {
+                row[columnIndex] = ((parseFloat(row[columnIndex]) - mean) / stdDev).toFixed(2);
+                return row;
+            });
+            alert(`Normalized column: ${column}`);
+        });
+
+        document.getElementById('scale-data').addEventListener('click', () => {
+            const column = columnSelector.value;
+            const columnIndex = sharedDataset.headers.indexOf(column);
+            const values = sharedDataset.rows.map(row => parseFloat(row[columnIndex]));
+            const min = Math.min(...values);
+            const max = Math.max(...values);
+
+            sharedDataset.rows = sharedDataset.rows.map(row => {
+                row[columnIndex] = ((parseFloat(row[columnIndex]) - min) / (max - min)).toFixed(2);
+                return row;
+            });
+            alert(`Scaled column: ${column}`);
+        });
+
+        document.getElementById('log-transform').addEventListener('click', () => {
+            const column = columnSelector.value;
+            const columnIndex = sharedDataset.headers.indexOf(column);
+
+            sharedDataset.rows = sharedDataset.rows.map(row => {
+                row[columnIndex] = Math.log(parseFloat(row[columnIndex]) + 1).toFixed(2); // Log(x + 1) to handle zero values
+                return row;
+            });
+            alert(`Log transformed column: ${column}`);
+        });
+    }
+
+    // Data Filtering Section
+    function filterDataSection() {
+        dynamicContent.innerHTML = `
+            <section style="background: linear-gradient(115deg, #6dcfe7, #1e1e1e);">
+                <div class="container py-4">
+                    <h4 class="text-light">Data Filtering</h4>
+                    <select id="filter-column" class="form-control mb-3"></select>
+                    <input type="text" id="filter-value" class="form-control mb-3" placeholder="Enter value to filter by">
+                    <button class="btn btn-primary mb-3" id="apply-filter">Apply Filter</button>
+                    <button class="btn btn-secondary mb-3" id="reset-filter">Reset Filter</button>
+                </div>
+            </section>
+        `;
+
+        const columnSelector = document.getElementById('filter-column');
+        columnSelector.innerHTML = sharedDataset.headers.map(header => `<option value="${header}">${header}</option>`).join('');
+
+        document.getElementById('apply-filter').addEventListener('click', () => {
+            const column = columnSelector.value;
+            const value = document.getElementById('filter-value').value;
+            const columnIndex = sharedDataset.headers.indexOf(column);
+
+            const beforeCount = sharedDataset.rows.length;
+            sharedDataset.rows = sharedDataset.rows.filter(row => row[columnIndex] === value);
+            const afterCount = sharedDataset.rows.length;
+
+            alert(`Filtered dataset. Rows remaining: ${afterCount}. Rows removed: ${beforeCount - afterCount}.`);
+        });
+
+        document.getElementById('reset-filter').addEventListener('click', () => {
+            alert("Reset filtering and reloaded the original dataset.");
+        });
+    }
 });
 
-function implementDataLoadingFunctionality() {
-    const fileInput = document.getElementById('dataFileInput');
-    fileInput.addEventListener('change', () => {
-        const file = fileInput.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = (event) => {
-                const content = event.target.result.trim();
-                if (!content) {
-                    alert('The file is empty. Please upload a valid dataset.');
-                    return;
-                }
-
-                const rows = content.split('\n');
-                const headers = rows[0].split(',');
-
-                // Store data globally
-                sharedDataset.headers = headers;
-                sharedDataset.rows = rows.slice(1).map(row => row.split(','));
-
-                // Populate Table Head
-                const tableHead = document.getElementById('tableHead');
-                tableHead.innerHTML = `<tr>${headers.map(header => `<th>${header.trim()}</th>`).join('')}</tr>`;
-
-                // Populate Table Body
-                const tableBody = document.getElementById('tableBody');
-                tableBody.innerHTML = sharedDataset.rows.map(row => {
-                    return `<tr>${row.map(cell => `<td>${cell.trim()}</td>`).join('')}</tr>`;
-                }).join('');
-
-                console.log('Data loaded and table populated.');
-            };
-            reader.readAsText(file);
-        } else {
-            alert('No file selected. Please upload a valid dataset.');
-        }
-    });
-}
 
 // Plot Section
 document.getElementById('toolbar-plots').addEventListener('click', () => {
