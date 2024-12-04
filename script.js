@@ -1,95 +1,57 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // Smooth scroll for navigation links with in-page anchors
-    document.querySelectorAll('a.nav-link').forEach(anchor => {
-        anchor.addEventListener('click', function (e) {
-            const targetPage = this.getAttribute('href');
-            if (targetPage && targetPage.startsWith('#')) {
-                e.preventDefault();
-                const targetElement = document.getElementById(targetPage.substring(1));
-                if (targetElement) {
-                    targetElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                }
-            }
-        });
-    });
-
-    console.log('Portfolio website interactions ready');
-});
-
-// Global variable to store shared data
-let sharedDataset = { headers: [], rows: [] };
-
-// Toolbar Logic
-const dynamicContent = document.getElementById('dynamicMenuContent');
-const toolbarButtons = document.querySelectorAll('.btn');
-
-// Update toolbar button states
-toolbarButtons.forEach(button => {
-    button.addEventListener('click', () => {
-        toolbarButtons.forEach(btn => {
-            btn.classList.remove('btn-primary');
-            btn.classList.add('btn-secondary');
-        });
-        button.classList.add('btn-primary');
-        button.classList.remove('btn-secondary');
-    });
-});
-
-document.addEventListener('DOMContentLoaded', () => {
     // Global Variables
     let sharedDataset = { headers: [], rows: [] };
-    const dynamicContent = document.getElementById('dynamicMenuContent');
 
-    // Data Menu Content
-    const dataMenuContent = `
-        <ul class="list-group">
-            <li class="list-group-item data-menu-item" id="menu-load-data">Load Data</li>
-            <li class="list-group-item data-menu-item" id="menu-clean-data">Clean Data</li>
-            <li class="list-group-item data-menu-item" id="menu-transform-data">Transform Data</li>
-            <li class="list-group-item data-menu-item" id="menu-filter-data">Filter Data</li>
-        </ul>
+    // Define static layout for the Data section with persistent menu
+    const dynamicContent = document.getElementById('dynamicMenuContent');
+    const dataSectionContent = `
+        <div class="row">
+            <!-- Static Sidebar Menu -->
+            <div class="col-md-3 bg-dark p-3 rounded shadow-sm menu-section">
+                <h4 class="text-light">Menu</h4>
+                <ul class="list-group">
+                    <li class="list-group-item menu-item" id="menu-load-data">Load Data</li>
+                    <li class="list-group-item menu-item" id="menu-clean-data">Clean Data</li>
+                    <li class="list-group-item menu-item" id="menu-transform-data">Transform Data</li>
+                    <li class="list-group-item menu-item" id="menu-filter-data">Filter Data</li>
+                </ul>
+            </div>
+            <!-- Dynamic Content Area -->
+            <div class="col-md-9 bg-light p-3 rounded shadow-sm" id="data-content">
+                <h4 class="text-center">Select a menu item to see options</h4>
+            </div>
+        </div>
     `;
 
-    // Data Section (Show Menu)
+    // Toolbar Button for Data Section
     document.getElementById('toolbar-data').addEventListener('click', () => {
-        dynamicContent.innerHTML = `
-            <section style="background: linear-gradient(115deg, #6dcfe7, #1e1e1e);">
-                <div class="container py-4">
-                    <h4 class="text-light">Data Menu</h4>
-                    <p class="text-light">Select an option to manage your data.</p>
-                    ${dataMenuContent}
-                </div>
-            </section>
-        `;
+        dynamicContent.innerHTML = dataSectionContent;
 
         // Add event listeners for Data Menu actions
-        document.getElementById('menu-load-data').addEventListener('click', () => loadDataSection());
-        document.getElementById('menu-clean-data').addEventListener('click', () => cleanDataSection());
-        document.getElementById('menu-transform-data').addEventListener('click', () => transformDataSection());
-        document.getElementById('menu-filter-data').addEventListener('click', () => filterDataSection());
+        document.getElementById('menu-load-data').addEventListener('click', loadDataSection);
+        document.getElementById('menu-clean-data').addEventListener('click', cleanDataSection);
+        document.getElementById('menu-transform-data').addEventListener('click', transformDataSection);
+        document.getElementById('menu-filter-data').addEventListener('click', filterDataSection);
     });
 
     // Load Data Section
     function loadDataSection() {
-        dynamicContent.innerHTML = `
-            <section style="background: linear-gradient(115deg, #6dcfe7, #1e1e1e);">
-                <div class="container py-4">
-                    <h4 class="text-light">Load Data</h4>
-                    <p class="text-light">Upload your dataset to view it in a professional data table.</p>
-                    <input type="file" id="dataFileInput" class="form-control mb-3" accept=".csv">
-                    <div class="table-container bg-dark rounded p-3">
-                        <table class="table table-dark table-striped">
-                            <thead id="tableHead"></thead>
-                            <tbody id="tableBody"></tbody>
-                        </table>
-                    </div>
-                </div>
-            </section>
+        const contentArea = document.getElementById('data-content');
+        contentArea.innerHTML = `
+            <h4 class="text-dark">Load Data</h4>
+            <p class="text-dark">Upload your dataset to view it in a professional data table.</p>
+            <input type="file" id="dataFileInput" class="form-control mb-3" accept=".csv">
+            <div class="table-container bg-dark rounded p-3">
+                <table class="table table-dark table-striped">
+                    <thead id="tableHead"></thead>
+                    <tbody id="tableBody"></tbody>
+                </table>
+            </div>
         `;
         implementDataLoadingFunctionality();
     }
 
-    // Implement Data Loading
+    // Implement Data Loading Functionality
     function implementDataLoadingFunctionality() {
         const fileInput = document.getElementById('dataFileInput');
         fileInput.addEventListener('change', () => {
@@ -131,15 +93,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Data Cleaning Section
     function cleanDataSection() {
-        dynamicContent.innerHTML = `
-            <section style="background: linear-gradient(115deg, #6dcfe7, #1e1e1e);">
-                <div class="container py-4">
-                    <h4 class="text-light">Data Cleaning</h4>
-                    <button class="btn btn-primary mb-3" id="clean-missing">Remove Missing Values</button>
-                    <button class="btn btn-primary mb-3" id="clean-duplicates">Remove Duplicate Rows</button>
-                    <button class="btn btn-primary mb-3" id="trim-spaces">Trim Spaces from Text</button>
-                </div>
-            </section>
+        const contentArea = document.getElementById('data-content');
+        contentArea.innerHTML = `
+            <h4 class="text-dark">Data Cleaning</h4>
+            <button class="btn btn-primary mb-3" id="clean-missing">Remove Missing Values</button>
+            <button class="btn btn-primary mb-3" id="clean-duplicates">Remove Duplicate Rows</button>
+            <button class="btn btn-primary mb-3" id="trim-spaces">Trim Spaces from Text</button>
         `;
 
         document.getElementById('clean-missing').addEventListener('click', () => {
@@ -165,16 +124,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Data Transformation Section
     function transformDataSection() {
-        dynamicContent.innerHTML = `
-            <section style="background: linear-gradient(115deg, #6dcfe7, #1e1e1e);">
-                <div class="container py-4">
-                    <h4 class="text-light">Data Transformation</h4>
-                    <select id="transform-column" class="form-control mb-3"></select>
-                    <button class="btn btn-primary mb-3" id="normalize-data">Normalize</button>
-                    <button class="btn btn-primary mb-3" id="scale-data">Scale (Min-Max)</button>
-                    <button class="btn btn-primary mb-3" id="log-transform">Log Transformation</button>
-                </div>
-            </section>
+        const contentArea = document.getElementById('data-content');
+        contentArea.innerHTML = `
+            <h4 class="text-dark">Data Transformation</h4>
+            <select id="transform-column" class="form-control mb-3"></select>
+            <button class="btn btn-primary mb-3" id="normalize-data">Normalize</button>
+            <button class="btn btn-primary mb-3" id="scale-data">Scale (Min-Max)</button>
+            <button class="btn btn-primary mb-3" id="log-transform">Log Transformation</button>
         `;
 
         const columnSelector = document.getElementById('transform-column');
@@ -219,41 +175,8 @@ document.addEventListener('DOMContentLoaded', () => {
             alert(`Log transformed column: ${column}`);
         });
     }
-
-    // Data Filtering Section
-    function filterDataSection() {
-        dynamicContent.innerHTML = `
-            <section style="background: linear-gradient(115deg, #6dcfe7, #1e1e1e);">
-                <div class="container py-4">
-                    <h4 class="text-light">Data Filtering</h4>
-                    <select id="filter-column" class="form-control mb-3"></select>
-                    <input type="text" id="filter-value" class="form-control mb-3" placeholder="Enter value to filter by">
-                    <button class="btn btn-primary mb-3" id="apply-filter">Apply Filter</button>
-                    <button class="btn btn-secondary mb-3" id="reset-filter">Reset Filter</button>
-                </div>
-            </section>
-        `;
-
-        const columnSelector = document.getElementById('filter-column');
-        columnSelector.innerHTML = sharedDataset.headers.map(header => `<option value="${header}">${header}</option>`).join('');
-
-        document.getElementById('apply-filter').addEventListener('click', () => {
-            const column = columnSelector.value;
-            const value = document.getElementById('filter-value').value;
-            const columnIndex = sharedDataset.headers.indexOf(column);
-
-            const beforeCount = sharedDataset.rows.length;
-            sharedDataset.rows = sharedDataset.rows.filter(row => row[columnIndex] === value);
-            const afterCount = sharedDataset.rows.length;
-
-            alert(`Filtered dataset. Rows remaining: ${afterCount}. Rows removed: ${beforeCount - afterCount}.`);
-        });
-
-        document.getElementById('reset-filter').addEventListener('click', () => {
-            alert("Reset filtering and reloaded the original dataset.");
-        });
-    }
 });
+
 
 
 // Plot Section
