@@ -385,28 +385,28 @@ function implementPlotFunctionality() {
         document.getElementById('correlationColumn2').innerHTML = columnOptions;
     }
 
-    function implementStatisticsFunctionality() {
-        // Logic for statistics
-    }
 
-    function loadDataSection() {
-        const contentArea = document.getElementById('data-content');
-        contentArea.innerHTML = `
-            <h4 class="text-dark">Load Data</h4>
-            <p class="text-dark">Upload your dataset to view it in a professional data table.</p>
-            <input type="file" id="dataFileInput" class="form-control mb-3" accept=".csv">
-            <div class="table-container bg-dark rounded p-3">
-                <table class="table table-dark table-striped">
-                    <thead id="tableHead"></thead>
-                    <tbody id="tableBody"></tbody>
-                </table>
-            </div>`;
-        implementDataLoadingFunctionality();
+    function attachDataMenuEventListeners() {
+        document.getElementById('menu-load-data').addEventListener('click', () => {
+            document.getElementById('data-content').innerHTML = `
+                <div class="table-container bg-dark rounded p-3">
+                    <table class="table table-dark table-striped">
+                        <thead id="tableHead"></thead>
+                        <tbody id="tableBody"></tbody>
+                    </table>
+                </div>`;
+            triggerFileDialogAndLoadData();
+        });
     }
-
-    // Implement Data Loading Functionality
-    function implementDataLoadingFunctionality() {
-        const fileInput = document.getElementById('dataFileInput');
+    
+    function triggerFileDialogAndLoadData() {
+        const fileInput = document.createElement('input');
+        fileInput.type = 'file';
+        fileInput.accept = '.csv';
+        fileInput.style.display = 'none';
+    
+        document.body.appendChild(fileInput);
+    
         fileInput.addEventListener('change', () => {
             const file = fileInput.files[0];
             if (file) {
@@ -415,33 +415,37 @@ function implementPlotFunctionality() {
                     const content = event.target.result.trim();
                     if (!content) {
                         alert('The file is empty. Please upload a valid dataset.');
+                        document.body.removeChild(fileInput);
                         return;
                     }
-
+    
                     const rows = content.split('\n');
                     const headers = rows[0].split(',');
-
+    
                     // Store data globally
                     sharedDataset.headers = headers;
                     sharedDataset.rows = rows.slice(1).map(row => row.split(','));
-
+    
                     // Populate Table Head
                     const tableHead = document.getElementById('tableHead');
                     tableHead.innerHTML = `<tr>${headers.map(header => `<th>${header.trim()}</th>`).join('')}</tr>`;
-
+    
                     // Populate Table Body
                     const tableBody = document.getElementById('tableBody');
                     tableBody.innerHTML = sharedDataset.rows.map(row => {
                         return `<tr>${row.map(cell => `<td>${cell.trim()}</td>`).join('')}</tr>`;
                     }).join('');
-
-                    console.log('Data loaded and table populated.');
+    
+                    alert('Data loaded successfully!');
                 };
                 reader.readAsText(file);
             } else {
                 alert('No file selected. Please upload a valid dataset.');
             }
+            document.body.removeChild(fileInput);
         });
+    
+        fileInput.click();
     }
 
 // Data Cleaning Section
