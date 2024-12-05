@@ -12,6 +12,13 @@
             max-height: 400px;
             overflow-y: auto;
         }
+        .gradient-background {
+            background: linear-gradient(115deg, #6dcfe7, #1e1e1e);
+        }
+        .navbar-nav .nav-item.active .nav-link {
+            font-weight: bold;
+            text-decoration: underline;
+        }
     </style>
 </head>
 <body>
@@ -24,17 +31,17 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ml-auto">
-                    <li class="nav-item"><a class="nav-link" href="about.html">About</a></li>
-                    <li class="nav-item"><a class="nav-link" href="resume.html">Work Experience</a></li>
-                    <li class="nav-item"><a class="nav-link" href="portfolio.html">Data Analytics Tool</a></li>
-                    <li class="nav-item"><a class="nav-link" href="skills.html">Skills</a></li>
+                    <li class="nav-item"><a class="nav-link" href="about.html" aria-label="About">About</a></li>
+                    <li class="nav-item"><a class="nav-link" href="resume.html" aria-label="Work Experience">Work Experience</a></li>
+                    <li class="nav-item"><a class="nav-link" href="portfolio.html" aria-label="Data Analytics Tool">Data Analytics Tool</a></li>
+                    <li class="nav-item"><a class="nav-link" href="skills.html" aria-label="Skills">Skills</a></li>
                 </ul>
             </div>
         </div>
     </nav>
 
     <!-- Combined Section -->
-    <section class="header-section text-light py-4" style="background: linear-gradient(115deg, #6dcfe7, #1e1e1e);">
+    <section class="header-section text-light py-4 gradient-background">
         <div class="container mt-5">
             <div class="card bg-dark text-white shadow border-0">
                 <div class="card-body text-center">
@@ -43,13 +50,13 @@
             </div>
             <!-- Secondary Toolbar -->
             <div class="bg-dark py-2 rounded shadow-sm mt-3">
-                <div class="d-flex justify-content-center gap-2">
-                    <button class="btn btn-primary" id="toolbar-data">Data</button>
-                    <button class="btn btn-secondary" id="toolbar-plots">Plots</button>
-                    <button class="btn btn-secondary" id="toolbar-statistics">Statistics</button>
-                    <button class="btn btn-secondary" id="toolbar-predictions">Predictions</button>
-                    <button class="btn btn-secondary" id="toolbar-correlations">Correlations</button>
-                    <button class="btn btn-secondary" id="toolbar-transformations">Data Transformations</button>
+                <div class="d-flex flex-wrap justify-content-center gap-2">
+                    <button class="btn btn-primary" id="toolbar-data" title="Access Data Options">Data</button>
+                    <button class="btn btn-secondary" id="toolbar-plots" title="Access Plot Options">Plots</button>
+                    <button class="btn btn-secondary" id="toolbar-statistics" title="Access Statistics Options">Statistics</button>
+                    <button class="btn btn-secondary" id="toolbar-predictions" title="Access Prediction Options">Predictions</button>
+                    <button class="btn btn-secondary" id="toolbar-correlations" title="Access Correlation Options">Correlations</button>
+                    <button class="btn btn-secondary" id="toolbar-transformations" title="Access Data Transformation Options">Data Transformations</button>
                 </div>
             </div>
         </div>
@@ -58,13 +65,21 @@
     <!-- Dynamic Content Section -->
     <section>
         <div class="container py-4" id="dynamicMenuContent">
-            <h4 class="text-center text-light">Select a toolbar option to get started</h4>
+            <h4 class="text-center text-light">Welcome to the Data Analytics Tool</h4>
+            <p class="text-center text-light">Choose from the toolbar above to start analyzing your data.</p>
+            <div class="text-center">
+                <div class="spinner-border text-light" role="status" id="loadingSpinner" style="display: none;">
+                    <span class="sr-only">Loading...</span>
+                </div>
+            </div>
         </div>
     </section>
 
     <!-- Footer -->
     <footer class="text-center text-light py-3 bg-dark">
         <p>&copy; 2024 Farnaz Nasehi. All rights reserved.</p>
+        <a href="https://linkedin.com/in/farnaz" class="text-light mx-2" aria-label="LinkedIn Profile">LinkedIn</a>
+        <a href="https://github.com/farnaz" class="text-light mx-2" aria-label="GitHub Profile">GitHub</a>
     </footer>
 </body>
 <script src="script.js"></script>
