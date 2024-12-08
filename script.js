@@ -266,6 +266,8 @@ document.addEventListener('DOMContentLoaded', () => {
         xAxisSelect.innerHTML = sharedDataset.headers.map(header => `<option value="${header}">${header}</option>`).join('');
         yAxisSelect.innerHTML = sharedDataset.headers.map(header => `<option value="${header}">${header}</option>`).join('');
     }
+
+
 // Implement Enhanced Plot Functionality
 function implementPlotFunctionality() {
     let chart;
@@ -386,7 +388,7 @@ function implementPlotFunctionality() {
     }
 
 
-    function attachDataMenuEventListeners() {
+    function loadDataSection() {
         document.getElementById('menu-load-data').addEventListener('click', () => {
             document.getElementById('data-content').innerHTML = `
                 <div class="table-container bg-dark rounded p-3">
@@ -448,95 +450,357 @@ function implementPlotFunctionality() {
         fileInput.click();
     }
 
-// Data Cleaning Section
-function cleanDataSection() {
-    const contentArea = document.getElementById('data-content');
-    contentArea.innerHTML = `
-        <h4 class="text-dark">Data Cleaning</h4>
-        <button class="btn btn-primary mb-3" id="clean-missing">Remove Missing Values</button>
-        <button class="btn btn-primary mb-3" id="clean-duplicates">Remove Duplicate Rows</button>
-        <button class="btn btn-primary mb-3" id="trim-spaces">Trim Spaces from Text</button>
-    `;
-
-    document.getElementById('clean-missing').addEventListener('click', () => {
-        const beforeCount = sharedDataset.rows.length;
-        sharedDataset.rows = sharedDataset.rows.filter(row => !row.includes(''));
-        const afterCount = sharedDataset.rows.length;
-        alert(`Removed ${beforeCount - afterCount} rows with missing values.`);
-    });
-
-    document.getElementById('clean-duplicates').addEventListener('click', () => {
-        const beforeCount = sharedDataset.rows.length;
-        const uniqueRows = new Set(sharedDataset.rows.map(row => JSON.stringify(row)));
-        sharedDataset.rows = Array.from(uniqueRows).map(row => JSON.parse(row));
-        const afterCount = sharedDataset.rows.length;
-        alert(`Removed ${beforeCount - afterCount} duplicate rows.`);
-    });
-
-    document.getElementById('trim-spaces').addEventListener('click', () => {
-        sharedDataset.rows = sharedDataset.rows.map(row => row.map(cell => cell.trim()));
-        alert("Trimmed leading and trailing spaces from all text cells.");
-    });
-}
-
-// Data Transformation Section
-function transformDataSection() {
-    const contentArea = document.getElementById('data-content');
-    contentArea.innerHTML = `
-        <h4 class="text-dark">Data Transformation</h4>
-        <select id="transform-column" class="form-control mb-3"></select>
-        <button class="btn btn-primary mb-3" id="normalize-data">Normalize</button>
-        <button class="btn btn-primary mb-3" id="scale-data">Scale (Min-Max)</button>
-        <button class="btn btn-primary mb-3" id="log-transform">Log Transformation</button>
-    `;
-
-    const columnSelector = document.getElementById('transform-column');
-    columnSelector.innerHTML = sharedDataset.headers.map(header => `<option value="${header}">${header}</option>`).join('');
-
-    document.getElementById('normalize-data').addEventListener('click', () => {
-        const column = columnSelector.value;
-        const columnIndex = sharedDataset.headers.indexOf(column);
-        const values = sharedDataset.rows.map(row => parseFloat(row[columnIndex]));
-        const mean = values.reduce((sum, val) => sum + val, 0) / values.length;
-        const stdDev = Math.sqrt(values.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) / values.length);
-
-        sharedDataset.rows = sharedDataset.rows.map(row => {
-            row[columnIndex] = ((parseFloat(row[columnIndex]) - mean) / stdDev).toFixed(2);
-            return row;
-        });
-        alert(`Normalized column: ${column}`);
-    });
-
-    document.getElementById('scale-data').addEventListener('click', () => {
-        const column = columnSelector.value;
-        const columnIndex = sharedDataset.headers.indexOf(column);
-        const values = sharedDataset.rows.map(row => parseFloat(row[columnIndex]));
-        const min = Math.min(...values);
-        const max = Math.max(...values);
-
-        sharedDataset.rows = sharedDataset.rows.map(row => {
-            row[columnIndex] = ((parseFloat(row[columnIndex]) - min) / (max - min)).toFixed(2);
-            return row;
-        });
-        alert(`Scaled column: ${column}`);
-    });
-
-    document.getElementById('log-transform').addEventListener('click', () => {
-        const column = columnSelector.value;
-        const columnIndex = sharedDataset.headers.indexOf(column);
-
-        sharedDataset.rows = sharedDataset.rows.map(row => {
-            row[columnIndex] = Math.log(parseFloat(row[columnIndex]) + 1).toFixed(2); // Log(x + 1) to handle zero values
-            return row;
-        });
-        alert(`Log transformed column: ${column}`);
-    });
-}
-
-
-    function filterDataSection() {
-        // Logic for filtering data
+    // Clean Data Section with Dropdown Submenu
+    function cleanDataSection() {
+        let existingSubmenu = document.getElementById('clean-data-submenu');
+        if (existingSubmenu) {
+            existingSubmenu.remove(); // Toggle off if already exists
+            return;
+        }
+    
+        const submenuHTML = `
+            <ul class="nested-submenu" id="clean-data-submenu">
+                <li class="nested-submenu-item" id="remove-missing">Remove Missing Values</li>
+                <li class="nested-submenu-item" id="remove-duplicates">Remove Duplicate Rows</li>
+                <li class="nested-submenu-item submenu-item" id="text-cleaning">
+                    Text Cleaning
+                    <ul class="nested-menu">
+                        <li class="nested-submenu-item" id="trim-spaces">Trim Spaces</li>
+                        <li class="nested-submenu-item" id="convert-lowercase">Convert to Lowercase</li>
+                    </ul>
+                </li>
+                <li class="nested-submenu-item" id="remove-outliers">Remove Outliers</li>
+                <li class="nested-submenu-item submenu-item" id="numeric-operations">
+                    Numeric Operations
+                    <ul class="nested-menu">
+                        <li class="nested-submenu-item" id="normalize-data">Normalize Data</li>
+                        <li class="nested-submenu-item" id="scale-data">Scale Data</li>
+                    </ul>
+                </li>
+                <li class="nested-submenu-item" id="filter-rows">Filter Rows</li>
+            </ul>
+        `;
+    
+        const cleanDataMenu = document.getElementById('menu-clean-data');
+        cleanDataMenu.insertAdjacentHTML('afterend', submenuHTML);
+    
+        attachSubmenuEventListeners();
     }
+    
+    function attachSubmenuEventListeners() {
+        // Remove Missing Values
+        document.getElementById('remove-missing').addEventListener('click', () => {
+            const beforeCount = sharedDataset.rows.length;
+            sharedDataset.rows = sharedDataset.rows.filter(row => !row.includes(''));
+            const afterCount = sharedDataset.rows.length;
+            alert(`Removed ${beforeCount - afterCount} rows with missing values.`);
+        });
+    
+        // Remove Duplicate Rows
+        document.getElementById('remove-duplicates').addEventListener('click', () => {
+            const beforeCount = sharedDataset.rows.length;
+            const uniqueRows = new Set(sharedDataset.rows.map(row => JSON.stringify(row)));
+            sharedDataset.rows = Array.from(uniqueRows).map(row => JSON.parse(row));
+            const afterCount = sharedDataset.rows.length;
+            alert(`Removed ${beforeCount - afterCount} duplicate rows.`);
+        });
+    
+        // Text Cleaning: Trim Spaces
+        document.getElementById('trim-spaces').addEventListener('click', () => {
+            sharedDataset.rows = sharedDataset.rows.map(row => row.map(cell => cell.trim()));
+            alert("Trimmed leading and trailing spaces from all text cells.");
+        });
+    
+        // Text Cleaning: Convert to Lowercase
+        document.getElementById('convert-lowercase').addEventListener('click', () => {
+            sharedDataset.rows = sharedDataset.rows.map(row => row.map(cell => typeof cell === 'string' ? cell.toLowerCase() : cell));
+            alert("Converted all text to lowercase.");
+        });
+    
+        // Remove Outliers
+        document.getElementById('remove-outliers').addEventListener('click', () => {
+            const columnName = prompt('Enter the column name to remove outliers:');
+            if (!columnName || !sharedDataset.headers.includes(columnName)) {
+                alert('Invalid column name.');
+                return;
+            }
+            const columnIndex = sharedDataset.headers.indexOf(columnName);
+            const values = sharedDataset.rows.map(row => parseFloat(row[columnIndex])).filter(val => !isNaN(val));
+            const mean = values.reduce((sum, val) => sum + val, 0) / values.length;
+            const stdDev = Math.sqrt(values.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) / values.length);
+            sharedDataset.rows = sharedDataset.rows.filter(row => {
+                const value = parseFloat(row[columnIndex]);
+                return !isNaN(value) && Math.abs(value - mean) <= 2 * stdDev;
+            });
+            alert(`Outliers removed from column "${columnName}".`);
+        });
+    
+        // Numeric Operations: Normalize Data
+        document.getElementById('normalize-data').addEventListener('click', () => {
+            const columnName = prompt('Enter the column name to normalize:');
+            if (!columnName || !sharedDataset.headers.includes(columnName)) {
+                alert('Invalid column name.');
+                return;
+            }
+            const columnIndex = sharedDataset.headers.indexOf(columnName);
+            const values = sharedDataset.rows.map(row => parseFloat(row[columnIndex])).filter(val => !isNaN(val));
+            const min = Math.min(...values);
+            const max = Math.max(...values);
+            sharedDataset.rows = sharedDataset.rows.map(row => {
+                const value = parseFloat(row[columnIndex]);
+                if (!isNaN(value)) {
+                    row[columnIndex] = ((value - min) / (max - min)).toFixed(2);
+                }
+                return row;
+            });
+            alert(`Normalized column "${columnName}".`);
+        });
+    
+        // Numeric Operations: Scale Data
+        document.getElementById('scale-data').addEventListener('click', () => {
+            const columnName = prompt('Enter the column name to scale:');
+            if (!columnName || !sharedDataset.headers.includes(columnName)) {
+                alert('Invalid column name.');
+                return;
+            }
+            const columnIndex = sharedDataset.headers.indexOf(columnName);
+            const values = sharedDataset.rows.map(row => parseFloat(row[columnIndex])).filter(val => !isNaN(val));
+            const min = Math.min(...values);
+            const max = Math.max(...values);
+            sharedDataset.rows = sharedDataset.rows.map(row => {
+                const value = parseFloat(row[columnIndex]);
+                if (!isNaN(value)) {
+                    row[columnIndex] = ((value - min) / (max - min)).toFixed(2);
+                }
+                return row;
+            });
+            alert(`Scaled column "${columnName}" to range [0, 1].`);
+        });
+    
+        // Filter Rows
+        document.getElementById('filter-rows').addEventListener('click', () => {
+            const condition = prompt('Enter a condition to filter rows (e.g., age > 30):');
+            if (!condition) {
+                alert('Invalid filter condition.');
+                return;
+            }
+            try {
+                sharedDataset.rows = sharedDataset.rows.filter(row => {
+                    return eval(condition.replace(/(\w+)/g, (_, key) => `row[sharedDataset.headers.indexOf("${key}")]`));
+                });
+                alert('Rows filtered successfully.');
+            } catch (err) {
+                alert('Invalid filter condition.');
+            }
+        });
+    }
+    
+    
+// Data Transformation Section
+// Transform Data Section with Dropdown Submenu
+function transformDataSection() {
+    let existingSubmenu = document.getElementById('transform-data-submenu');
+    if (existingSubmenu) {
+        existingSubmenu.remove(); // Toggle off if already exists
+        return;
+    }
+
+    const submenuHTML = `
+        <ul class="nested-submenu" id="transform-data-submenu">
+            <li class="nested-submenu-item" id="normalize-data">Normalize Data</li>
+            <li class="nested-submenu-item" id="scale-data">Scale Data</li>
+            <li class="nested-submenu-item" id="log-transform">Log Transformation</li>
+        </ul>
+    `;
+
+    const transformDataMenu = document.getElementById('menu-transform-data');
+    transformDataMenu.insertAdjacentHTML('afterend', submenuHTML);
+
+    attachTransformSubmenuEventListeners();
+}
+
+// Attach Event Listeners for Transform Data Submenu
+function attachTransformSubmenuEventListeners() {
+    document.getElementById('normalize-data').addEventListener('click', normalizeData);
+    document.getElementById('scale-data').addEventListener('click', scaleData);
+    document.getElementById('log-transform').addEventListener('click', logTransformation);
+}
+
+// Normalize Data Function
+function normalizeData() {
+    const column = prompt('Enter the column name to normalize:');
+    if (!sharedDataset.headers.includes(column)) {
+        alert('Invalid column name.');
+        return;
+    }
+
+    const columnIndex = sharedDataset.headers.indexOf(column);
+    const values = sharedDataset.rows.map(row => parseFloat(row[columnIndex])).filter(val => !isNaN(val));
+
+    const mean = values.reduce((sum, val) => sum + val, 0) / values.length;
+    const stdDev = Math.sqrt(values.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) / values.length);
+
+    sharedDataset.rows = sharedDataset.rows.map(row => {
+        const value = parseFloat(row[columnIndex]);
+        if (!isNaN(value)) {
+            row[columnIndex] = ((value - mean) / stdDev).toFixed(2);
+        }
+        return row;
+    });
+
+    alert(`Normalized column: ${column}`);
+}
+
+// Scale Data Function
+function scaleData() {
+    const column = prompt('Enter the column name to scale:');
+    if (!sharedDataset.headers.includes(column)) {
+        alert('Invalid column name.');
+        return;
+    }
+
+    const columnIndex = sharedDataset.headers.indexOf(column);
+    const values = sharedDataset.rows.map(row => parseFloat(row[columnIndex])).filter(val => !isNaN(val));
+
+    const min = Math.min(...values);
+    const max = Math.max(...values);
+
+    sharedDataset.rows = sharedDataset.rows.map(row => {
+        const value = parseFloat(row[columnIndex]);
+        if (!isNaN(value)) {
+            row[columnIndex] = ((value - min) / (max - min)).toFixed(2);
+        }
+        return row;
+    });
+
+    alert(`Scaled column: ${column}`);
+}
+
+// Log Transformation Function
+function logTransformation() {
+    const column = prompt('Enter the column name to apply log transformation:');
+    if (!sharedDataset.headers.includes(column)) {
+        alert('Invalid column name.');
+        return;
+    }
+
+    const columnIndex = sharedDataset.headers.indexOf(column);
+
+    sharedDataset.rows = sharedDataset.rows.map(row => {
+        const value = parseFloat(row[columnIndex]);
+        if (!isNaN(value)) {
+            row[columnIndex] = Math.log(value + 1).toFixed(2); // Log(x + 1) to handle zero values
+        }
+        return row;
+    });
+
+    alert(`Applied log transformation to column: ${column}`);
+}
+
+
+
+
+
+// Filter Data Section with Dropdown Submenu
+function filterDataSection() {
+    let existingSubmenu = document.getElementById('filter-data-submenu');
+    if (existingSubmenu) {
+        existingSubmenu.remove(); // Toggle off if already exists
+        return;
+    }
+
+    const submenuHTML = `
+        <ul class="nested-submenu" id="filter-data-submenu">
+            <li class="nested-submenu-item" id="filter-condition">Filter by Condition</li>
+            <li class="nested-submenu-item" id="filter-range">Filter by Range</li>
+            <li class="nested-submenu-item" id="filter-top-n">Filter Top N Rows</li>
+            <li class="nested-submenu-item" id="filter-column-null">Filter Rows with Null Column</li>
+        </ul>
+    `;
+
+    const filterDataMenu = document.getElementById('menu-filter-data');
+    filterDataMenu.insertAdjacentHTML('afterend', submenuHTML);
+
+    attachFilterSubmenuEventListeners();
+}
+
+// Attach Event Listeners for Filter Data Submenu
+function attachFilterSubmenuEventListeners() {
+    document.getElementById('filter-condition').addEventListener('click', filterByCondition);
+    document.getElementById('filter-range').addEventListener('click', filterByRange);
+    document.getElementById('filter-top-n').addEventListener('click', filterTopNRows);
+    document.getElementById('filter-column-null').addEventListener('click', filterRowsWithNullColumn);
+}
+
+// Filter by Condition Function
+function filterByCondition() {
+    const condition = prompt('Enter the condition (e.g., "age > 30"):');
+    if (!condition) {
+        alert('Invalid condition.');
+        return;
+    }
+
+    try {
+        sharedDataset.rows = sharedDataset.rows.filter(row => {
+            return eval(condition.replace(/(\w+)/g, (_, key) => `row[sharedDataset.headers.indexOf("${key}")]`));
+        });
+        alert('Rows filtered successfully based on the condition.');
+    } catch (err) {
+        alert('Invalid condition syntax.');
+    }
+}
+
+// Filter by Range Function
+function filterByRange() {
+    const column = prompt('Enter the column name to filter by range:');
+    if (!sharedDataset.headers.includes(column)) {
+        alert('Invalid column name.');
+        return;
+    }
+
+    const minValue = parseFloat(prompt('Enter the minimum value:'));
+    const maxValue = parseFloat(prompt('Enter the maximum value:'));
+
+    if (isNaN(minValue) || isNaN(maxValue)) {
+        alert('Invalid range values.');
+        return;
+    }
+
+    const columnIndex = sharedDataset.headers.indexOf(column);
+    sharedDataset.rows = sharedDataset.rows.filter(row => {
+        const value = parseFloat(row[columnIndex]);
+        return value >= minValue && value <= maxValue;
+    });
+
+    alert(`Rows filtered successfully for column "${column}" in range [${minValue}, ${maxValue}].`);
+}
+
+// Filter Top N Rows Function
+function filterTopNRows() {
+    const n = parseInt(prompt('Enter the number of top rows to keep (N):'), 10);
+    if (isNaN(n) || n <= 0) {
+        alert('Invalid value for N.');
+        return;
+    }
+
+    sharedDataset.rows = sharedDataset.rows.slice(0, n);
+    alert(`Top ${n} rows retained successfully.`);
+}
+
+// Filter Rows with Null Column Function
+function filterRowsWithNullColumn() {
+    const column = prompt('Enter the column name to check for null values:');
+    if (!sharedDataset.headers.includes(column)) {
+        alert('Invalid column name.');
+        return;
+    }
+
+    const columnIndex = sharedDataset.headers.indexOf(column);
+    sharedDataset.rows = sharedDataset.rows.filter(row => row[columnIndex] !== null && row[columnIndex] !== '');
+
+    alert(`Rows with non-null values in column "${column}" retained successfully.`);
+}
+
 
 
  // Implement Statistics Functionality

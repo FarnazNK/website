@@ -400,6 +400,48 @@ footer {
     color: #6dcfe7;
 }
 
+
+.nested-submenu {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    background-color: #343a40;
+    border-left: 2px solid #6c757d;
+}
+
+.nested-submenu-item {
+    padding: 8px 15px;
+    color: white;
+    cursor: pointer;
+    border-bottom: 1px solid #444;
+}
+
+.nested-submenu-item:hover {
+    background-color: #495057;
+}
+
+.submenu-item {
+    position: relative;
+    cursor: pointer;
+}
+
+.nested-menu {
+    display: none;
+    list-style-type: none;
+    margin: 0;
+    padding: 0 0 0 15px;
+    background-color: #495057;
+}
+
+.nested-menu .nested-submenu-item {
+    padding: 8px 15px;
+}
+
+.nested-menu .nested-submenu-item:hover {
+    background-color: #6c757d;
+}
+
+
 /* Main Page (Hero Section) */
 .hero-section {
     background-image: url('images/background-main.jpg');
@@ -424,3 +466,4 @@ footer {
 .work-experience-section {
     background-image: url('images/background-work-experience.jpg');
 }
+
