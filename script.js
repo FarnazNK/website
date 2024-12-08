@@ -185,43 +185,35 @@ document.addEventListener('DOMContentLoaded', () => {
         console.error('Button with id "toolbar-plots" not found.');
     }
 
-    // Toolbar Button for Statistics Section
-    const statsButton = document.getElementById('toolbar-statistics');
-    if (statsButton) {
-        statsButton.addEventListener('click', () => {
-            if (!sharedDataset.headers.length) {
-                alert('No data available. Please upload data in the Data section.');
-                return;
-            }
-            dynamicContent.innerHTML = `
-                <section style="background: linear-gradient(115deg, #6dcfe7, #1e1e1e);">
-                    <div class="container py-4">
-                        <h4 class="text-light">Statistics Section</h4>
-                        <div class="row">
-                            <div class="col-md-4 bg-dark text-light p-3 rounded shadow-sm">
-                                <h5>Summary Statistics</h5>
-                                <select id="statsColumn" class="form-control mb-3"></select>
-                                <button class="btn btn-primary mb-3" id="generateStats">Generate Statistics</button>
-                                <div id="statsResult" class="text-light"></div>
-                            </div>
-                            <div class="col-md-4 bg-dark text-light p-3 rounded shadow-sm">
-                                <h5>Correlation</h5>
-                                <label>Select Column 1:</label>
-                                <select id="correlationColumn1" class="form-control mb-3"></select>
-                                <label>Select Column 2:</label>
-                                <select id="correlationColumn2" class="form-control mb-3"></select>
-                                <button class="btn btn-primary mb-3" id="calculateCorrelation">Calculate Correlation</button>
-                                <div id="correlationResult" class="text-light"></div>
-                            </div>
+// Toolbar Button for Statistics Section
+const statsButton = document.getElementById('toolbar-statistics');
+if (statsButton) {
+    statsButton.addEventListener('click', () => {
+        if (!sharedDataset.headers.length) {
+            alert('No data available. Please upload data in the Data section.');
+            return;
+        }
+        dynamicContent.innerHTML = `
+            <section style="background: linear-gradient(115deg, #6dcfe7, #1e1e1e);">
+                <div class="container py-4">
+                    <h4 class="text-light">Statistics Section</h4>
+                    <div class="row">
+                        <div class="col-md-6 bg-dark text-light p-3 rounded shadow-sm">
+                            <h5>Summary Statistics</h5>
+                            <select id="statsColumn" class="form-control mb-3"></select>
+                            <button class="btn btn-primary mb-3" id="generateStats">Generate Statistics</button>
+                            <div id="statsResult" class="text-light"></div>
                         </div>
                     </div>
-                </section>`;
-            populateStatsSelectors();
-            implementStatisticsFunctionality();
-        });
-    } else {
-        console.error('Button with id "toolbar-statistics" not found.');
-    }
+                </div>
+            </section>`;
+        populateStatsSelectors();
+        implementStatisticsFunctionality();
+    });
+} else {
+    console.error('Button with id "toolbar-statistics" not found.');
+}
+
 
     // Toolbar Button for Data Section
     const dataButton = document.getElementById('toolbar-data');
@@ -379,13 +371,17 @@ function implementPlotFunctionality() {
         chart.update();
     });
 }
+function populateStatsSelectors() {
+    const columnOptions = sharedDataset.headers
+        .map(header => `<option value="${header}">${header}</option>`)
+        .join('');
+    const statsColumn = document.getElementById('statsColumn');
+    statsColumn.setAttribute('multiple', 'multiple'); // Enable multiple selection
+    statsColumn.setAttribute('size', '5'); // Adjust size for better visibility
+    statsColumn.innerHTML = `<option value="">Select Column(s)</option>${columnOptions}`;
+}
 
-    function populateStatsSelectors() {
-        const columnOptions = sharedDataset.headers.map(header => `<option value="${header}">${header}</option>`).join('');
-        document.getElementById('statsColumn').innerHTML = `<option value="">Select Column</option>${columnOptions}`;
-        document.getElementById('correlationColumn1').innerHTML = columnOptions;
-        document.getElementById('correlationColumn2').innerHTML = columnOptions;
-    }
+
 
 
     function loadDataSection() {
@@ -802,37 +798,142 @@ function filterRowsWithNullColumn() {
 }
 
 
-
- // Implement Statistics Functionality
- function implementStatisticsFunctionality() {
+function implementStatisticsFunctionality() {
     // Generate Summary Statistics
     document.getElementById('generateStats').addEventListener('click', () => {
-        const column = document.getElementById('statsColumn').value;
+        const statsColumn = document.getElementById('statsColumn');
+        const selectedOptions = Array.from(statsColumn.selectedOptions).map(option => option.value);
+
+        if (selectedOptions.length === 0) {
+            alert('Please select at least one column.');
+            return;
+        }
+
+        // Prepare the table for statistics
+        let tableHTML = `<table class="table table-dark table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Column</th>
+                                    <th>Mean</th>
+                                    <th>Median</th>
+                                    <th>Variance</th>
+                                    <th>Standard Deviation</th>
+                                </tr>
+                            </thead>
+                            <tbody>`;
+
+        selectedOptions.forEach(column => {
+            const columnIndex = sharedDataset.headers.indexOf(column);
+
+            if (columnIndex === -1) {
+                tableHTML += `<tr>
+                                <td>${column}</td>
+                                <td colspan="4">Invalid column</td>
+                              </tr>`;
+                return;
+            }
+
+            const values = sharedDataset.rows.map(row => parseFloat(row[columnIndex])).filter(val => !isNaN(val));
+
+            if (values.length === 0) {
+                tableHTML += `<tr>
+                                <td>${column}</td>
+                                <td colspan="4">No numeric data</td>
+                              </tr>`;
+                return;
+            }
+
+            const mean = values.reduce((sum, val) => sum + val, 0) / values.length;
+            const median = values.sort((a, b) => a - b)[Math.floor(values.length / 2)];
+            const variance = values.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) / values.length;
+            const stdDev = Math.sqrt(variance);
+
+            tableHTML += `<tr>
+                            <td>${column}</td>
+                            <td>${mean.toFixed(2)}</td>
+                            <td>${median.toFixed(2)}</td>
+                            <td>${variance.toFixed(2)}</td>
+                            <td>${stdDev.toFixed(2)}</td>
+                          </tr>`;
+        });
+
+        tableHTML += '</tbody></table>';
+
+        // Update the results section
+        document.getElementById('statsResult').innerHTML = tableHTML;
+    });
+
+    // Generate Frequency Distribution
+    document.getElementById('generateFrequency').addEventListener('click', () => {
+        const frequencyColumn = document.getElementById('frequencyColumn');
+        const column = frequencyColumn.value;
+
         if (!column) {
             alert('Please select a column.');
             return;
         }
 
         const columnIndex = sharedDataset.headers.indexOf(column);
-        const values = sharedDataset.rows.map(row => parseFloat(row[columnIndex])).filter(val => !isNaN(val));
+        if (columnIndex === -1) {
+            alert(`Invalid column: ${column}`);
+            return;
+        }
 
-        const mean = values.reduce((sum, val) => sum + val, 0) / values.length;
-        const median = values.sort((a, b) => a - b)[Math.floor(values.length / 2)];
-        const variance = values.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) / values.length;
-        const stdDev = Math.sqrt(variance);
+        const values = sharedDataset.rows.map(row => row[columnIndex]);
 
-        document.getElementById('statsResult').innerHTML = `
-            <p>Mean: ${mean.toFixed(2)}</p>
-            <p>Median: ${median.toFixed(2)}</p>
-            <p>Variance: ${variance.toFixed(2)}</p>
-            <p>Standard Deviation: ${stdDev.toFixed(2)}</p>
-        `;
+        const frequency = values.reduce((acc, val) => {
+            acc[val] = (acc[val] || 0) + 1;
+            return acc;
+        }, {});
+
+        const frequencyHTML = Object.entries(frequency)
+            .map(([key, count]) => `<p>${key}: ${count}</p>`)
+            .join('');
+
+        document.getElementById('frequencyResult').innerHTML = frequencyHTML;
     });
+}
 
-    // Calculate Correlation
+
+document.getElementById('toolbar-correlations').addEventListener('click', () => {
+    const dynamicContent = document.getElementById('dynamicMenuContent');
+    dynamicContent.innerHTML = `
+        <section style="background: linear-gradient(115deg, #6dcfe7, #1e1e1e);">
+            <div class="container py-4">
+                <h4 class="text-light">Correlation Section</h4>
+                <div class="row">
+                    <div class="col-md-6 bg-dark text-light p-3 rounded shadow-sm">
+                        <h5>Correlation Analysis</h5>
+                        <label for="correlationColumn1">Select Column 1:</label>
+                        <select id="correlationColumn1" class="form-control mb-3"></select>
+                        <label for="correlationColumn2">Select Column 2:</label>
+                        <select id="correlationColumn2" class="form-control mb-3"></select>
+                        <button class="btn btn-primary mb-3" id="calculateCorrelation">Calculate Correlation</button>
+                        <div id="correlationResult" class="text-light"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    `;
+
+    populateCorrelationSelectors();
+    implementCorrelationFunctionality();
+});
+
+// Populate column selectors for correlation
+function populateCorrelationSelectors() {
+    const columnOptions = sharedDataset.headers.map(header => `<option value="${header}">${header}</option>`).join('');
+    document.getElementById('correlationColumn1').innerHTML = `<option value="">Select Column</option>${columnOptions}`;
+    document.getElementById('correlationColumn2').innerHTML = `<option value="">Select Column</option>${columnOptions}`;
+}
+
+function implementCorrelationFunctionality() {
     document.getElementById('calculateCorrelation').addEventListener('click', () => {
         const column1 = document.getElementById('correlationColumn1').value;
         const column2 = document.getElementById('correlationColumn2').value;
+
+        // Debugging
+        console.log(`Column 1: ${column1}, Column 2: ${column2}`);
 
         if (!column1 || !column2) {
             alert('Please select both columns.');
@@ -842,8 +943,18 @@ function filterRowsWithNullColumn() {
         const columnIndex1 = sharedDataset.headers.indexOf(column1);
         const columnIndex2 = sharedDataset.headers.indexOf(column2);
 
+        if (columnIndex1 === -1 || columnIndex2 === -1) {
+            alert('Selected columns are not valid.');
+            return;
+        }
+
         const values1 = sharedDataset.rows.map(row => parseFloat(row[columnIndex1])).filter(val => !isNaN(val));
         const values2 = sharedDataset.rows.map(row => parseFloat(row[columnIndex2])).filter(val => !isNaN(val));
+
+        if (values1.length !== values2.length || values1.length === 0) {
+            alert('Mismatch in column data lengths or invalid data.');
+            return;
+        }
 
         const mean1 = values1.reduce((sum, val) => sum + val, 0) / values1.length;
         const mean2 = values2.reduce((sum, val) => sum + val, 0) / values2.length;
@@ -860,5 +971,6 @@ function filterRowsWithNullColumn() {
     });
 }
 
-// Placeholder for additional functionality (e.g., Data, Correlations, etc.)
 });
+
+
