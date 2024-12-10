@@ -1,76 +1,72 @@
 document.addEventListener('DOMContentLoaded', () => {
     const dynamicContent = document.getElementById('dynamicMenuContent');
-    let sharedDataset = { headers: [], rows: [] };
 
-    // Toolbar Handlers
+    // Menu structure for Predictions
     const toolbarHandlers = {
         'toolbar-predictions': `
             <div class="row">
+                <!-- Left Menu -->
                 <div class="col-md-3 bg-dark p-3 rounded shadow-sm menu-section">
-                    <h4 class="text-light">Prediction Models</h4>
+                    <h4 class="text-light">Models</h4>
                     <ul class="list-group">
-                        <li class="list-group-item menu-item submenu-item" id="supervised-ml">Supervised ML</li>
-                        <ul class="nested-menu" id="supervised-ml-menu">
-                            <li class="nested-submenu-item" id="linearRegression">Linear Regression</li>
-                            <li class="nested-submenu-item" id="logisticRegression">Logistic Regression</li>
-                            <li class="nested-submenu-item" id="decisionTree">Decision Tree</li>
-                        </ul>
-                        <li class="list-group-item menu-item submenu-item" id="unsupervised-ml">Unsupervised ML</li>
-                        <ul class="nested-menu" id="unsupervised-ml-menu">
-                            <li class="nested-submenu-item" id="kMeansClustering">K-Means Clustering</li>
-                            <li class="nested-submenu-item" id="pca">Principal Component Analysis (PCA)</li>
-                        </ul>
+                        <li class="list-group-item menu-item submenu-item" id="supervised-ml">
+                            Supervised ML
+                            <ul class="nested-menu" id="supervised-ml-submenu" style="display: none;">
+                                <li class="nested-submenu-item" id="linearRegression">Linear Regression</li>
+                                <li class="nested-submenu-item" id="logisticRegression">Logistic Regression</li>
+                                <li class="nested-submenu-item" id="decisionTree">Decision Tree</li>
+                            </ul>
+                        </li>
+                        <li class="list-group-item menu-item submenu-item" id="unsupervised-ml">
+                            Unsupervised ML
+                            <ul class="nested-menu" id="unsupervised-ml-submenu" style="display: none;">
+                                <li class="nested-submenu-item" id="kMeansClustering">K-Means Clustering</li>
+                                <li class="nested-submenu-item" id="pca">Principal Component Analysis (PCA)</li>
+                            </ul>
+                        </li>
                     </ul>
                 </div>
-                <div class="col-md-9 bg-light p-3 rounded shadow-sm" id="prediction-content">
-                    <h4 class="text-center">Select a model to see results</h4>
+                <!-- Right Content -->
+                <div class="col-md-9 bg-light p-3 rounded shadow-sm" id="mlOutput">
+                    <h4 class="text-center">Select a model to display results</h4>
                 </div>
-            </div>`
+            </div>
+        `
     };
 
-    // Add Event Listeners for Toolbar Buttons
-    Object.keys(toolbarHandlers).forEach(id => {
-        const button = document.getElementById(id);
-        if (button) {
-            button.addEventListener('click', () => {
-                dynamicContent.innerHTML = toolbarHandlers[id];
-                if (id === 'toolbar-predictions') {
-                    implementPredictionFunctionality();
-                }
-            });
-        }
-    });
+    // Attach toolbar event listener for predictions
+    const predictionsButton = document.getElementById('toolbar-predictions');
+    if (predictionsButton) {
+        predictionsButton.addEventListener('click', () => {
+            dynamicContent.innerHTML = toolbarHandlers['toolbar-predictions'];
+            attachMenuFunctionality();
+        });
+    }
 
-    // Implement Prediction Functionality
-    function implementPredictionFunctionality() {
-        // Toggle Submenus
-        toggleSubmenu('supervised-ml', 'supervised-ml-menu');
-        toggleSubmenu('unsupervised-ml', 'unsupervised-ml-menu');
+    // Attach toggle and click functionality for menus
+    function attachMenuFunctionality() {
+        // Toggle functionality for Supervised and Unsupervised ML
+        toggleSubmenu('supervised-ml', 'supervised-ml-submenu');
+        toggleSubmenu('unsupervised-ml', 'unsupervised-ml-submenu');
 
-        // Supervised ML Event Listeners
+        // Attach event listeners to each model
         document.getElementById('linearRegression').addEventListener('click', () => {
-            if (!validateDataset()) return;
             performLinearRegression();
         });
 
         document.getElementById('logisticRegression').addEventListener('click', () => {
-            if (!validateDataset()) return;
             performLogisticRegression();
         });
 
         document.getElementById('decisionTree').addEventListener('click', () => {
-            if (!validateDataset()) return;
             performDecisionTree();
         });
 
-        // Unsupervised ML Event Listeners
         document.getElementById('kMeansClustering').addEventListener('click', () => {
-            if (!validateDataset()) return;
             performKMeansClustering();
         });
 
         document.getElementById('pca').addEventListener('click', () => {
-            if (!validateDataset()) return;
             performPCA();
         });
     }
@@ -93,7 +89,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Helper: Validate Dataset
     function validateDataset() {
-        if (!sharedDataset.headers.length || !sharedDataset.rows.length) {
+        // This is a placeholder for actual dataset validation
+        if (false) {
             alert('No data available. Please upload a valid dataset.');
             return false;
         }
@@ -102,34 +99,45 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Machine Learning Functions
     function performLinearRegression() {
-        const output = document.getElementById('prediction-content');
-        output.innerHTML = '<p>Performing Linear Regression...</p>';
+        const output = document.getElementById('mlOutput');
+        output.innerHTML = '<h4>Linear Regression</h4>';
+        output.innerHTML += '<p>Performing Linear Regression...</p>';
+        // Mock implementation for demonstration
         output.innerHTML += '<p>Linear Regression completed successfully!</p>';
     }
 
     function performLogisticRegression() {
-        const output = document.getElementById('prediction-content');
-        output.innerHTML = '<p>Performing Logistic Regression...</p>';
+        const output = document.getElementById('mlOutput');
+        output.innerHTML = '<h4>Logistic Regression</h4>';
+        output.innerHTML += '<p>Performing Logistic Regression...</p>';
+        // Mock implementation for demonstration
         output.innerHTML += '<p>Logistic Regression completed successfully!</p>';
     }
 
     function performDecisionTree() {
-        const output = document.getElementById('prediction-content');
-        output.innerHTML = '<p>Performing Decision Tree...</p>';
+        const output = document.getElementById('mlOutput');
+        output.innerHTML = '<h4>Decision Tree</h4>';
+        output.innerHTML += '<p>Performing Decision Tree...</p>';
+        // Mock implementation for demonstration
         output.innerHTML += '<p>Decision Tree completed successfully!</p>';
     }
 
     function performKMeansClustering() {
-        const output = document.getElementById('prediction-content');
-        output.innerHTML = '<p>Performing K-Means Clustering...</p>';
+        const output = document.getElementById('mlOutput');
+        output.innerHTML = '<h4>K-Means Clustering</h4>';
+        output.innerHTML += '<p>Performing K-Means Clustering...</p>';
+        // Mock implementation for demonstration
         output.innerHTML += '<p>K-Means Clustering completed successfully!</p>';
     }
 
     function performPCA() {
-        const output = document.getElementById('prediction-content');
-        output.innerHTML = '<p>Performing PCA...</p>';
+        const output = document.getElementById('mlOutput');
+        output.innerHTML = '<h4>Principal Component Analysis (PCA)</h4>';
+        output.innerHTML += '<p>Performing PCA...</p>';
+        // Mock implementation for demonstration
         output.innerHTML += '<p>PCA completed successfully!</p>';
     }
+
 
 
 
