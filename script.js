@@ -1,142 +1,174 @@
 document.addEventListener('DOMContentLoaded', () => {
     const dynamicContent = document.getElementById('dynamicMenuContent');
+    let sharedDataset = { headers: [], rows: [] };
 
-    // Menu structure for Predictions
     const toolbarHandlers = {
         'toolbar-predictions': `
-            <div class="row">
-                <!-- Left Menu -->
-                <div class="col-md-3 bg-dark p-3 rounded shadow-sm menu-section">
-                    <h4 class="text-light">Models</h4>
-                    <ul class="list-group">
-                        <li class="list-group-item menu-item submenu-item" id="supervised-ml">
-                            Supervised ML
-                            <ul class="nested-menu" id="supervised-ml-submenu" style="display: none;">
-                                <li class="nested-submenu-item" id="linearRegression">Linear Regression</li>
-                                <li class="nested-submenu-item" id="logisticRegression">Logistic Regression</li>
-                                <li class="nested-submenu-item" id="decisionTree">Decision Tree</li>
-                            </ul>
-                        </li>
-                        <li class="list-group-item menu-item submenu-item" id="unsupervised-ml">
-                            Unsupervised ML
-                            <ul class="nested-menu" id="unsupervised-ml-submenu" style="display: none;">
-                                <li class="nested-submenu-item" id="kMeansClustering">K-Means Clustering</li>
-                                <li class="nested-submenu-item" id="pca">Principal Component Analysis (PCA)</li>
-                            </ul>
-                        </li>
-                    </ul>
+            <section style="background: linear-gradient(115deg, #6dcfe7, #1e1e1e);">
+                <div class="row">
+                    <div class="col-md-3 bg-dark text-light p-3 rounded shadow-sm menu-section">
+                        <h4 class="text-light">Prediction Models</h4>
+                        <ul class="list-group">
+                            <li class="list-group-item menu-item" id="menu-supervised">
+                                Supervised Learning
+                                <ul class="nested-submenu" id="submenu-supervised">
+                                    <li class="nested-submenu-item" id="linearRegression">Linear Regression</li>
+                                    <li class="nested-submenu-item" id="logisticRegression">Logistic Regression</li>
+                                    <li class="nested-submenu-item" id="decisionTree">Decision Tree</li>
+                                    <li class="nested-submenu-item" id="randomForest">Random Forest</li>
+                                    <li class="nested-submenu-item" id="svm">Support Vector Machine (SVM)</li>
+                                </ul>
+                            </li>
+                            <li class="list-group-item menu-item" id="menu-unsupervised">
+                                Unsupervised Learning
+                                <ul class="nested-submenu" id="submenu-unsupervised">
+                                    <li class="nested-submenu-item" id="kMeansClustering">K-Means Clustering</li>
+                                    <li class="nested-submenu-item" id="pca">Principal Component Analysis (PCA)</li>
+                                    <li class="nested-submenu-item" id="hierarchicalClustering">Hierarchical Clustering</li>
+                                    <li class="nested-submenu-item" id="dbscan">DBSCAN</li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="col-md-9 bg-light p-3 rounded shadow-sm" id="model-content">
+                        <h4 class="text-center">Select a model to see details</h4>
+                    </div>
                 </div>
-                <!-- Right Content -->
-                <div class="col-md-9 bg-light p-3 rounded shadow-sm" id="mlOutput">
-                    <h4 class="text-center">Select a model to display results</h4>
-                </div>
-            </div>
-        `
+            </section>`,
     };
 
-    // Attach toolbar event listener for predictions
-    const predictionsButton = document.getElementById('toolbar-predictions');
-    if (predictionsButton) {
-        predictionsButton.addEventListener('click', () => {
-            dynamicContent.innerHTML = toolbarHandlers['toolbar-predictions'];
-            attachMenuFunctionality();
-        });
-    }
-
-    // Attach toggle and click functionality for menus
-    function attachMenuFunctionality() {
-        // Toggle functionality for Supervised and Unsupervised ML
-        toggleSubmenu('supervised-ml', 'supervised-ml-submenu');
-        toggleSubmenu('unsupervised-ml', 'unsupervised-ml-submenu');
-
-        // Attach event listeners to each model
-        document.getElementById('linearRegression').addEventListener('click', () => {
-            performLinearRegression();
-        });
-
-        document.getElementById('logisticRegression').addEventListener('click', () => {
-            performLogisticRegression();
-        });
-
-        document.getElementById('decisionTree').addEventListener('click', () => {
-            performDecisionTree();
-        });
-
-        document.getElementById('kMeansClustering').addEventListener('click', () => {
-            performKMeansClustering();
-        });
-
-        document.getElementById('pca').addEventListener('click', () => {
-            performPCA();
-        });
-    }
-
-    // Helper: Toggle Submenu
-    function toggleSubmenu(menuId, submenuId) {
-        const menuElement = document.getElementById(menuId);
-        const submenuElement = document.getElementById(submenuId);
-
-        if (menuElement && submenuElement) {
-            menuElement.addEventListener('click', () => {
-                if (submenuElement.style.display === 'none') {
-                    submenuElement.style.display = 'block';
-                } else {
-                    submenuElement.style.display = 'none';
+    Object.keys(toolbarHandlers).forEach(id => {
+        const button = document.getElementById(id);
+        if (button) {
+            button.addEventListener('click', () => {
+                dynamicContent.innerHTML = toolbarHandlers[id];
+                if (id === 'toolbar-predictions') {
+                    implementPredictionFunctionality();
                 }
             });
         }
+    });
+
+    function implementPredictionFunctionality() {
+        document.getElementById('linearRegression').addEventListener('click', () => handleModelClick('Linear Regression', performLinearRegression));
+        document.getElementById('logisticRegression').addEventListener('click', () => handleModelClick('Logistic Regression', performLogisticRegression));
+        document.getElementById('decisionTree').addEventListener('click', () => handleModelClick('Decision Tree', performDecisionTree));
+        document.getElementById('randomForest').addEventListener('click', () => handleModelClick('Random Forest', performRandomForest));
+        document.getElementById('svm').addEventListener('click', () => handleModelClick('Support Vector Machine (SVM)', performSVM));
+        document.getElementById('kMeansClustering').addEventListener('click', () => handleModelClick('K-Means Clustering', performKMeansClustering));
+        document.getElementById('pca').addEventListener('click', () => handleModelClick('Principal Component Analysis (PCA)', performPCA));
+        document.getElementById('hierarchicalClustering').addEventListener('click', () => handleModelClick('Hierarchical Clustering', performHierarchicalClustering));
+        document.getElementById('dbscan').addEventListener('click', () => handleModelClick('DBSCAN', performDBSCAN));
     }
 
-    // Helper: Validate Dataset
-    function validateDataset() {
-        // This is a placeholder for actual dataset validation
-        if (false) {
-            alert('No data available. Please upload a valid dataset.');
-            return false;
-        }
-        return true;
+    function handleModelClick(modelName, modelFunction) {
+        const modelContent = document.getElementById('model-content');
+        modelContent.innerHTML = `
+            <h4>${modelName} Model</h4>
+            <p>Performing ${modelName}...</p>
+            <div id="mlOutput" class="text-dark mt-3"></div>`;
+        modelFunction();
     }
 
-    // Machine Learning Functions
+    // Helper: Parse Dataset Columns
+    function getColumnData(columnName) {
+        const columnIndex = sharedDataset.headers.indexOf(columnName);
+        return sharedDataset.rows.map(row => parseFloat(row[columnIndex])).filter(val => !isNaN(val));
+    }
+
+    // Model Functions
     function performLinearRegression() {
         const output = document.getElementById('mlOutput');
-        output.innerHTML = '<h4>Linear Regression</h4>';
-        output.innerHTML += '<p>Performing Linear Regression...</p>';
-        // Mock implementation for demonstration
-        output.innerHTML += '<p>Linear Regression completed successfully!</p>';
+        const x = getColumnData(prompt('Enter the column name for the independent variable (X):'));
+        const y = getColumnData(prompt('Enter the column name for the dependent variable (Y):'));
+        if (x.length !== y.length || x.length === 0) {
+            output.innerHTML += '<p>Invalid data for Linear Regression.</p>';
+            return;
+        }
+        const n = x.length, meanX = x.reduce((a, b) => a + b, 0) / n, meanY = y.reduce((a, b) => a + b, 0) / n;
+        const numerator = x.reduce((sum, xi, i) => sum + (xi - meanX) * (y[i] - meanY), 0);
+        const denominator = x.reduce((sum, xi) => sum + Math.pow(xi - meanX, 2), 0);
+        const slope = numerator / denominator, intercept = meanY - slope * meanX;
+        output.innerHTML += `<p>Slope: ${slope.toFixed(2)}, Intercept: ${intercept.toFixed(2)}</p>`;
     }
 
     function performLogisticRegression() {
         const output = document.getElementById('mlOutput');
-        output.innerHTML = '<h4>Logistic Regression</h4>';
-        output.innerHTML += '<p>Performing Logistic Regression...</p>';
-        // Mock implementation for demonstration
-        output.innerHTML += '<p>Logistic Regression completed successfully!</p>';
+        const x = getColumnData(prompt('Enter the column name for the independent variable (X):'));
+        const y = getColumnData(prompt('Enter the column name for the dependent variable (Y):'));
+        if (x.length !== y.length || x.length === 0) {
+            output.innerHTML += '<p>Invalid data for Logistic Regression.</p>';
+            return;
+        }
+        const sigmoid = z => 1 / (1 + Math.exp(-z));
+        const weights = Array(x.length).fill(0.5);
+        const predictions = x.map((xi, i) => sigmoid(weights[i] * xi));
+        output.innerHTML += `<p>Predictions: [${predictions.map(p => p.toFixed(2)).join(', ')}]</p>`;
     }
 
     function performDecisionTree() {
         const output = document.getElementById('mlOutput');
-        output.innerHTML = '<h4>Decision Tree</h4>';
-        output.innerHTML += '<p>Performing Decision Tree...</p>';
-        // Mock implementation for demonstration
-        output.innerHTML += '<p>Decision Tree completed successfully!</p>';
+        output.innerHTML = '<p>Decision Tree implementation requires external libraries.</p>';
+    }
+
+    function performRandomForest() {
+        const output = document.getElementById('mlOutput');
+        output.innerHTML = '<p>Random Forest implementation requires external libraries.</p>';
+    }
+
+    function performSVM() {
+        const output = document.getElementById('mlOutput');
+        output.innerHTML = '<p>SVM implementation requires external libraries.</p>';
     }
 
     function performKMeansClustering() {
         const output = document.getElementById('mlOutput');
-        output.innerHTML = '<h4>K-Means Clustering</h4>';
-        output.innerHTML += '<p>Performing K-Means Clustering...</p>';
-        // Mock implementation for demonstration
-        output.innerHTML += '<p>K-Means Clustering completed successfully!</p>';
+        const k = parseInt(prompt('Enter number of clusters (K):'), 10);
+        const columnName = prompt('Enter column for clustering:');
+        const data = getColumnData(columnName);
+        if (!k || data.length < k) {
+            output.innerHTML += '<p>Invalid data or insufficient rows for clustering.</p>';
+            return;
+        }
+        const centroids = data.slice(0, k), assignments = Array(data.length).fill(0);
+        for (let iteration = 0; iteration < 10; iteration++) {
+            data.forEach((val, i) => assignments[i] = centroids.map(c => Math.abs(val - c)).indexOf(Math.min(...centroids.map(c => Math.abs(val - c)))));
+            centroids.forEach((_, cluster) => centroids[cluster] = data.filter((_, i) => assignments[i] === cluster).reduce((a, b) => a + b, 0) / data.filter((_, i) => assignments[i] === cluster).length || centroids[cluster]);
+        }
+        output.innerHTML += `<p>Clusters: [${assignments.join(', ')}]</p>`;
     }
 
     function performPCA() {
         const output = document.getElementById('mlOutput');
-        output.innerHTML = '<h4>Principal Component Analysis (PCA)</h4>';
-        output.innerHTML += '<p>Performing PCA...</p>';
-        // Mock implementation for demonstration
-        output.innerHTML += '<p>PCA completed successfully!</p>';
+        output.innerHTML = '<p>PCA implementation requires external libraries.</p>';
     }
+
+    function performHierarchicalClustering() {
+        const output = document.getElementById('mlOutput');
+        output.innerHTML = '<p>Hierarchical Clustering implementation requires external libraries.</p>';
+    }
+
+    function performDBSCAN() {
+        const output = document.getElementById('mlOutput');
+        output.innerHTML = '<p>DBSCAN implementation requires external libraries.</p>';
+    }
+
+
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
