@@ -35,8 +35,37 @@ document.addEventListener('DOMContentLoaded', () => {
                     </div>
                 </div>
             </section>`,
+
+     'toolbar-transformations': `
+    <section style="background: linear-gradient(115deg, #6dcfe7, #1e1e1e);">
+        <div class="row">
+            <div class="col-md-3 bg-dark text-light p-3 rounded shadow-sm menu-section">
+                <h4 class="text-light">Data Transformations</h4>
+                <ul class="list-group">
+                    <li class="list-group-item menu-item" id="normalize-data">Normalize Data</li>
+                    <li class="list-group-item menu-item" id="scale-data">Scale Data</li>
+                    <li class="list-group-item menu-item" id="log-transform">Log Transformation</li>
+                    <li class="list-group-item menu-item" id="custom-transform">Custom Transformation</li>
+                    <li class="list-group-item menu-item" id="sqrt-transform">Square Root Transformation</li>
+                    <li class="list-group-item menu-item" id="exp-transform">Exponential Transformation</li>
+                    <li class="list-group-item menu-item" id="inverse-transform">Inverse Transformation</li>
+                    <li class="list-group-item menu-item" id="binning-data">Binning</li>
+                    <li class="list-group-item menu-item" id="absolute-value">Absolute Value Transformation</li>
+                    <li class="list-group-item menu-item" id="capping">Capping (Winsorizing)</li>
+                    <li class="list-group-item menu-item" id="one-hot-encoding">One-Hot Encoding</li>
+                    <li class="list-group-item menu-item" id="standardize-data">Standardize Data (Z-Score)</li>
+                    <li class="list-group-item menu-item" id="clipping">Clipping</li>
+                </ul>
+            </div>
+            <div class="col-md-9 bg-light p-3 rounded shadow-sm" id="transformation-content">
+                <h4 class="text-center">Select a Transformation to Display Results</h4>
+                <div id="transformationOutput" class="text-dark mt-3"></div>
+            </div>
+        </div>
+    </section>`
     };
 
+    // Attach Event Listeners to Toolbar Buttons
     Object.keys(toolbarHandlers).forEach(id => {
         const button = document.getElementById(id);
         if (button) {
@@ -44,6 +73,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 dynamicContent.innerHTML = toolbarHandlers[id];
                 if (id === 'toolbar-predictions') {
                     implementPredictionFunctionality();
+                } else if (id === 'toolbar-transformations') {
+                    implementTransformationFunctionality();
                 }
             });
         }
@@ -70,107 +101,290 @@ document.addEventListener('DOMContentLoaded', () => {
         modelFunction();
     }
 
-    // Helper: Parse Dataset Columns
-    function getColumnData(columnName) {
-        const columnIndex = sharedDataset.headers.indexOf(columnName);
+    function implementTransformationFunctionality() {
+        document.getElementById('normalize-data').addEventListener('click', () => handleTransformationClick('Normalize Data', normalizeData));
+        document.getElementById('scale-data').addEventListener('click', () => handleTransformationClick('Scale Data', scaleData));
+        document.getElementById('log-transform').addEventListener('click', () => handleTransformationClick('Log Transformation', logTransformation));
+        document.getElementById('custom-transform').addEventListener('click', () => handleTransformationClick('Custom Transformation', customTransformation));
+        document.getElementById('sqrt-transform').addEventListener('click', () => handleTransformationClick('Square Root Transformation', sqrtTransformation));
+        document.getElementById('exp-transform').addEventListener('click', () => handleTransformationClick('Exponential Transformation', expTransformation));
+        document.getElementById('inverse-transform').addEventListener('click', () => handleTransformationClick('Inverse Transformation', inverseTransformation));
+        document.getElementById('binning-data').addEventListener('click', () => handleTransformationClick('Binning', binningData));
+        document.getElementById('absolute-value').addEventListener('click', () => handleTransformationClick('Absolute Value Transformation', absoluteValueTransformation));
+        document.getElementById('capping').addEventListener('click', () => handleTransformationClick('Capping (Winsorizing)', cappingTransformation));
+        document.getElementById('one-hot-encoding').addEventListener('click', () => handleTransformationClick('One-Hot Encoding', oneHotEncoding));
+        document.getElementById('standardize-data').addEventListener('click', () => handleTransformationClick('Standardize Data (Z-Score)', standardizeData));
+        document.getElementById('clipping').addEventListener('click', () => handleTransformationClick('Clipping', clipping));
+    }
+    function handleTransformationClick(transformationName, transformationFunction) {
+        const transformationContent = document.getElementById('transformation-content');
+        transformationContent.innerHTML = `
+            <h4>${transformationName}</h4>
+            <p>Applying ${transformationName}...</p>
+            <div id="transformationOutput" class="text-dark mt-3"></div>`;
+        transformationFunction();
+    }
+
+    function sqrtTransformation() {
+        const column = prompt('Enter the column name to apply square root transformation:');
+        if (!validateColumn(column)) return;
+    
+        const columnIndex = sharedDataset.headers.indexOf(column);
+    
+        sharedDataset.rows = sharedDataset.rows.map(row => {
+            const value = parseFloat(row[columnIndex]);
+            if (!isNaN(value) && value >= 0) row[columnIndex] = Math.sqrt(value).toFixed(2);
+            return row;
+        });
+    
+        updateTransformationOutput(`Applied square root transformation to column: ${column}`);
+    }
+
+    function expTransformation() {
+        const column = prompt('Enter the column name to apply exponential transformation:');
+        if (!validateColumn(column)) return;
+    
+        const columnIndex = sharedDataset.headers.indexOf(column);
+    
+        sharedDataset.rows = sharedDataset.rows.map(row => {
+            const value = parseFloat(row[columnIndex]);
+            if (!isNaN(value)) row[columnIndex] = Math.exp(value).toFixed(2);
+            return row;
+        });
+    
+        updateTransformationOutput(`Applied exponential transformation to column: ${column}`);
+    }
+    function inverseTransformation() {
+        const column = prompt('Enter the column name to apply inverse transformation:');
+        if (!validateColumn(column)) return;
+    
+        const columnIndex = sharedDataset.headers.indexOf(column);
+    
+        sharedDataset.rows = sharedDataset.rows.map(row => {
+            const value = parseFloat(row[columnIndex]);
+            if (!isNaN(value) && value !== 0) row[columnIndex] = (1 / value).toFixed(2);
+            return row;
+        });
+    
+        updateTransformationOutput(`Applied inverse transformation to column: ${column}`);
+    }
+    function binningData() {
+        const column = prompt('Enter the column name for binning:');
+        const bins = parseInt(prompt('Enter the number of bins:'), 10);
+        if (!validateColumn(column) || isNaN(bins) || bins <= 0) return;
+    
+        const columnIndex = sharedDataset.headers.indexOf(column);
+        const values = getColumnData(columnIndex);
+    
+        const min = Math.min(...values);
+        const max = Math.max(...values);
+        const binSize = (max - min) / bins;
+    
+        sharedDataset.rows = sharedDataset.rows.map(row => {
+            const value = parseFloat(row[columnIndex]);
+            if (!isNaN(value)) {
+                const bin = Math.floor((value - min) / binSize) + 1;
+                row[columnIndex] = `Bin ${bin}`;
+            }
+            return row;
+        });
+    
+        updateTransformationOutput(`Binned column: ${column} into ${bins} bins.`);
+    }
+    function absoluteValueTransformation() {
+        const column = prompt('Enter the column name to apply absolute value transformation:');
+        if (!validateColumn(column)) return;
+    
+        const columnIndex = sharedDataset.headers.indexOf(column);
+    
+        sharedDataset.rows = sharedDataset.rows.map(row => {
+            const value = parseFloat(row[columnIndex]);
+            if (!isNaN(value)) row[columnIndex] = Math.abs(value).toFixed(2);
+            return row;
+        });
+    
+        updateTransformationOutput(`Applied absolute value transformation to column: ${column}`);
+    }
+    function cappingTransformation() {
+        const column = prompt('Enter the column name for capping:');
+        const percentile = parseFloat(prompt('Enter the percentile threshold (e.g., 0.05 for 5%):'));
+        if (!validateColumn(column) || isNaN(percentile) || percentile <= 0 || percentile >= 1) return;
+    
+        const columnIndex = sharedDataset.headers.indexOf(column);
+        const values = getColumnData(columnIndex).sort((a, b) => a - b);
+    
+        const lowerIndex = Math.floor(percentile * values.length);
+        const upperIndex = Math.ceil((1 - percentile) * values.length) - 1;
+    
+        const lowerCap = values[lowerIndex];
+        const upperCap = values[upperIndex];
+    
+        sharedDataset.rows = sharedDataset.rows.map(row => {
+            const value = parseFloat(row[columnIndex]);
+            if (!isNaN(value)) {
+                row[columnIndex] = Math.max(lowerCap, Math.min(value, upperCap)).toFixed(2);
+            }
+            return row;
+        });
+    
+        updateTransformationOutput(`Capped column: ${column} to ${percentile * 100}% bounds.`);
+    }
+    function oneHotEncoding() {
+        const column = prompt('Enter the column name for one-hot encoding:');
+        if (!validateColumn(column)) return;
+    
+        const columnIndex = sharedDataset.headers.indexOf(column);
+        const uniqueValues = [...new Set(sharedDataset.rows.map(row => row[columnIndex]))];
+    
+        uniqueValues.forEach(value => {
+            sharedDataset.headers.push(`${column}_${value}`);
+            sharedDataset.rows = sharedDataset.rows.map(row => {
+                row.push(row[columnIndex] === value ? 1 : 0);
+                return row;
+            });
+        });
+    
+        updateTransformationOutput(`Applied one-hot encoding to column: ${column}`);
+    }
+    function standardizeData() {
+        const column = prompt('Enter the column name to standardize:');
+        if (!validateColumn(column)) return;
+    
+        const columnIndex = sharedDataset.headers.indexOf(column);
+        const values = getColumnData(columnIndex);
+    
+        const mean = calculateMean(values);
+        const stdDev = calculateStdDev(values, mean);
+    
+        sharedDataset.rows = sharedDataset.rows.map(row => {
+            const value = parseFloat(row[columnIndex]);
+            if (!isNaN(value)) row[columnIndex] = ((value - mean) / stdDev).toFixed(2);
+            return row;
+        });
+    
+        updateTransformationOutput(`Standardized column: ${column}`);
+    }
+    function clipping() {
+        const column = prompt('Enter the column name to clip:');
+        const minValue = parseFloat(prompt('Enter the minimum value:'));
+        const maxValue = parseFloat(prompt('Enter the maximum value:'));
+        if (!validateColumn(column) || isNaN(minValue) || isNaN(maxValue) || minValue >= maxValue) return;
+    
+        const columnIndex = sharedDataset.headers.indexOf(column);
+    
+        sharedDataset.rows = sharedDataset.rows.map(row => {
+            const value = parseFloat(row[columnIndex]);
+            if (!isNaN(value)) row[columnIndex] = Math.max(minValue, Math.min(value, maxValue)).toFixed(2);
+            return row;
+        });
+    
+        updateTransformationOutput(`Clipped column: ${column} to range [${minValue}, ${maxValue}]`);
+    }
+                                
+    function normalizeData() {
+        const column = prompt('Enter the column name to normalize:');
+        if (!validateColumn(column)) return;
+
+        const columnIndex = sharedDataset.headers.indexOf(column);
+        const values = getColumnData(columnIndex);
+
+        const mean = calculateMean(values);
+        const stdDev = calculateStdDev(values, mean);
+
+        sharedDataset.rows = sharedDataset.rows.map(row => {
+            const value = parseFloat(row[columnIndex]);
+            if (!isNaN(value)) row[columnIndex] = ((value - mean) / stdDev).toFixed(2);
+            return row;
+        });
+
+        updateTransformationOutput(`Normalized column: ${column}`);
+    }
+
+    function scaleData() {
+        const column = prompt('Enter the column name to scale:');
+        if (!validateColumn(column)) return;
+
+        const columnIndex = sharedDataset.headers.indexOf(column);
+        const values = getColumnData(columnIndex);
+
+        const min = Math.min(...values);
+        const max = Math.max(...values);
+
+        sharedDataset.rows = sharedDataset.rows.map(row => {
+            const value = parseFloat(row[columnIndex]);
+            if (!isNaN(value)) row[columnIndex] = ((value - min) / (max - min)).toFixed(2);
+            return row;
+        });
+
+        updateTransformationOutput(`Scaled column: ${column}`);
+    }
+
+    function logTransformation() {
+        const column = prompt('Enter the column name to apply log transformation:');
+        if (!validateColumn(column)) return;
+
+        const columnIndex = sharedDataset.headers.indexOf(column);
+
+        sharedDataset.rows = sharedDataset.rows.map(row => {
+            const value = parseFloat(row[columnIndex]);
+            if (!isNaN(value)) row[columnIndex] = Math.log(value + 1).toFixed(2);
+            return row;
+        });
+
+        updateTransformationOutput(`Applied log transformation to column: ${column}`);
+    }
+
+    function customTransformation() {
+        const column = prompt('Enter the column name for custom transformation:');
+        if (!validateColumn(column)) return;
+
+        const expression = prompt('Enter the transformation expression (e.g., x * 2 for doubling values):');
+        if (!expression) {
+            alert('Invalid transformation expression.');
+            return;
+        }
+
+        const columnIndex = sharedDataset.headers.indexOf(column);
+
+        sharedDataset.rows = sharedDataset.rows.map(row => {
+            const value = parseFloat(row[columnIndex]);
+            if (!isNaN(value)) {
+                try {
+                    row[columnIndex] = eval(expression.replace(/x/g, value)).toFixed(2);
+                } catch (e) {
+                    alert('Error in transformation expression.');
+                }
+            }
+            return row;
+        });
+
+        updateTransformationOutput(`Applied custom transformation to column: ${column}`);
+    }
+
+    function validateColumn(column) {
+        if (!sharedDataset.headers.includes(column)) {
+            alert('Invalid column name.');
+            return false;
+        }
+        return true;
+    }
+
+    function getColumnData(columnIndex) {
         return sharedDataset.rows.map(row => parseFloat(row[columnIndex])).filter(val => !isNaN(val));
     }
 
-    // Model Functions
-    function performLinearRegression() {
-        const output = document.getElementById('mlOutput');
-        const x = getColumnData(prompt('Enter the column name for the independent variable (X):'));
-        const y = getColumnData(prompt('Enter the column name for the dependent variable (Y):'));
-        if (x.length !== y.length || x.length === 0) {
-            output.innerHTML += '<p>Invalid data for Linear Regression.</p>';
-            return;
-        }
-        const n = x.length, meanX = x.reduce((a, b) => a + b, 0) / n, meanY = y.reduce((a, b) => a + b, 0) / n;
-        const numerator = x.reduce((sum, xi, i) => sum + (xi - meanX) * (y[i] - meanY), 0);
-        const denominator = x.reduce((sum, xi) => sum + Math.pow(xi - meanX, 2), 0);
-        const slope = numerator / denominator, intercept = meanY - slope * meanX;
-        output.innerHTML += `<p>Slope: ${slope.toFixed(2)}, Intercept: ${intercept.toFixed(2)}</p>`;
+    function calculateMean(values) {
+        return values.reduce((sum, val) => sum + val, 0) / values.length;
     }
 
-    function performLogisticRegression() {
-        const output = document.getElementById('mlOutput');
-        const x = getColumnData(prompt('Enter the column name for the independent variable (X):'));
-        const y = getColumnData(prompt('Enter the column name for the dependent variable (Y):'));
-        if (x.length !== y.length || x.length === 0) {
-            output.innerHTML += '<p>Invalid data for Logistic Regression.</p>';
-            return;
-        }
-        const sigmoid = z => 1 / (1 + Math.exp(-z));
-        const weights = Array(x.length).fill(0.5);
-        const predictions = x.map((xi, i) => sigmoid(weights[i] * xi));
-        output.innerHTML += `<p>Predictions: [${predictions.map(p => p.toFixed(2)).join(', ')}]</p>`;
+    function calculateStdDev(values, mean) {
+        return Math.sqrt(values.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) / values.length);
     }
 
-    function performDecisionTree() {
-        const output = document.getElementById('mlOutput');
-        output.innerHTML = '<p>Decision Tree implementation requires external libraries.</p>';
+    function updateTransformationOutput(message) {
+        const output = document.getElementById('transformationOutput');
+        output.innerHTML = `<p>${message}</p>`;
     }
-
-    function performRandomForest() {
-        const output = document.getElementById('mlOutput');
-        output.innerHTML = '<p>Random Forest implementation requires external libraries.</p>';
-    }
-
-    function performSVM() {
-        const output = document.getElementById('mlOutput');
-        output.innerHTML = '<p>SVM implementation requires external libraries.</p>';
-    }
-
-    function performKMeansClustering() {
-        const output = document.getElementById('mlOutput');
-        const k = parseInt(prompt('Enter number of clusters (K):'), 10);
-        const columnName = prompt('Enter column for clustering:');
-        const data = getColumnData(columnName);
-        if (!k || data.length < k) {
-            output.innerHTML += '<p>Invalid data or insufficient rows for clustering.</p>';
-            return;
-        }
-        const centroids = data.slice(0, k), assignments = Array(data.length).fill(0);
-        for (let iteration = 0; iteration < 10; iteration++) {
-            data.forEach((val, i) => assignments[i] = centroids.map(c => Math.abs(val - c)).indexOf(Math.min(...centroids.map(c => Math.abs(val - c)))));
-            centroids.forEach((_, cluster) => centroids[cluster] = data.filter((_, i) => assignments[i] === cluster).reduce((a, b) => a + b, 0) / data.filter((_, i) => assignments[i] === cluster).length || centroids[cluster]);
-        }
-        output.innerHTML += `<p>Clusters: [${assignments.join(', ')}]</p>`;
-    }
-
-    function performPCA() {
-        const output = document.getElementById('mlOutput');
-        output.innerHTML = '<p>PCA implementation requires external libraries.</p>';
-    }
-
-    function performHierarchicalClustering() {
-        const output = document.getElementById('mlOutput');
-        output.innerHTML = '<p>Hierarchical Clustering implementation requires external libraries.</p>';
-    }
-
-    function performDBSCAN() {
-        const output = document.getElementById('mlOutput');
-        output.innerHTML = '<p>DBSCAN implementation requires external libraries.</p>';
-    }
-
-
-
-
-    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
     // Add Event Listeners for Static Toolbar Buttons
@@ -286,7 +500,6 @@ if (statsButton) {
                     <ul class="list-group">
                         <li class="list-group-item menu-item" id="menu-load-data">Load Data</li>
                         <li class="list-group-item menu-item" id="menu-clean-data">Clean Data</li>
-                        <li class="list-group-item menu-item" id="menu-transform-data">Transform Data</li>
                         <li class="list-group-item menu-item" id="menu-filter-data">Filter Data</li>
                     </ul>
                 </div>
@@ -299,7 +512,6 @@ if (statsButton) {
     function attachDataMenuEventListeners() {
         document.getElementById('menu-load-data').addEventListener('click', loadDataSection);
         document.getElementById('menu-clean-data').addEventListener('click', cleanDataSection);
-        document.getElementById('menu-transform-data').addEventListener('click', transformDataSection);
         document.getElementById('menu-filter-data').addEventListener('click', filterDataSection);
     }
 
@@ -1022,6 +1234,19 @@ function implementCorrelationFunctionality() {
     });
 }
 
+
+
+
 });
 
+function toggleDetails(card) {
+    console.log('Card clicked:', card); // Debugging: Check if card is correct
+    const details = card.querySelector('.skill-details');
+    if (!details) {
+        console.error('No element with class .skill-details found inside the card:', card);
+        return;
+    }
+    details.classList.toggle('show');
+    console.log('Toggled details visibility:', details); // Debugging: Confirm toggling
+}
 
