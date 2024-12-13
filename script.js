@@ -100,6 +100,89 @@ document.addEventListener('DOMContentLoaded', () => {
             <div id="mlOutput" class="text-dark mt-3"></div>`;
         modelFunction();
     }
+    function performLinearRegression() {
+        const xColumn = prompt('Enter the X-axis column name:');
+        const yColumn = prompt('Enter the Y-axis column name:');
+    
+        if (!validateColumn(xColumn) || !validateColumn(yColumn)) return;
+    
+        const xIndex = sharedDataset.headers.indexOf(xColumn);
+        const yIndex = sharedDataset.headers.indexOf(yColumn);
+    
+        const xValues = getColumnData(xIndex);
+        const yValues = getColumnData(yIndex);
+    
+        if (xValues.length !== yValues.length || xValues.length === 0) {
+            alert('Invalid data: X and Y columns must have the same number of valid numeric entries.');
+            return;
+        }
+    
+        // Calculate the means
+        const xMean = calculateMean(xValues);
+        const yMean = calculateMean(yValues);
+    
+        // Calculate slope (m) and intercept (b)
+        const numerator = xValues.reduce((sum, x, i) => sum + (x - xMean) * (yValues[i] - yMean), 0);
+        const denominator = xValues.reduce((sum, x) => sum + Math.pow(x - xMean, 2), 0);
+        const slope = numerator / denominator;
+        const intercept = yMean - slope * xMean;
+    
+        // Generate predictions
+        const predictions = xValues.map(x => slope * x + intercept);
+    
+        updateModelOutput(`Linear Regression Model:<br>Slope (m): ${slope.toFixed(2)}<br>Intercept (b): ${intercept.toFixed(2)}`);
+    
+        // Plot the results
+        plotRegressionResults(xValues, yValues, predictions, xColumn, yColumn);
+    }
+    
+    function plotRegressionResults(xValues, yValues, predictions, xColumn, yColumn) {
+        const chartCanvas = document.getElementById('chartCanvas').getContext('2d');
+    
+        new Chart(chartCanvas, {
+            type: 'scatter',
+            data: {
+                datasets: [
+                    {
+                        label: 'Data Points',
+                        data: xValues.map((x, i) => ({ x, y: yValues[i] })),
+                        backgroundColor: '#4b9cdf',
+                    },
+                    {
+                        label: 'Regression Line',
+                        data: xValues.map((x, i) => ({ x, y: predictions[i] })),
+                        type: 'line',
+                        borderColor: '#ff6347',
+                        fill: false,
+                    },
+                ],
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: true,
+                    },
+                },
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: xColumn,
+                        },
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: yColumn,
+                        },
+                    },
+                },
+            },
+        });
+    }
+    
 
     function implementTransformationFunctionality() {
         document.getElementById('normalize-data').addEventListener('click', () => handleTransformationClick('Normalize Data', normalizeData));
