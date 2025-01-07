@@ -35,34 +35,33 @@ document.addEventListener('DOMContentLoaded', () => {
                     </div>
                 </div>
             </section>`,
-
-     'toolbar-transformations': `
-    <section style="background: linear-gradient(115deg, #6dcfe7, #1e1e1e);">
-        <div class="row">
-            <div class="col-md-3 bg-dark text-light p-3 rounded shadow-sm menu-section">
-                <h4 class="text-light">Data Transformations</h4>
-                <ul class="list-group">
-                    <li class="list-group-item menu-item" id="normalize-data">Normalize Data</li>
-                    <li class="list-group-item menu-item" id="scale-data">Scale Data</li>
-                    <li class="list-group-item menu-item" id="log-transform">Log Transformation</li>
-                    <li class="list-group-item menu-item" id="custom-transform">Custom Transformation</li>
-                    <li class="list-group-item menu-item" id="sqrt-transform">Square Root Transformation</li>
-                    <li class="list-group-item menu-item" id="exp-transform">Exponential Transformation</li>
-                    <li class="list-group-item menu-item" id="inverse-transform">Inverse Transformation</li>
-                    <li class="list-group-item menu-item" id="binning-data">Binning</li>
-                    <li class="list-group-item menu-item" id="absolute-value">Absolute Value Transformation</li>
-                    <li class="list-group-item menu-item" id="capping">Capping (Winsorizing)</li>
-                    <li class="list-group-item menu-item" id="one-hot-encoding">One-Hot Encoding</li>
-                    <li class="list-group-item menu-item" id="standardize-data">Standardize Data (Z-Score)</li>
-                    <li class="list-group-item menu-item" id="clipping">Clipping</li>
-                </ul>
-            </div>
-            <div class="col-md-9 bg-light p-3 rounded shadow-sm" id="transformation-content">
-                <h4 class="text-center">Select a Transformation to Display Results</h4>
-                <div id="transformationOutput" class="text-dark mt-3"></div>
-            </div>
-        </div>
-    </section>`
+        'toolbar-transformations': `
+            <section style="background: linear-gradient(115deg, #6dcfe7, #1e1e1e);">
+                <div class="row">
+                    <div class="col-md-3 bg-dark text-light p-3 rounded shadow-sm menu-section">
+                        <h4 class="text-light">Data Transformations</h4>
+                        <ul class="list-group">
+                            <li class="list-group-item menu-item" id="normalize-data">Normalize Data</li>
+                            <li class="list-group-item menu-item" id="scale-data">Scale Data</li>
+                            <li class="list-group-item menu-item" id="log-transform">Log Transformation</li>
+                            <li class="list-group-item menu-item" id="custom-transform">Custom Transformation</li>
+                            <li class="list-group-item menu-item" id="sqrt-transform">Square Root Transformation</li>
+                            <li class="list-group-item menu-item" id="exp-transform">Exponential Transformation</li>
+                            <li class="list-group-item menu-item" id="inverse-transform">Inverse Transformation</li>
+                            <li class="list-group-item menu-item" id="binning-data">Binning</li>
+                            <li class="list-group-item menu-item" id="absolute-value">Absolute Value Transformation</li>
+                            <li class="list-group-item menu-item" id="capping">Capping (Winsorizing)</li>
+                            <li class="list-group-item menu-item" id="one-hot-encoding">One-Hot Encoding</li>
+                            <li class="list-group-item menu-item" id="standardize-data">Standardize Data (Z-Score)</li>
+                            <li class="list-group-item menu-item" id="clipping">Clipping</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-9 bg-light p-3 rounded shadow-sm" id="transformation-content">
+                        <h4 class="text-center">Select a Transformation to Display Results</h4>
+                        <div id="transformationOutput" class="text-dark mt-3"></div>
+                    </div>
+                </div>
+            </section>`
     };
 
     // Attach Event Listeners to Toolbar Buttons
@@ -71,11 +70,14 @@ document.addEventListener('DOMContentLoaded', () => {
         if (button) {
             button.addEventListener('click', () => {
                 dynamicContent.innerHTML = toolbarHandlers[id];
-                if (id === 'toolbar-predictions') {
-                    implementPredictionFunctionality();
-                } else if (id === 'toolbar-transformations') {
-                    implementTransformationFunctionality();
-                }
+                // Ensure the DOM has been updated
+                setTimeout(() => {
+                    if (id === 'toolbar-predictions') {
+                        implementPredictionFunctionality();
+                    } else if (id === 'toolbar-transformations') {
+                        implementTransformationFunctionality();
+                    }
+                }, 0);
             });
         }
     });
@@ -92,96 +94,161 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('dbscan').addEventListener('click', () => handleModelClick('DBSCAN', performDBSCAN));
     }
 
-    function handleModelClick(modelName, modelFunction) {
-        const modelContent = document.getElementById('model-content');
-        modelContent.innerHTML = `
-            <h4>${modelName} Model</h4>
-            <p>Performing ${modelName}...</p>
-            <div id="mlOutput" class="text-dark mt-3"></div>`;
-        modelFunction();
+// Global variable to store the current Chart.js instance
+let currentChart = null;
+
+// Function to handle model selection and display
+function handleModelClick(modelName, modelFunction) {
+    const dynamicContent = document.getElementById('dynamicMenuContent');
+
+    // Clear previous content and reset current chart
+    if (currentChart) {
+        currentChart.destroy();
+        currentChart = null;
     }
-    function performLinearRegression() {
-        const xColumn = prompt('Enter the X-axis column name:');
-        const yColumn = prompt('Enter the Y-axis column name:');
-    
-        if (!validateColumn(xColumn) || !validateColumn(yColumn)) return;
-    
-        const xIndex = sharedDataset.headers.indexOf(xColumn);
-        const yIndex = sharedDataset.headers.indexOf(yColumn);
-    
-        const xValues = getColumnData(xIndex);
-        const yValues = getColumnData(yIndex);
-    
-        if (xValues.length !== yValues.length || xValues.length === 0) {
-            alert('Invalid data: X and Y columns must have the same number of valid numeric entries.');
-            return;
+
+    dynamicContent.innerHTML = `
+        <div class="row">
+            <div class="col-md-4 bg-dark text-light p-3">
+                <h4>Data Options</h4>
+                <p>Select data for analysis:</p>
+                <div id="dataSelectionForm">
+                    <label for="x-axis">X-axis:</label>
+                    <select id="x-axis" class="form-control">
+                        ${sharedDataset.headers.map(header => `<option>${header}</option>`).join('')}
+                    </select>
+                    <label for="y-axis">Y-axis:</label>
+                    <select id="y-axis" class="form-control">
+                        ${sharedDataset.headers.map(header => `<option>${header}</option>`).join('')}
+                    </select>
+                    <button class="btn btn-primary mt-3" id="plotButton">Plot</button>
+                </div>
+            </div>
+            <div class="col-md-8 bg-light p-3">
+                <h4>${modelName} Model</h4>
+                <canvas id="chartCanvas" style="width: 100%; height: 400px;"></canvas>
+            </div>
+        </div>`;
+
+    // Attach event listener for the Plot button
+    const plotButton = document.getElementById('plotButton');
+    plotButton.addEventListener('click', function () {
+        if (currentChart) {
+            currentChart.destroy(); // Ensure the previous chart is destroyed
         }
-    
-        // Calculate the means
-        const xMean = calculateMean(xValues);
-        const yMean = calculateMean(yValues);
-    
-        // Calculate slope (m) and intercept (b)
-        const numerator = xValues.reduce((sum, x, i) => sum + (x - xMean) * (yValues[i] - yMean), 0);
-        const denominator = xValues.reduce((sum, x) => sum + Math.pow(x - xMean, 2), 0);
-        const slope = numerator / denominator;
-        const intercept = yMean - slope * xMean;
-    
-        // Generate predictions
-        const predictions = xValues.map(x => slope * x + intercept);
-    
-        updateModelOutput(`Linear Regression Model:<br>Slope (m): ${slope.toFixed(2)}<br>Intercept (b): ${intercept.toFixed(2)}`);
-    
-        // Plot the results
-        plotRegressionResults(xValues, yValues, predictions, xColumn, yColumn);
+        modelFunction();
+    });
+}
+
+// Function to perform linear regression
+function performLinearRegression() {
+    const xColumn = document.getElementById('x-axis').value;
+    const yColumn = document.getElementById('y-axis').value;
+
+    const xIndex = sharedDataset.headers.indexOf(xColumn);
+    const yIndex = sharedDataset.headers.indexOf(yColumn);
+
+    const xValues = getColumnData(xIndex);
+    const yValues = getColumnData(yIndex);
+
+    if (xValues.length !== yValues.length || xValues.length === 0) {
+        alert('Invalid data: X and Y columns must have the same number of valid numeric entries.');
+        return;
     }
-    
-    function plotRegressionResults(xValues, yValues, predictions, xColumn, yColumn) {
-        const chartCanvas = document.getElementById('chartCanvas').getContext('2d');
-    
-        new Chart(chartCanvas, {
-            type: 'scatter',
-            data: {
-                datasets: [
-                    {
-                        label: 'Data Points',
-                        data: xValues.map((x, i) => ({ x, y: yValues[i] })),
-                        backgroundColor: '#4b9cdf',
-                    },
-                    {
-                        label: 'Regression Line',
-                        data: xValues.map((x, i) => ({ x, y: predictions[i] })),
-                        type: 'line',
-                        borderColor: '#ff6347',
-                        fill: false,
-                    },
-                ],
+
+    // Perform regression
+    const regressionResults = calculateLinearRegression(xValues, yValues);
+    console.log('Regression Results:', regressionResults); // Debugging
+    plotRegressionResults(xValues, yValues, regressionResults.predictions, xColumn, yColumn);
+}
+
+// Function to plot regression results
+function plotRegressionResults(xValues, yValues, predictions, xColumn, yColumn) {
+    const canvasElement = document.getElementById('chartCanvas');
+    if (!canvasElement) {
+        alert('Chart canvas element not found.');
+        return;
+    }
+
+    const chartCanvas = canvasElement.getContext('2d');
+    if (!chartCanvas) {
+        alert('Failed to get canvas context.');
+        return;
+    }
+
+    // Destroy the existing chart if it exists
+    if (currentChart) {
+        currentChart.destroy();
+    }
+
+    // Create a new Chart.js instance
+    currentChart = new Chart(chartCanvas, {
+        type: 'scatter',
+        data: {
+            datasets: [
+                {
+                    label: 'Data Points',
+                    data: xValues.map((x, i) => ({ x, y: yValues[i] })),
+                    backgroundColor: '#4b9cdf',
+                },
+                {
+                    label: 'Regression Line',
+                    data: xValues.map((x, i) => ({ x, y: predictions[i] })),
+                    type: 'line',
+                    borderColor: '#ff6347',
+                    fill: false,
+                },
+            ],
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: true,
+                },
             },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
+            scales: {
+                x: {
+                    title: {
                         display: true,
+                        text: xColumn,
                     },
                 },
-                scales: {
-                    x: {
-                        title: {
-                            display: true,
-                            text: xColumn,
-                        },
-                    },
-                    y: {
-                        title: {
-                            display: true,
-                            text: yColumn,
-                        },
+                y: {
+                    title: {
+                        display: true,
+                        text: yColumn,
                     },
                 },
             },
-        });
-    }
+        },
+    });
+}
+
+// Function to calculate linear regression
+function calculateLinearRegression(xValues, yValues) {
+    const n = xValues.length;
+    const xMean = xValues.reduce((sum, val) => sum + val, 0) / n;
+    const yMean = yValues.reduce((sum, val) => sum + val, 0) / n;
+
+    const numerator = xValues.reduce((sum, x, i) => sum + (x - xMean) * (yValues[i] - yMean), 0);
+    const denominator = xValues.reduce((sum, x) => sum + Math.pow(x - xMean, 2), 0);
+
+    const slope = numerator / denominator;
+    const intercept = yMean - slope * xMean;
+
+    const predictions = xValues.map(x => slope * x + intercept);
+
+    return { slope, intercept, predictions };
+}
+
+// Function to get column data
+function getColumnData(columnIndex) {
+    return sharedDataset.rows.map(row => parseFloat(row[columnIndex])).filter(val => !isNaN(val));
+}
+
+    
     
 
     function implementTransformationFunctionality() {
@@ -445,12 +512,15 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function validateColumn(column) {
+        console.log('Validating column:', column); // Debug
+        console.log('Current headers:', sharedDataset.headers); // Debug
         if (!sharedDataset.headers.includes(column)) {
             alert('Invalid column name.');
             return false;
         }
         return true;
     }
+    
 
     function getColumnData(columnIndex) {
         return sharedDataset.rows.map(row => parseFloat(row[columnIndex])).filter(val => !isNaN(val));
@@ -481,15 +551,16 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     const plotsButton = document.getElementById('toolbar-plots');
-    if (plotsButton) {
-        plotsButton.addEventListener('click', () => {
-            if (!sharedDataset.headers.length) {
-                alert('No data available. Please upload data in the Data section.');
-                return;
-            }
-            dynamicContent.innerHTML = `
-                <section style="background: linear-gradient(115deg, #6dcfe7, #1e1e1e);">
-                    <div class="container py-4 d-flex">
+if (plotsButton) {
+    plotsButton.addEventListener('click', () => {
+        if (!sharedDataset.headers.length) {
+            alert('No data available. Please upload data in the Data section.');
+            return;
+        }
+        dynamicContent.innerHTML = `
+            <section style="background: linear-gradient(115deg, #6dcfe7, #1e1e1e);">
+                <div class="container py-4">
+                    <div class="row">
                         <div class="col-3 bg-dark text-light p-3 rounded shadow-sm">
                             <h4>Plot Options</h4>
                             <label>Select X-Axis:</label>
@@ -522,16 +593,18 @@ document.addEventListener('DOMContentLoaded', () => {
                             <button class="btn btn-secondary w-100" id="updateChart">Update Chart</button>
                         </div>
                         <div class="col-9">
-                            <canvas id="chartCanvas" class="bg-white p-3 rounded shadow"></canvas>
+                            <div id="chartsContainer" class="d-flex flex-wrap gap-3"></div>
                         </div>
                     </div>
-                </section>`;
-            populateColumnSelectors();
-            implementPlotFunctionality();
-        });
-    } else {
-        console.error('Button with id "toolbar-plots" not found.');
-    }
+                </div>
+            </section>`;
+        populateColumnSelectors();
+        implementPlotFunctionality();
+    });
+} else {
+    console.error('Button with id "toolbar-plots" not found.');
+}
+
 
 // Toolbar Button for Statistics Section
 const statsButton = document.getElementById('toolbar-statistics');
@@ -607,116 +680,147 @@ if (statsButton) {
 
 
 // Implement Enhanced Plot Functionality
+// Implement Enhanced Plot Functionality
 function implementPlotFunctionality() {
-    let chart;
+    const chartsContainer = document.getElementById('chartsContainer');
+    let chartInstances = [];
 
-    document.getElementById('generateChart').addEventListener('click', () => {
-        const xAxisColumn = document.getElementById('xAxisColumn').value;
-        const yAxisColumn = document.getElementById('yAxisColumn').value;
-        const chartType = document.getElementById('chartType').value;
-        const chartLabel = document.getElementById('chartLabel').value || `${yAxisColumn} vs ${xAxisColumn}`;
-        const chartColor = document.getElementById('chartColor').value || '#4b9cdf';
-        const showLegend = document.getElementById('showLegend').value === 'true';
-        const xAxisRange = document.getElementById('xAxisRange').value.split(',').map(Number);
-        const yAxisRange = document.getElementById('yAxisRange').value.split(',').map(Number);
+    // Generate Chart
+    // Generate Chart with Improved Layout
+document.getElementById('generateChart').addEventListener('click', () => {
+    const xAxisColumn = document.getElementById('xAxisColumn').value;
+    const yAxisColumn = document.getElementById('yAxisColumn').value;
+    const chartType = document.getElementById('chartType').value;
+    const chartLabel = document.getElementById('chartLabel').value || `${yAxisColumn} vs ${xAxisColumn}`;
+    const chartColor = document.getElementById('chartColor').value || '#4b9cdf';
+    const showLegend = document.getElementById('showLegend').value === 'true';
 
-        if (!xAxisColumn || !yAxisColumn) {
-            alert('Please select both X and Y axes.');
-            return;
-        }
+    if (!xAxisColumn || !yAxisColumn) {
+        alert('Please select both X and Y axes.');
+        return;
+    }
 
-        const labels = sharedDataset.rows.map(row => row[sharedDataset.headers.indexOf(xAxisColumn)]);
-        const data = sharedDataset.rows.map(row => parseFloat(row[sharedDataset.headers.indexOf(yAxisColumn)]));
+    const labels = sharedDataset.rows.map(row => row[sharedDataset.headers.indexOf(xAxisColumn)]);
+    const data = sharedDataset.rows.map(row => parseFloat(row[sharedDataset.headers.indexOf(yAxisColumn)]));
 
-        if (data.every(isNaN)) {
-            alert('The selected Y-axis column contains no valid numeric data.');
-            return;
-        }
+    if (data.every(isNaN)) {
+        alert('The selected Y-axis column contains no valid numeric data.');
+        return;
+    }
 
-        const chartCanvas = document.getElementById('chartCanvas').getContext('2d');
+    // Create Chart Wrapper
+    const chartWrapper = document.createElement('div');
+    chartWrapper.className = 'chart-wrapper';
 
-        if (chart) {
-            chart.destroy();
-        }
+    // Add Chart Title
+    const chartTitle = document.createElement('h4');
+    chartTitle.textContent = chartLabel;
+    chartWrapper.appendChild(chartTitle);
 
-        chart = new Chart(chartCanvas, {
-            type: chartType,
-            data: {
-                labels: labels,
-                datasets: [{
-                    label: chartLabel,
-                    data: data,
-                    backgroundColor: chartColor,
-                    borderColor: chartColor,
-                    borderWidth: 1
-                }]
+    // Create Canvas for Chart
+    const canvas = document.createElement('canvas');
+    chartWrapper.appendChild(canvas);
+
+    // Add Remove Button
+    const removeButton = document.createElement('button');
+    removeButton.className = 'remove-chart-btn';
+    removeButton.textContent = 'Remove Chart';
+    removeButton.addEventListener('click', () => {
+        chartsContainer.removeChild(chartWrapper);
+    });
+    chartWrapper.appendChild(removeButton);
+
+    chartsContainer.appendChild(chartWrapper);
+
+    // Create Chart
+    const ctx = canvas.getContext('2d');
+    new Chart(ctx, {
+        type: chartType,
+        data: {
+            labels: labels,
+            datasets: [{
+                label: chartLabel,
+                data: data,
+                backgroundColor: chartColor,
+                borderColor: chartColor,
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: showLegend
+                }
             },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        display: showLegend
+            scales: {
+                x: {
+                    title: {
+                        display: true,
+                        text: xAxisColumn
                     }
                 },
-                scales: {
-                    x: {
-                        title: {
-                            display: true,
-                            text: xAxisColumn
-                        },
-                        ...(xAxisRange.length === 2 && {
-                            min: xAxisRange[0],
-                            max: xAxisRange[1]
-                        })
-                    },
-                    y: {
-                        title: {
-                            display: true,
-                            text: yAxisColumn
-                        },
-                        ...(yAxisRange.length === 2 && {
-                            min: yAxisRange[0],
-                            max: yAxisRange[1]
-                        })
+                y: {
+                    title: {
+                        display: true,
+                        text: yAxisColumn
                     }
                 }
             }
-        });
-    });
-
-
-    // Update Chart Axes or Settings
-    document.getElementById('updateChart').addEventListener('click', () => {
-        if (!chart) {
-            alert('No chart is currently generated. Please generate a chart first.');
-            return;
         }
-
-        const newXAxisColumn = document.getElementById('xAxisColumn').value;
-        const newYAxisColumn = document.getElementById('yAxisColumn').value;
-        const newLabelText = document.getElementById('chartLabel').value || `${newYAxisColumn} vs ${newXAxisColumn}`;
-        const newColor = document.getElementById('chartColor').value || 'rgba(75, 192, 192, 0.2)';
-
-        if (!newXAxisColumn || !newYAxisColumn) {
-            alert('Please select both X and Y axes.');
-            return;
-        }
-
-        // Update Data and Labels
-        const labels = sharedDataset.rows.map(row => row[sharedDataset.headers.indexOf(newXAxisColumn)]);
-        const data = sharedDataset.rows.map(row => parseFloat(row[sharedDataset.headers.indexOf(newYAxisColumn)]));
-
-        chart.data.labels = labels;
-        chart.data.datasets[0].data = data;
-        chart.data.datasets[0].label = newLabelText;
-        chart.data.datasets[0].backgroundColor = newColor;
-        chart.data.datasets[0].borderColor = newColor;
-
-        // Update Chart
-        chart.update();
     });
+});
+
+
+// Update Chart
+document.getElementById('updateChart').addEventListener('click', () => {
+    if (!chart) {
+        alert('No chart is currently generated. Please generate a chart first.');
+        return;
+    }
+
+    const newXAxisColumn = document.getElementById('xAxisColumn').value;
+    const newYAxisColumn = document.getElementById('yAxisColumn').value;
+    const newLabelText = document.getElementById('chartLabel').value || `${newYAxisColumn} vs ${newXAxisColumn}`;
+    const newColor = document.getElementById('chartColor').value || '#4b9cdf';
+
+    // Parse new X and Y axis range inputs
+    const xAxisRangeInput = document.getElementById('xAxisRange').value.split(',').map(Number);
+    const yAxisRangeInput = document.getElementById('yAxisRange').value.split(',').map(Number);
+
+    const xAxisRange = xAxisRangeInput.length === 2 && xAxisRangeInput.every(val => !isNaN(val)) ? xAxisRangeInput : null;
+    const yAxisRange = yAxisRangeInput.length === 2 && yAxisRangeInput.every(val => !isNaN(val)) ? yAxisRangeInput : null;
+
+    if (!newXAxisColumn || !newYAxisColumn) {
+        alert('Please select both X and Y axes.');
+        return;
+    }
+
+    // Update Data and Labels
+    const labels = sharedDataset.rows.map(row => row[sharedDataset.headers.indexOf(newXAxisColumn)]);
+    const data = sharedDataset.rows.map(row => parseFloat(row[sharedDataset.headers.indexOf(newYAxisColumn)]));
+
+    chart.data.labels = labels;
+    chart.data.datasets[0].data = data;
+    chart.data.datasets[0].label = newLabelText;
+    chart.data.datasets[0].backgroundColor = newColor;
+    chart.data.datasets[0].borderColor = newColor;
+
+    // Update Axes Ranges
+    if (xAxisRange) {
+        chart.options.scales.x.min = xAxisRange[0];
+        chart.options.scales.x.max = xAxisRange[1];
+    }
+    if (yAxisRange) {
+        chart.options.scales.y.min = yAxisRange[0];
+        chart.options.scales.y.max = yAxisRange[1];
+    }
+
+    chart.update();
+});
 }
+
 function populateStatsSelectors() {
     const columnOptions = sharedDataset.headers
         .map(header => `<option value="${header}">${header}</option>`)
@@ -1145,6 +1249,21 @@ function filterRowsWithNullColumn() {
 
 
 function implementStatisticsFunctionality() {
+    // Add Menu Bar Dynamically
+    const statsOptionsContainer = document.createElement('div');
+    statsOptionsContainer.innerHTML = `
+        <h5>Statistics Options:</h5>
+        <label><input type="checkbox" id="optionMean" checked> Mean</label>
+        <label><input type="checkbox" id="optionMedian" checked> Median</label>
+        <label><input type="checkbox" id="optionVariance" checked> Variance</label>
+        <label><input type="checkbox" id="optionStdDev" checked> Standard Deviation</label>
+        <label><input type="checkbox" id="optionSkewness" checked> Skewness</label>
+        <label><input type="checkbox" id="optionKurtosis" checked> Kurtosis</label>
+        <label><input type="checkbox" id="optionOutliers" checked> Outliers</label>
+        <label><input type="checkbox" id="optionANOVA" checked> ANOVA</label>
+    `;
+    document.getElementById('dynamicMenuContent').prepend(statsOptionsContainer);
+
     // Generate Summary Statistics
     document.getElementById('generateStats').addEventListener('click', () => {
         const statsColumn = document.getElementById('statsColumn');
@@ -1155,26 +1274,43 @@ function implementStatisticsFunctionality() {
             return;
         }
 
-        // Prepare the table for statistics
+        // Fetch selected statistics options
+        const selectedStats = {
+            mean: document.getElementById('optionMean').checked,
+            median: document.getElementById('optionMedian').checked,
+            variance: document.getElementById('optionVariance').checked,
+            stdDev: document.getElementById('optionStdDev').checked,
+            skewness: document.getElementById('optionSkewness').checked,
+            kurtosis: document.getElementById('optionKurtosis').checked,
+            outliers: document.getElementById('optionOutliers').checked,
+            anova: document.getElementById('optionANOVA').checked
+        };
+
+        // Build table headers dynamically
         let tableHTML = `<table class="table table-dark table-striped">
                             <thead>
                                 <tr>
-                                    <th>Column</th>
-                                    <th>Mean</th>
-                                    <th>Median</th>
-                                    <th>Variance</th>
-                                    <th>Standard Deviation</th>
-                                </tr>
+                                    <th>Column</th>`;
+        if (selectedStats.mean) tableHTML += '<th>Mean</th>';
+        if (selectedStats.median) tableHTML += '<th>Median</th>';
+        if (selectedStats.variance) tableHTML += '<th>Variance</th>';
+        if (selectedStats.stdDev) tableHTML += '<th>Standard Deviation</th>';
+        if (selectedStats.skewness) tableHTML += '<th>Skewness</th>';
+        if (selectedStats.kurtosis) tableHTML += '<th>Kurtosis</th>';
+        if (selectedStats.outliers) tableHTML += '<th>Outliers Detected</th>';
+        if (selectedStats.anova) tableHTML += '<th>ANOVA p-value</th>';
+        tableHTML += `</tr>
                             </thead>
                             <tbody>`;
 
+        // Process each selected column
         selectedOptions.forEach(column => {
             const columnIndex = sharedDataset.headers.indexOf(column);
 
             if (columnIndex === -1) {
                 tableHTML += `<tr>
                                 <td>${column}</td>
-                                <td colspan="4">Invalid column</td>
+                                <td colspan="${Object.keys(selectedStats).length}">Invalid column</td>
                               </tr>`;
                 return;
             }
@@ -1184,61 +1320,86 @@ function implementStatisticsFunctionality() {
             if (values.length === 0) {
                 tableHTML += `<tr>
                                 <td>${column}</td>
-                                <td colspan="4">No numeric data</td>
+                                <td colspan="${Object.keys(selectedStats).length}">No numeric data</td>
                               </tr>`;
                 return;
             }
 
-            const mean = values.reduce((sum, val) => sum + val, 0) / values.length;
-            const median = values.sort((a, b) => a - b)[Math.floor(values.length / 2)];
-            const variance = values.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) / values.length;
-            const stdDev = Math.sqrt(variance);
-
-            tableHTML += `<tr>
-                            <td>${column}</td>
-                            <td>${mean.toFixed(2)}</td>
-                            <td>${median.toFixed(2)}</td>
-                            <td>${variance.toFixed(2)}</td>
-                            <td>${stdDev.toFixed(2)}</td>
-                          </tr>`;
+            // Generate statistics based on selection
+            let rowHTML = `<tr><td>${column}</td>`;
+            if (selectedStats.mean) {
+                const mean = values.reduce((sum, val) => sum + val, 0) / values.length;
+                rowHTML += `<td>${mean.toFixed(2)}</td>`;
+            }
+            if (selectedStats.median) {
+                const median = values.sort((a, b) => a - b)[Math.floor(values.length / 2)];
+                rowHTML += `<td>${median.toFixed(2)}</td>`;
+            }
+            if (selectedStats.variance) {
+                const mean = values.reduce((sum, val) => sum + val, 0) / values.length;
+                const variance = values.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) / values.length;
+                rowHTML += `<td>${variance.toFixed(2)}</td>`;
+            }
+            if (selectedStats.stdDev) {
+                const mean = values.reduce((sum, val) => sum + val, 0) / values.length;
+                const variance = values.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) / values.length;
+                const stdDev = Math.sqrt(variance);
+                rowHTML += `<td>${stdDev.toFixed(2)}</td>`;
+            }
+            if (selectedStats.skewness) {
+                const mean = values.reduce((sum, val) => sum + val, 0) / values.length;
+                const stdDev = Math.sqrt(values.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) / values.length);
+                const skewness = values.reduce((sum, val) => sum + Math.pow((val - mean) / stdDev, 3), 0) / values.length;
+                rowHTML += `<td>${skewness.toFixed(2)}</td>`;
+            }
+            if (selectedStats.kurtosis) {
+                const mean = values.reduce((sum, val) => sum + val, 0) / values.length;
+                const stdDev = Math.sqrt(values.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) / values.length);
+                const kurtosis = values.reduce((sum, val) => sum + Math.pow((val - mean) / stdDev, 4), 0) / values.length - 3;
+                rowHTML += `<td>${kurtosis.toFixed(2)}</td>`;
+            }
+            if (selectedStats.outliers) {
+                const sorted = [...values].sort((a, b) => a - b);
+                const q1 = sorted[Math.floor(sorted.length / 4)];
+                const q3 = sorted[Math.floor(sorted.length * 3 / 4)];
+                const iqr = q3 - q1;
+                const outliers = values.filter(val => val < q1 - 1.5 * iqr || val > q3 + 1.5 * iqr);
+                rowHTML += `<td>${outliers.length}</td>`;
+            }
+            if (selectedStats.anova) {
+                const quartileSize = Math.floor(values.length / 4);
+                const groups = [
+                    values.slice(0, quartileSize),
+                    values.slice(quartileSize, quartileSize * 2),
+                    values.slice(quartileSize * 2, quartileSize * 3),
+                    values.slice(quartileSize * 3)
+                ];
+                const overallMean = values.reduce((sum, val) => sum + val, 0) / values.length;
+                const betweenGroupSS = groups.reduce((sum, group) => {
+                    const groupMean = group.reduce((sum, val) => sum + val, 0) / group.length;
+                    return sum + group.length * Math.pow(groupMean - overallMean, 2);
+                }, 0);
+                const withinGroupSS = groups.reduce((sum, group) => {
+                    const groupMean = group.reduce((sum, val) => sum + val, 0) / group.length;
+                    return sum + group.reduce((sum, val) => sum + Math.pow(val - groupMean, 2), 0);
+                }, 0);
+                const dfBetween = groups.length - 1;
+                const dfWithin = values.length - groups.length;
+                const msBetween = betweenGroupSS / dfBetween;
+                const msWithin = withinGroupSS / dfWithin;
+                const fStatistic = msBetween / msWithin;
+                const pValue = 1 - jStat.centralF.cdf(fStatistic, dfBetween, dfWithin); // Requires jStat library
+                rowHTML += `<td>${pValue.toFixed(5)}</td>`;
+            }
+            rowHTML += `</tr>`;
+            tableHTML += rowHTML;
         });
 
         tableHTML += '</tbody></table>';
-
-        // Update the results section
         document.getElementById('statsResult').innerHTML = tableHTML;
     });
-
-    // Generate Frequency Distribution
-    document.getElementById('generateFrequency').addEventListener('click', () => {
-        const frequencyColumn = document.getElementById('frequencyColumn');
-        const column = frequencyColumn.value;
-
-        if (!column) {
-            alert('Please select a column.');
-            return;
-        }
-
-        const columnIndex = sharedDataset.headers.indexOf(column);
-        if (columnIndex === -1) {
-            alert(`Invalid column: ${column}`);
-            return;
-        }
-
-        const values = sharedDataset.rows.map(row => row[columnIndex]);
-
-        const frequency = values.reduce((acc, val) => {
-            acc[val] = (acc[val] || 0) + 1;
-            return acc;
-        }, {});
-
-        const frequencyHTML = Object.entries(frequency)
-            .map(([key, count]) => `<p>${key}: ${count}</p>`)
-            .join('');
-
-        document.getElementById('frequencyResult').innerHTML = frequencyHTML;
-    });
 }
+
 
 
 document.getElementById('toolbar-correlations').addEventListener('click', () => {
