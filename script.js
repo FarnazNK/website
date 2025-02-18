@@ -605,7 +605,6 @@ if (plotsButton) {
     console.error('Button with id "toolbar-plots" not found.');
 }
 
-
 // Toolbar Button for Statistics Section
 const statsButton = document.getElementById('toolbar-statistics');
 if (statsButton) {
@@ -619,7 +618,7 @@ if (statsButton) {
                 <div class="container py-4">
                     <h4 class="text-light">Statistics Section</h4>
                     <div class="row">
-                        <div class="col-md-6 bg-dark text-light p-3 rounded shadow-sm">
+                        <div class="col-md-12 bg-dark text-light p-3 rounded shadow-sm">
                             <h5>Summary Statistics</h5>
                             <select id="statsColumn" class="form-control mb-3"></select>
                             <button class="btn btn-primary mb-3" id="generateStats">Generate Statistics</button>
@@ -661,7 +660,7 @@ function getDataSectionContent() {
                 </ul>
             </div>
             <div class="col-md-9 bg-light p-3 rounded shadow-sm" id="data-content">
-                <h4 class="text-center">Select a menu item to see options</h4>
+                <h4 class="text-center" style="color: black;">Select a menu item to see options</h4>
             </div>
         </div>`;
 }
@@ -737,15 +736,12 @@ function detectColumnType(values) {
         yAxisSelect.innerHTML = sharedDataset.headers.map(header => `<option value="${header}">${header}</option>`).join('');
     }
 
-
-// Implement Enhanced Plot Functionality
 // Implement Enhanced Plot Functionality
 function implementPlotFunctionality() {
     const chartsContainer = document.getElementById('chartsContainer');
     let chartInstances = [];
 
     // Generate Chart
-    // Generate Chart with Improved Layout
 document.getElementById('generateChart').addEventListener('click', () => {
     const xAxisColumn = document.getElementById('xAxisColumn').value;
     const yAxisColumn = document.getElementById('yAxisColumn').value;
@@ -889,8 +885,6 @@ function populateStatsSelectors() {
     statsColumn.setAttribute('size', '5'); // Adjust size for better visibility
     statsColumn.innerHTML = `<option value="">Select Column(s)</option>${columnOptions}`;
 }
-
-
 
 
     function loadDataSection() {
