@@ -1494,3 +1494,187 @@ function toggleDetails(card) {
     console.log('Toggled details visibility:', details); // Debugging: Confirm toggling
 }
 
+const OPENAI_API_KEY = "YOUR_OPENAI_API_KEY";
+
+document.addEventListener('DOMContentLoaded', () => {
+    // Prevent duplicate chatbot UI
+    if (document.getElementById("chatbot")) return;
+
+    // Create Chatbot UI
+    const chatbotHTML = `
+        <div id="chatbot" class="chatbot-container">
+            <div class="chatbot-header">
+                <h4>AI Data Assistant</h4>
+                <button id="chatbot-close">✖</button>
+            </div>
+            <div id="chatbot-messages" class="chatbot-messages"></div>
+            <div class="chatbot-input-container">
+                <input type="text" id="chatbot-input" placeholder="Ask about your data...">
+                <button id="chatbot-send">Send</button>
+                <button id="interpret-data" class="interpret-btn">Interpret Data</button>
+            </div>
+        </div>`;
+
+    document.body.insertAdjacentHTML("beforeend", chatbotHTML);
+
+    // Chatbot Styles
+    const chatbotStyles = document.createElement("style");
+    chatbotStyles.innerHTML = `
+        .chatbot-container { 
+            position: fixed; bottom: 20px; right: 20px; width: 350px; 
+            background: white; border-radius: 10px; overflow: hidden; 
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.99); 
+            display: flex; flex-direction: column; z-index: 1000;
+        }
+        .chatbot-header { 
+            background:rgb(0, 119, 255); color: white; padding: 12px; 
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .chatbot-header h4 { margin: 0; font-size: 16px; }
+        .chatbot-header button { background: none; border: none; color: white; cursor: pointer; font-size: 16px; }
+        .chatbot-messages { 
+            height: 300px; overflow-y: auto; padding: 12px; 
+            background:rgb(1, 5, 8); font-size: 14px;
+        }
+        .chatbot-input-container { 
+            display: flex; padding: 8px; background: #fff; 
+            border-top: 1px solid #ddd;
+        }
+        #chatbot-input { flex: 1; padding: 8px; border: 1px solid #ddd; border-radius: 5px; }
+        #chatbot-send, .interpret-btn { 
+            padding: 8px 10px; border: none; background:rgb(0, 119, 255); 
+            color: white; cursor: pointer; margin-left: 5px; border-radius: 5px;
+        }
+    `;
+    document.head.appendChild(chatbotStyles);
+
+    // Close Chatbot
+    document.getElementById("chatbot-close").addEventListener("click", () => {
+        document.getElementById("chatbot").style.display = "none";
+    });
+
+    // Chatbot Elements
+    const chatbotInput = document.getElementById("chatbot-input");
+    const chatbotMessages = document.getElementById("chatbot-messages");
+    const chatbotSend = document.getElementById("chatbot-send");
+    const interpretButton = document.getElementById("interpret-data");
+
+    // Function to Add Messages
+    function addChatMessage(sender, message) {
+        chatbotMessages.innerHTML += `<div style='text-align: ${sender === "AI" ? "left" : "right"}; margin-bottom: 5px;'>
+            <strong>${sender}:</strong> ${message}
+        </div>`;
+        chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
+    }
+
+    // OpenAI API Call
+    async function fetchChatGPTResponse(query) {
+        console.log("Sending Query to OpenAI:", query);  // Debugging Output
+    
+        try {
+            const response = await fetch("https://api.openai.com/v1/chat/completions", {
+                method: "POST",
+                headers: {
+                    "Authorization": `Bearer ${OPENAI_API_KEY}`,
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+model: "gpt-3.5-turbo",
+                    messages: [
+                        { role: "system", content: "You are a data analytics AI assistant. Provide statistical insights." },
+                        { role: "user", content: query }
+                    ],
+                    max_tokens: 500
+                })
+            });
+    
+            if (!response.ok) {
+                const errorText = await response.text();
+                console.error("OpenAI API Error:", errorText);
+                throw new Error(`API Error: ${response.status} ${response.statusText} - ${errorText}`);
+            }
+    
+            const result = await response.json();
+            console.log("OpenAI Response:", result);
+            return result.choices[0].message.content.trim();
+        } catch (error) {
+            console.error("Error fetching OpenAI response:", error);
+            return `OpenAI API Error: ${error.message}`;
+        }
+    }
+    
+
+    // Send User Message
+    chatbotSend.addEventListener("click", async () => {
+        const userMessage = chatbotInput.value.trim();
+        if (!userMessage) return;
+
+        addChatMessage("You", userMessage);
+        chatbotInput.value = "";
+
+        const botResponse = await fetchChatGPTResponse(userMessage);
+        addChatMessage("AI", botResponse);
+    });
+
+    // Enable Enter Key to Send Message
+    chatbotInput.addEventListener("keypress", (event) => {
+        if (event.key === "Enter") {
+            chatbotSend.click();
+        }
+    });
+
+    // Interpret Data Button Click
+    interpretButton.addEventListener("click", async () => {
+        const activeTabData = extractActiveTabData();
+        if (!activeTabData) {
+            addChatMessage("AI", "No data found in the active tab. Please generate or load data first.");
+            return;
+        }
+
+        addChatMessage("You", "Interpret the data from the active tab.");
+        const botResponse = await fetchChatGPTResponse(activeTabData);
+        addChatMessage("AI", botResponse);
+    });
+
+    // Extract Data from Active Tab
+    function extractActiveTabData() {
+        const dynamicContent = document.getElementById('dynamicMenuContent');
+        if (!dynamicContent) return null;
+
+        const tabText = dynamicContent.innerText.trim();
+
+        if (tabText.includes("Summary Statistics")) {
+            return extractSummaryStatistics();
+        } else if (tabText.includes("Correlation")) {
+            return extractCorrelationData();
+        } else if (tabText.includes("Prediction Models")) {
+            return extractPredictionDetails();
+        } else if (tabText.includes("Data Transformations")) {
+            return extractTransformationDetails();
+        } else {
+            return null;
+        }
+    }
+
+    function extractSummaryStatistics() {
+        const table = document.querySelector("#statsResult table");
+        if (!table) return null;
+
+        let summaryText = "Summary Statistics:\n";
+        const rows = table.querySelectorAll("tbody tr");
+
+        rows.forEach(row => {
+            const cells = row.querySelectorAll("td");
+            if (cells.length < 2) return;
+
+            let rowText = `${cells[0].textContent.trim()}: `;
+            for (let i = 1; i < cells.length; i++) {
+                rowText += `${table.querySelector("thead").rows[0].cells[i].textContent.trim()} - ${cells[i].textContent.trim()}, `;
+            }
+            summaryText += rowText + "\n";
+        });
+
+        return summaryText;
+    }
+});
+
