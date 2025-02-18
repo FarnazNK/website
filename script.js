@@ -690,7 +690,7 @@ function identifyColumnTypes() {
     // Generate Table
     let tableHTML = `
         <h4 class="text-center">Column Type Identification</h4>
-        <table class="table table-striped table-bordered">
+        <table class="table table-dark table-striped">
             <thead>
                 <tr>
                     <th>Column Name</th>
