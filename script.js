@@ -901,53 +901,115 @@ function populateStatsSelectors() {
     }
     
     function triggerFileDialogAndLoadData() {
-        const fileInput = document.createElement('input');
-        fileInput.type = 'file';
-        fileInput.accept = '.csv';
-        fileInput.style.display = 'none';
-    
-        document.body.appendChild(fileInput);
-    
-        fileInput.addEventListener('change', () => {
-            const file = fileInput.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = (event) => {
-                    const content = event.target.result.trim();
-                    if (!content) {
-                        alert('The file is empty. Please upload a valid dataset.');
-                        document.body.removeChild(fileInput);
-                        return;
-                    }
-    
-                    const rows = content.split('\n');
-                    const headers = rows[0].split(',');
-    
-                    // Store data globally
-                    sharedDataset.headers = headers;
-                    sharedDataset.rows = rows.slice(1).map(row => row.split(','));
-    
-                    // Populate Table Head
-                    const tableHead = document.getElementById('tableHead');
-                    tableHead.innerHTML = `<tr>${headers.map(header => `<th>${header.trim()}</th>`).join('')}</tr>`;
-    
-                    // Populate Table Body
-                    const tableBody = document.getElementById('tableBody');
-                    tableBody.innerHTML = sharedDataset.rows.map(row => {
-                        return `<tr>${row.map(cell => `<td>${cell.trim()}</td>`).join('')}</tr>`;
-                    }).join('');
-    
-                    alert('Data loaded successfully!');
-                };
-                reader.readAsText(file);
-            } else {
-                alert('No file selected. Please upload a valid dataset.');
-            }
+    const fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.accept = '.csv, .xlsx, .xls';
+    fileInput.style.display = 'none';
+
+    document.body.appendChild(fileInput);
+
+    fileInput.addEventListener('change', async () => {
+        const file = fileInput.files[0];
+        if (!file) {
+            alert('No file selected. Please upload a valid dataset.');
             document.body.removeChild(fileInput);
-        });
-    
-        fileInput.click();
+            return;
+        }
+
+        const fileExtension = file.name.split('.').pop().toLowerCase();
+        const reader = new FileReader();
+
+        if (fileExtension === 'csv') {
+            // Handle CSV File
+            reader.onload = (event) => {
+                processCSV(event.target.result);
+            };
+            reader.readAsText(file);
+        } else if (fileExtension === 'xlsx' || fileExtension === 'xls') {
+            // Handle Excel File
+            reader.onload = async (event) => {
+                const data = new Uint8Array(event.target.result);
+                const workbook = XLSX.read(data, { type: 'array' });
+
+                // Assuming the first sheet is used
+                const sheetName = workbook.SheetNames[0];
+                const worksheet = workbook.Sheets[sheetName];
+                const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+
+                processExcel(jsonData);
+            };
+            reader.readAsArrayBuffer(file);
+        } else {
+            alert('Invalid file type. Please upload a CSV or Excel file.');
+        }
+
+        document.body.removeChild(fileInput);
+    });
+
+    fileInput.click();
+}
+
+// Process CSV Data
+function processCSV(content) {
+    if (!content.trim()) {
+        alert('The file is empty. Please upload a valid dataset.');
+        return;
     }
+
+    const rows = content.split('\n').map(row => row.split(','));
+    updateSharedDataset(rows);
+}
+
+// Process Excel Data
+function processExcel(jsonData) {
+    if (!jsonData.length) {
+        alert('The Excel file is empty. Please upload a valid dataset.');
+        return;
+    }
+
+    updateSharedDataset(jsonData);
+}
+
+// Update Global Dataset & Display Table
+function updateSharedDataset(rows) {
+    sharedDataset.headers = rows[0]; // First row as headers
+    sharedDataset.rows = rows.slice(1); // Remaining rows as data
+
+    // Save dataset for persistence (Optional)
+    localStorage.setItem('savedDataset', JSON.stringify(sharedDataset));
+
+    displayDataTable();
+    alert('Data loaded successfully!');
+}
+
+// Display Data Table
+function displayDataTable() {
+    document.getElementById('data-content').innerHTML = `
+        <div class="table-container bg-dark rounded p-3">
+            <table class="table table-dark table-striped">
+                <thead id="tableHead"></thead>
+                <tbody id="tableBody"></tbody>
+            </table>
+        </div>`;
+
+    const tableHead = document.getElementById('tableHead');
+    tableHead.innerHTML = `<tr>${sharedDataset.headers.map(header => `<th>${header.trim()}</th>`).join('')}</tr>`;
+
+    const tableBody = document.getElementById('tableBody');
+    tableBody.innerHTML = sharedDataset.rows.map(row => {
+        return `<tr>${row.map(cell => `<td>${cell ? cell.toString().trim() : ''}</td>`).join('')}</tr>`;
+    }).join('');
+}
+
+// Restore Data on Page Load (Optional)
+document.addEventListener('DOMContentLoaded', () => {
+    const savedData = localStorage.getItem('savedDataset');
+    if (savedData) {
+        sharedDataset = JSON.parse(savedData);
+        displayDataTable();
+    }
+});
+
 
     // Clean Data Section with Dropdown Submenu
     function cleanDataSection() {
