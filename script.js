@@ -647,29 +647,82 @@ if (statsButton) {
         console.error('Button with id "toolbar-data" not found.');
     }
 
-    // Helper Functions
-    function getDataSectionContent() {
-        return `
-            <div class="row">
-                <div class="col-md-3 bg-dark p-3 rounded shadow-sm menu-section">
-                    <h4 class="text-light">Menu</h4>
-                    <ul class="list-group">
-                        <li class="list-group-item menu-item" id="menu-load-data">Load Data</li>
-                        <li class="list-group-item menu-item" id="menu-clean-data">Clean Data</li>
-                        <li class="list-group-item menu-item" id="menu-filter-data">Filter Data</li>
-                    </ul>
-                </div>
-                <div class="col-md-9 bg-light p-3 rounded shadow-sm" id="data-content">
-                    <h4 class="text-center">Select a menu item to see options</h4>
-                </div>
-            </div>`;
+   // Helper Functions
+function getDataSectionContent() {
+    return `
+        <div class="row">
+            <div class="col-md-3 bg-dark p-3 rounded shadow-sm menu-section">
+                <h4 class="text-light">Menu</h4>
+                <ul class="list-group">
+                    <li class="list-group-item menu-item" id="menu-load-data">Load Data</li>
+                    <li class="list-group-item menu-item" id="menu-clean-data">Clean Data</li>
+                    <li class="list-group-item menu-item" id="menu-filter-data">Filter Data</li>
+                    <li class="list-group-item menu-item" id="menu-identify-types">Identify Column Types</li>
+                </ul>
+            </div>
+            <div class="col-md-9 bg-light p-3 rounded shadow-sm" id="data-content">
+                <h4 class="text-center">Select a menu item to see options</h4>
+            </div>
+        </div>`;
+}
+
+function attachDataMenuEventListeners() {
+    document.getElementById('menu-load-data').addEventListener('click', loadDataSection);
+    document.getElementById('menu-clean-data').addEventListener('click', cleanDataSection);
+    document.getElementById('menu-filter-data').addEventListener('click', filterDataSection);
+    document.getElementById('menu-identify-types').addEventListener('click', identifyColumnTypes);
+}
+
+// Function to Identify Column Types
+function identifyColumnTypes() {
+    if (!sharedDataset.headers.length) {
+        alert('No data available. Please load data first.');
+        return;
     }
 
-    function attachDataMenuEventListeners() {
-        document.getElementById('menu-load-data').addEventListener('click', loadDataSection);
-        document.getElementById('menu-clean-data').addEventListener('click', cleanDataSection);
-        document.getElementById('menu-filter-data').addEventListener('click', filterDataSection);
+    let columnTypes = sharedDataset.headers.map(header => {
+        let values = sharedDataset.rows.map(row => row[sharedDataset.headers.indexOf(header)]);
+        let detectedType = detectColumnType(values);
+        return { column: header, type: detectedType };
+    });
+
+    // Generate Table
+    let tableHTML = `
+        <h4 class="text-center">Column Type Identification</h4>
+        <table class="table table-striped table-bordered">
+            <thead>
+                <tr>
+                    <th>Column Name</th>
+                    <th>Detected Type</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${columnTypes.map(col => `<tr><td>${col.column}</td><td>${col.type}</td></tr>`).join('')}
+            </tbody>
+        </table>`;
+
+    document.getElementById('data-content').innerHTML = tableHTML;
+}
+
+// Function to Detect Column Type
+function detectColumnType(values) {
+    let uniqueValues = [...new Set(values.filter(v => v !== ""))]; 
+    let numValues = uniqueValues.map(v => parseFloat(v)).filter(v => !isNaN(v));
+    
+    if (uniqueValues.length === 2 && uniqueValues.every(v => v.toLowerCase() === "true" || v.toLowerCase() === "false" || v === "0" || v === "1")) {
+        return "Boolean";
     }
+    if (numValues.length === uniqueValues.length) {
+        return numValues.some(v => v % 1 !== 0) ? "Numerical (Float)" : "Numerical (Integer)";
+    }
+    if (uniqueValues.every(v => !isNaN(Date.parse(v)))) {
+        return "Date/Time";
+    }
+    if (uniqueValues.length < sharedDataset.rows.length * 0.1) {
+        return "Categorical";
+    }
+    return "Text";
+}
 
     function populateColumnSelectors() {
         const xAxisSelect = document.getElementById('xAxisColumn');
