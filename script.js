@@ -689,18 +689,20 @@ function identifyColumnTypes() {
 
     // Generate Table
     let tableHTML = `
-        <h4 class="text-center">Column Type Identification</h4>
-        <table class="table table-dark table-striped">
-            <thead>
-                <tr>
-                    <th>Column Name</th>
-                    <th>Detected Type</th>
-                </tr>
-            </thead>
-            <tbody>
-                ${columnTypes.map(col => `<tr><td>${col.column}</td><td>${col.type}</td></tr>`).join('')}
-            </tbody>
-        </table>`;
+        <h4 class="text-center text-light">Column Type Identification</h4>
+        <div class="table-container bg-dark rounded p-3">
+            <table class="table table-dark table-striped">
+                <thead>
+                    <tr>
+                        <th>Column Name</th>
+                        <th>Detected Type</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${columnTypes.map(col => `<tr><td>${col.column}</td><td>${col.type}</td></tr>`).join('')}
+                </tbody>
+            </table>
+        </div>`;
 
     document.getElementById('data-content').innerHTML = tableHTML;
 }
