@@ -671,6 +671,7 @@ function attachDataMenuEventListeners() {
     document.getElementById('menu-clean-data').addEventListener('click', cleanDataSection);
     document.getElementById('menu-filter-data').addEventListener('click', filterDataSection);
     document.getElementById('menu-identify-types').addEventListener('click', identifyColumnTypes);
+
 }
 
 // Function to Identify Column Types
