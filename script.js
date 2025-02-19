@@ -615,14 +615,14 @@ if (statsButton) {
         }
         dynamicContent.innerHTML = `
             <section style="background: linear-gradient(115deg, #6dcfe7, #1e1e1e);">
-                <div class="container py-4">
+                <div class="container-fluid py-4">
                     <h4 class="text-light">Statistics Section</h4>
                     <div class="row">
                         <div class="col-md-12 bg-dark text-light p-3 rounded shadow-sm">
                             <h5>Summary Statistics</h5>
                             <select id="statsColumn" class="form-control mb-3"></select>
                             <button class="btn btn-primary mb-3" id="generateStats">Generate Statistics</button>
-                            <div id="statsResult" class="text-light"></div>
+                            <div id="statsResult" class="table-responsive text-light"></div>
                         </div>
                     </div>
                 </div>
@@ -1400,12 +1400,14 @@ function implementStatisticsFunctionality() {
             outliers: document.getElementById('optionOutliers').checked,
             anova: document.getElementById('optionANOVA').checked
         };
-
-        // Build table headers dynamically
-        let tableHTML = `<table class="table table-dark table-striped">
-                            <thead>
-                                <tr>
-                                    <th>Column</th>`;
+        
+       // Build table headers dynamically
+        let tableHTML = `
+            <div class="table-responsive">
+                <table class="table table-dark table-striped w-100">
+                    <thead>
+                        <tr>
+                            <th>Column</th>`;
         if (selectedStats.mean) tableHTML += '<th>Mean</th>';
         if (selectedStats.median) tableHTML += '<th>Median</th>';
         if (selectedStats.variance) tableHTML += '<th>Variance</th>';
@@ -1415,10 +1417,10 @@ function implementStatisticsFunctionality() {
         if (selectedStats.outliers) tableHTML += '<th>Outliers Detected</th>';
         if (selectedStats.anova) tableHTML += '<th>ANOVA p-value</th>';
         tableHTML += `</tr>
-                            </thead>
-                            <tbody>`;
-
-        // Process each selected column
+                    </thead>
+                    <tbody>`;
+        
+          // Process each selected column
         selectedOptions.forEach(column => {
             const columnIndex = sharedDataset.headers.indexOf(column);
 
@@ -1510,8 +1512,9 @@ function implementStatisticsFunctionality() {
             tableHTML += rowHTML;
         });
 
-        tableHTML += '</tbody></table>';
+        tableHTML += '</tbody></table></div>';
         document.getElementById('statsResult').innerHTML = tableHTML;
+
     });
 }
 
