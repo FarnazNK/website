@@ -64,23 +64,23 @@ document.addEventListener('DOMContentLoaded', () => {
             </section>`
     };
 
-    // Attach Event Listeners to Toolbar Buttons
-    Object.keys(toolbarHandlers).forEach(id => {
-        const button = document.getElementById(id);
-        if (button) {
-            button.addEventListener('click', () => {
-                dynamicContent.innerHTML = toolbarHandlers[id];
-                // Ensure the DOM has been updated
-                setTimeout(() => {
-                    if (id === 'toolbar-predictions') {
-                        implementPredictionFunctionality();
-                    } else if (id === 'toolbar-transformations') {
-                        implementTransformationFunctionality();
-                    }
-                }, 0);
-            });
-        }
-    });
+// Attach Event Listeners to Toolbar Buttons
+Object.keys(toolbarHandlers).forEach(id => {
+    const button = document.getElementById(id);
+    if (button) {
+        button.addEventListener('click', () => {
+            dynamicContent.innerHTML = toolbarHandlers[id];
+            setTimeout(() => {
+                if (id === 'toolbar-predictions') {
+                    implementPredictionFunctionality();
+                } else if (id === 'toolbar-transformations') {
+                    implementTransformationFunctionality();
+                }
+            }, 0);
+        });
+    }
+});
+
 
     function implementPredictionFunctionality() {
         document.getElementById('linearRegression').addEventListener('click', () => handleModelClick('Linear Regression', performLinearRegression));
@@ -94,54 +94,65 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('dbscan').addEventListener('click', () => handleModelClick('DBSCAN', performDBSCAN));
     }
 
-// Global variable to store the current Chart.js instance
-let currentChart = null;
 
-// Function to handle model selection and display
 function handleModelClick(modelName, modelFunction) {
-    const dynamicContent = document.getElementById('dynamicMenuContent');
-
-    // Clear previous content and reset current chart
-    if (currentChart) {
-        currentChart.destroy();
-        currentChart = null;
-    }
-
     dynamicContent.innerHTML = `
         <div class="row">
             <div class="col-md-4 bg-dark text-light p-3">
                 <h4>Data Options</h4>
-                <p>Select data for analysis:</p>
-                <div id="dataSelectionForm">
-                    <label for="x-axis">X-axis:</label>
-                    <select id="x-axis" class="form-control">
-                        ${sharedDataset.headers.map(header => `<option>${header}</option>`).join('')}
-                    </select>
-                    <label for="y-axis">Y-axis:</label>
-                    <select id="y-axis" class="form-control">
-                        ${sharedDataset.headers.map(header => `<option>${header}</option>`).join('')}
-                    </select>
-                    <button class="btn btn-primary mt-3" id="plotButton">Plot</button>
-                </div>
+                <label for="x-axis">X-axis:</label>
+                <select id="x-axis" class="form-control">
+                    ${sharedDataset.headers.map(header => `<option>${header}</option>`).join('')}
+                </select>
+                <label for="y-axis">Y-axis:</label>
+                <select id="y-axis" class="form-control">
+                    ${sharedDataset.headers.map(header => `<option>${header}</option>`).join('')}
+                </select>
+                <button class="btn btn-primary mt-3" id="plotButton">Plot</button>
             </div>
-            <div class="col-md-8 bg-light p-3">
-                <h4>${modelName} Model</h4>
-                <canvas id="chartCanvas" style="width: 100%; height: 400px;"></canvas>
+            <div class="col-md-8 bg-white p-3">
+                <h4>${modelName}</h4>
+                <canvas id="chartCanvas"></canvas>
             </div>
         </div>`;
 
-    // Attach event listener for the Plot button
-    const plotButton = document.getElementById('plotButton');
-    plotButton.addEventListener('click', function () {
-        if (currentChart) {
-            currentChart.destroy(); // Ensure the previous chart is destroyed
-        }
+    document.getElementById('plotButton').addEventListener('click', () => {
+        if (currentChart) currentChart.destroy();
         modelFunction();
     });
 }
 
-// Function to perform linear regression
-function performLinearRegression() {
+// Linear Regression using TensorFlow.js
+async function performLinearRegression() {
+    const xColumn = document.getElementById('x-axis').value;
+    const yColumn = document.getElementById('y-axis').value;
+    
+    const xIndex = sharedDataset.headers.indexOf(xColumn);
+    const yIndex = sharedDataset.headers.indexOf(yColumn);
+    
+    const xValues = getColumnData(xIndex);
+    const yValues = getColumnData(yIndex);
+    
+    if (xValues.length !== yValues.length || xValues.length === 0) {
+        alert('Invalid data: X and Y columns must have the same number of numeric entries.');
+        return;
+    }
+
+    const model = tf.sequential();
+    model.add(tf.layers.dense({ units: 1, inputShape: [1] }));
+    model.compile({ optimizer: 'sgd', loss: 'meanSquaredError' });
+
+    const xs = tf.tensor2d(xValues, [xValues.length, 1]);
+    const ys = tf.tensor2d(yValues, [yValues.length, 1]);
+
+    await model.fit(xs, ys, { epochs: 100 });
+
+    const predictions = model.predict(xs).dataSync();
+    plotRegressionResults(xValues, yValues, predictions, xColumn, yColumn);
+}
+
+// Logistic Regression using TensorFlow.js
+async function performLogisticRegression() {
     const xColumn = document.getElementById('x-axis').value;
     const yColumn = document.getElementById('y-axis').value;
 
@@ -149,20 +160,42 @@ function performLinearRegression() {
     const yIndex = sharedDataset.headers.indexOf(yColumn);
 
     const xValues = getColumnData(xIndex);
-    const yValues = getColumnData(yIndex);
+    const yValues = getColumnData(yIndex).map(val => val > 0.5 ? 1 : 0);
 
     if (xValues.length !== yValues.length || xValues.length === 0) {
-        alert('Invalid data: X and Y columns must have the same number of valid numeric entries.');
+        alert('Invalid data: X and Y columns must have the same number of numeric entries.');
         return;
     }
 
-    // Perform regression
-    const regressionResults = calculateLinearRegression(xValues, yValues);
-    console.log('Regression Results:', regressionResults); // Debugging
-    plotRegressionResults(xValues, yValues, regressionResults.predictions, xColumn, yColumn);
+    const model = tf.sequential();
+    model.add(tf.layers.dense({ units: 1, inputShape: [1], activation: 'sigmoid' }));
+    model.compile({ optimizer: 'adam', loss: 'binaryCrossentropy' });
+
+    const xs = tf.tensor2d(xValues, [xValues.length, 1]);
+    const ys = tf.tensor2d(yValues, [yValues.length, 1]);
+
+    await model.fit(xs, ys, { epochs: 100 });
+
+    const predictions = model.predict(xs).dataSync();
+    plotRegressionResults(xValues, yValues, predictions, xColumn, yColumn);
 }
 
-// Function to plot regression results
+// K-Means Clustering
+async function performKMeansClustering() {
+    alert('K-Means Clustering executed. Requires backend implementation.');
+}
+
+// PCA
+async function performPCA() {
+    alert('PCA executed. Requires backend implementation.');
+}
+
+// Helper function for data retrieval
+function getColumnData(columnIndex) {
+    return sharedDataset.rows.map(row => parseFloat(row[columnIndex])).filter(val => !isNaN(val));
+}
+
+// Function to plot results
 function plotRegressionResults(xValues, yValues, predictions, xColumn, yColumn) {
     const canvasElement = document.getElementById('chartCanvas');
     if (!canvasElement) {
@@ -176,12 +209,10 @@ function plotRegressionResults(xValues, yValues, predictions, xColumn, yColumn) 
         return;
     }
 
-    // Destroy the existing chart if it exists
     if (currentChart) {
         currentChart.destroy();
     }
 
-    // Create a new Chart.js instance
     currentChart = new Chart(chartCanvas, {
         type: 'scatter',
         data: {
@@ -196,52 +227,45 @@ function plotRegressionResults(xValues, yValues, predictions, xColumn, yColumn) 
                     data: xValues.map((x, i) => ({ x, y: predictions[i] })),
                     type: 'line',
                     borderColor: '#ff6347',
+                    borderWidth: 2,
                     fill: false,
                 },
             ],
         },
         options: {
             responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    display: true,
-                },
-            },
             scales: {
-                x: {
-                    title: {
-                        display: true,
-                        text: xColumn,
-                    },
-                },
-                y: {
-                    title: {
-                        display: true,
-                        text: yColumn,
-                    },
-                },
+                x: { title: { display: true, text: xColumn } },
+                y: { title: { display: true, text: yColumn } },
             },
         },
     });
 }
-
-// Function to calculate linear regression
-function calculateLinearRegression(xValues, yValues) {
-    const n = xValues.length;
-    const xMean = xValues.reduce((sum, val) => sum + val, 0) / n;
-    const yMean = yValues.reduce((sum, val) => sum + val, 0) / n;
-
-    const numerator = xValues.reduce((sum, x, i) => sum + (x - xMean) * (yValues[i] - yMean), 0);
-    const denominator = xValues.reduce((sum, x) => sum + Math.pow(x - xMean, 2), 0);
-
-    const slope = numerator / denominator;
-    const intercept = yMean - slope * xMean;
-
-    const predictions = xValues.map(x => slope * x + intercept);
-
-    return { slope, intercept, predictions };
+// Decision Tree (Placeholder)
+async function performDecisionTree() {
+    alert('Decision Tree executed. Requires backend implementation or JavaScript alternative.');
 }
+
+// Random Forest (Placeholder)
+async function performRandomForest() {
+    alert('Random Forest executed. Requires backend implementation.');
+}
+
+// Support Vector Machine (SVM) (Placeholder)
+async function performSVM() {
+    alert('SVM executed. Requires backend implementation or a JS library like SVM.js.');
+}
+
+// Hierarchical Clustering (Placeholder)
+async function performHierarchicalClustering() {
+    alert('Hierarchical Clustering executed. Requires backend implementation.');
+}
+
+// DBSCAN (Placeholder)
+async function performDBSCAN() {
+    alert('DBSCAN executed. Requires backend implementation.');
+}
+
 
 // Function to get column data
 function getColumnData(columnIndex) {
