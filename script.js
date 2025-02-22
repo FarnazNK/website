@@ -759,146 +759,254 @@ function detectColumnType(values) {
         xAxisSelect.innerHTML = sharedDataset.headers.map(header => `<option value="${header}">${header}</option>`).join('');
         yAxisSelect.innerHTML = sharedDataset.headers.map(header => `<option value="${header}">${header}</option>`).join('');
     }
+    document.getElementById('chartType').addEventListener('change', () => {
+        const chartType = document.getElementById('chartType').value;
+        const pieOptionsContainer = document.getElementById('pieOptions');
+        const donutOptionsContainer = document.getElementById('donutOptions');
+        
+        if (chartType === 'pie') {
+          pieOptionsContainer.style.display = 'block';
+          donutOptionsContainer.style.display = 'none';
+        } else if (chartType === 'doughnut') {
+          pieOptionsContainer.style.display = 'none';
+          donutOptionsContainer.style.display = 'block';
+        } else {
+          pieOptionsContainer.style.display = 'none';
+          donutOptionsContainer.style.display = 'none';
+        }
+      });
+      
+  
 
-// Implement Enhanced Plot Functionality
-function implementPlotFunctionality() {
-    const chartsContainer = document.getElementById('chartsContainer');
-    let chartInstances = [];
-
-    // Generate Chart
-document.getElementById('generateChart').addEventListener('click', () => {
+  // Helper: Create a chart configuration based on type and options
+  function createChartConfig(type, labels, data, options) {
+    let dataset = {};
+    if (['pie', 'doughnut', 'radar'].includes(type)) {
+      dataset = {
+        data: data,
+        backgroundColor: data.map(() => options.chartColor),
+        // Use extra pie option for border width if available
+        borderWidth: type === 'pie' && options.pieOptions ? options.pieOptions.sliceBorderWidth : 1
+      };
+    } else {
+      dataset = {
+        label: options.chartLabel,
+        data: data,
+        backgroundColor: options.chartColor,
+        borderColor: options.chartColor,
+        borderWidth: 1
+      };
+    }
+    
+    const config = {
+      type: type,
+      data: {
+        labels: labels,
+        datasets: [dataset]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: options.showLegend,
+            position: 'top'
+          }
+        },
+        scales: (['pie', 'doughnut', 'radar'].includes(type))
+          ? {}
+          : {
+              x: {
+                title: {
+                  display: true,
+                  text: options.xAxisColumn
+                },
+                min: options.xAxisRange ? options.xAxisRange[0] : undefined,
+                max: options.xAxisRange ? options.xAxisRange[1] : undefined
+              },
+              y: {
+                title: {
+                  display: true,
+                  text: options.yAxisColumn
+                },
+                min: options.yAxisRange ? options.yAxisRange[0] : undefined,
+                max: options.yAxisRange ? options.yAxisRange[1] : undefined
+              }
+            }
+      }
+    };
+  
+    // If it's a pie chart and the option is enabled, add a tooltip callback to show percentages
+    if (type === 'pie' && options.pieOptions && options.pieOptions.showPercentages) {
+      config.options.plugins.tooltip = {
+        callbacks: {
+          label: function(context) {
+            const dataset = context.chart.data.datasets[0];
+            const total = dataset.data.reduce((sum, val) => sum + val, 0);
+            const currentValue = context.raw;
+            const percentage = parseFloat(((currentValue / total) * 100).toFixed(1));
+            return `${context.label}: ${percentage}%`;
+          }
+        }
+      };
+    }
+    
+    return config;
+  }
+    
+  // Generate a new chart and add it to the container
+  function generateChart() {
     const xAxisColumn = document.getElementById('xAxisColumn').value;
     const yAxisColumn = document.getElementById('yAxisColumn').value;
     const chartType = document.getElementById('chartType').value;
     const chartLabel = document.getElementById('chartLabel').value || `${yAxisColumn} vs ${xAxisColumn}`;
     const chartColor = document.getElementById('chartColor').value || '#4b9cdf';
     const showLegend = document.getElementById('showLegend').value === 'true';
-
+    
+    // Parse optional axis ranges
+    const xAxisRangeInput = document.getElementById('xAxisRange').value.split(',').map(Number);
+    const yAxisRangeInput = document.getElementById('yAxisRange').value.split(',').map(Number);
+    const xAxisRange = (xAxisRangeInput.length === 2 && xAxisRangeInput.every(v => !isNaN(v))) ? xAxisRangeInput : null;
+    const yAxisRange = (yAxisRangeInput.length === 2 && yAxisRangeInput.every(v => !isNaN(v))) ? yAxisRangeInput : null;
+    
     if (!xAxisColumn || !yAxisColumn) {
-        alert('Please select both X and Y axes.');
-        return;
+      alert('Please select both X and Y axes.');
+      return;
     }
-
+    
+    // Extract data from the shared dataset
     const labels = sharedDataset.rows.map(row => row[sharedDataset.headers.indexOf(xAxisColumn)]);
     const data = sharedDataset.rows.map(row => parseFloat(row[sharedDataset.headers.indexOf(yAxisColumn)]));
-
     if (data.every(isNaN)) {
-        alert('The selected Y-axis column contains no valid numeric data.');
-        return;
+      alert('The selected Y-axis column contains no valid numeric data.');
+      return;
     }
-
-    // Create Chart Wrapper
+    
+    // Build options object for configuration
+    const options = {
+      chartLabel,
+      chartColor,
+      showLegend,
+      xAxisColumn,
+      yAxisColumn,
+      xAxisRange,
+      yAxisRange
+    };
+    
+    // If a pie chart is selected, gather extra options
+    if (chartType === 'pie') {
+      options.pieOptions = {
+        showPercentages: document.getElementById('showPercentages').value === 'true',
+        sliceBorderWidth: parseInt(document.getElementById('sliceBorderWidth').value, 10) || 1
+      };
+    }
+    
+    // Create Chart.js configuration
+    const config = createChartConfig(chartType, labels, data, options);
+    
+    // Create a chart card wrapper
     const chartWrapper = document.createElement('div');
-    chartWrapper.className = 'chart-wrapper';
-
-    // Add Chart Title
-    const chartTitle = document.createElement('h4');
-    chartTitle.textContent = chartLabel;
-    chartWrapper.appendChild(chartTitle);
-
-    // Create Canvas for Chart
+    chartWrapper.className = 'chart-wrapper card m-2 p-2';
+    chartWrapper.style.width = '45%';
+    chartWrapper.style.minWidth = '300px';
+    chartWrapper.style.height = '400px';
+    chartWrapper.style.position = 'relative';
+    
+    // Create canvas element for Chart.js
     const canvas = document.createElement('canvas');
     chartWrapper.appendChild(canvas);
-
-    // Add Remove Button
+    
+    // Add Remove Button ("×" icon in the top-right corner)
     const removeButton = document.createElement('button');
-    removeButton.className = 'remove-chart-btn';
-    removeButton.textContent = 'Remove Chart';
+    removeButton.textContent = '×';
+    removeButton.style.position = 'absolute';
+    removeButton.style.top = '5px';
+    removeButton.style.right = '5px';
+    removeButton.style.border = 'none';
+    removeButton.style.background = 'transparent';
+    removeButton.style.fontSize = '20px';
+    removeButton.style.cursor = 'pointer';
+    removeButton.style.color = '#dc3545';
     removeButton.addEventListener('click', () => {
-        chartsContainer.removeChild(chartWrapper);
+      if (canvas.chartInstance) canvas.chartInstance.destroy();
+      chartWrapper.remove();
     });
     chartWrapper.appendChild(removeButton);
-
-    chartsContainer.appendChild(chartWrapper);
-
-    // Create Chart
+    
+    // Append the chart card to the charts container
+    document.getElementById('chartsContainer').appendChild(chartWrapper);
+    
+    // Instantiate the chart and attach it to the canvas element
     const ctx = canvas.getContext('2d');
-    new Chart(ctx, {
-        type: chartType,
-        data: {
-            labels: labels,
-            datasets: [{
-                label: chartLabel,
-                data: data,
-                backgroundColor: chartColor,
-                borderColor: chartColor,
-                borderWidth: 1
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    display: showLegend
-                }
-            },
-            scales: {
-                x: {
-                    title: {
-                        display: true,
-                        text: xAxisColumn
-                    }
-                },
-                y: {
-                    title: {
-                        display: true,
-                        text: yAxisColumn
-                    }
-                }
-            }
-        }
-    });
-});
-
-
-// Update Chart
-document.getElementById('updateChart').addEventListener('click', () => {
-    if (!chart) {
-        alert('No chart is currently generated. Please generate a chart first.');
-        return;
-    }
-
+    const chartInstance = new Chart(ctx, config);
+    canvas.chartInstance = chartInstance; // Save reference for updates
+  }
+    
+  // Update an existing chart (if needed) with new configuration
+  function updateChart(chartInstance) {
     const newXAxisColumn = document.getElementById('xAxisColumn').value;
     const newYAxisColumn = document.getElementById('yAxisColumn').value;
     const newLabelText = document.getElementById('chartLabel').value || `${newYAxisColumn} vs ${newXAxisColumn}`;
     const newColor = document.getElementById('chartColor').value || '#4b9cdf';
-
-    // Parse new X and Y axis range inputs
+    
     const xAxisRangeInput = document.getElementById('xAxisRange').value.split(',').map(Number);
     const yAxisRangeInput = document.getElementById('yAxisRange').value.split(',').map(Number);
-
-    const xAxisRange = xAxisRangeInput.length === 2 && xAxisRangeInput.every(val => !isNaN(val)) ? xAxisRangeInput : null;
-    const yAxisRange = yAxisRangeInput.length === 2 && yAxisRangeInput.every(val => !isNaN(val)) ? yAxisRangeInput : null;
-
-    if (!newXAxisColumn || !newYAxisColumn) {
-        alert('Please select both X and Y axes.');
-        return;
+    const xAxisRange = (xAxisRangeInput.length === 2 && xAxisRangeInput.every(v => !isNaN(v))) ? xAxisRangeInput : null;
+    const yAxisRange = (yAxisRangeInput.length === 2 && yAxisRangeInput.every(v => !isNaN(v))) ? yAxisRangeInput : null;
+    
+    const newLabels = sharedDataset.rows.map(row => row[sharedDataset.headers.indexOf(newXAxisColumn)]);
+    const newData = sharedDataset.rows.map(row => parseFloat(row[sharedDataset.headers.indexOf(newYAxisColumn)]));
+    
+    chartInstance.data.labels = newLabels;
+    if (['pie', 'doughnut', 'radar'].includes(chartInstance.config.type)) {
+      chartInstance.data.datasets[0].data = newData;
+      chartInstance.data.datasets[0].backgroundColor = newData.map(() => newColor);
+    } else {
+      chartInstance.data.datasets[0].data = newData;
+      chartInstance.data.datasets[0].label = newLabelText;
+      chartInstance.data.datasets[0].backgroundColor = newColor;
+      chartInstance.data.datasets[0].borderColor = newColor;
     }
-
-    // Update Data and Labels
-    const labels = sharedDataset.rows.map(row => row[sharedDataset.headers.indexOf(newXAxisColumn)]);
-    const data = sharedDataset.rows.map(row => parseFloat(row[sharedDataset.headers.indexOf(newYAxisColumn)]));
-
-    chart.data.labels = labels;
-    chart.data.datasets[0].data = data;
-    chart.data.datasets[0].label = newLabelText;
-    chart.data.datasets[0].backgroundColor = newColor;
-    chart.data.datasets[0].borderColor = newColor;
-
-    // Update Axes Ranges
-    if (xAxisRange) {
-        chart.options.scales.x.min = xAxisRange[0];
-        chart.options.scales.x.max = xAxisRange[1];
+    if (chartInstance.config.options.scales.x) {
+      chartInstance.config.options.scales.x.title.text = newXAxisColumn;
+      if (xAxisRange) {
+        chartInstance.config.options.scales.x.min = xAxisRange[0];
+        chartInstance.config.options.scales.x.max = xAxisRange[1];
+      } else {
+        delete chartInstance.config.options.scales.x.min;
+        delete chartInstance.config.options.scales.x.max;
+      }
     }
-    if (yAxisRange) {
-        chart.options.scales.y.min = yAxisRange[0];
-        chart.options.scales.y.max = yAxisRange[1];
+    if (chartInstance.config.options.scales.y) {
+      chartInstance.config.options.scales.y.title.text = newYAxisColumn;
+      if (yAxisRange) {
+        chartInstance.config.options.scales.y.min = yAxisRange[0];
+        chartInstance.config.options.scales.y.max = yAxisRange[1];
+      } else {
+        delete chartInstance.config.options.scales.y.min;
+        delete chartInstance.config.options.scales.y.max;
+      }
     }
-
-    chart.update();
-});
-}
+    chartInstance.update();
+  }
+    
+  // Initialize Plot Functionality: Attach listeners to Generate and Update buttons
+  function implementPlotFunctionality() {
+    // Generate new chart on button click
+    document.getElementById('generateChart').addEventListener('click', generateChart);
+    
+    // Update the first chart in the container (as an example)
+    document.getElementById('updateChart').addEventListener('click', () => {
+      const chartsContainer = document.getElementById('chartsContainer');
+      const firstCanvas = chartsContainer.querySelector('canvas');
+      if (firstCanvas && firstCanvas.chartInstance) {
+        updateChart(firstCanvas.chartInstance);
+      } else {
+        alert('No chart to update. Please generate a chart first.');
+      }
+    });
+  }
+  
 
 function populateStatsSelectors() {
     const columnOptions = sharedDataset.headers

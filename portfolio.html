@@ -1,93 +1,140 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Data Visualization Tool</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <link rel="stylesheet" href="styles.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jstat/1.9.4/jstat.min.js"></script>
-    <script src="https://www.lactame.com/lib/ml/4.0.0/ml.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-
-
-    <style>
-        .table-container {
-            max-height: 400px;
-            overflow-y: auto;
-        }
-        .gradient-background {
-            background: linear-gradient(115deg, #6dcfe7, #1e1e1e);
-        }
-        .navbar-nav .nav-item.active .nav-link {
-            font-weight: bold;
-            text-decoration: underline;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Data Visualization Tool</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
+  <link rel="stylesheet" href="styles.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jstat/1.9.4/jstat.min.js"></script>
+  <script src="https://www.lactame.com/lib/ml/4.0.0/ml.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top shadow-sm">
-        <div class="container">
-            <a class="navbar-brand" href="index.html">Farnaz Nasehi</a>
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ml-auto">
-                    <li class="nav-item"><a class="nav-link" href="about.html" aria-label="About">About</a></li>
-                    <li class="nav-item"><a class="nav-link" href="resume.html" aria-label="Work Experience">Work Experience</a></li>
-                    <li class="nav-item"><a class="nav-link" href="skills.html">Skills</a></li>
-                    <li class="nav-item"><a class="nav-link" href="portfolio.html">Data Analytics Tool</a></li>
-                </ul>
-            </div>
-        </div>
-    </nav>
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top shadow-sm">
+    <div class="container">
+      <a class="navbar-brand" href="index.html">Farnaz Nasehi</a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ml-auto">
+          <li class="nav-item"><a class="nav-link" href="about.html" aria-label="About">About</a></li>
+          <li class="nav-item"><a class="nav-link" href="resume.html" aria-label="Work Experience">Work Experience</a></li>
+          <li class="nav-item"><a class="nav-link" href="skills.html">Skills</a></li>
+          <li class="nav-item"><a class="nav-link" href="portfolio.html">Data Analytics Tool</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
 
-    <!-- Combined Section -->
-    <section class="header-section text-light py-4 gradient-background">
-        <div class="container mt-5">
-            <div class="card bg-dark text-white shadow border-0">
-                <div class="card-body text-center">
-                    <h1 class="card-title">Data Analytics Tool</h1>
-                </div>
-            </div>
-            <!-- Secondary Toolbar -->
-            <div class="bg-dark py-2 rounded shadow-sm mt-3">
-                <div class="d-flex flex-wrap justify-content-center gap-2">
-                    <button class="btn btn-primary" id="toolbar-data" title="Access Data Options">Data</button>
-                    <button class="btn btn-secondary" id="toolbar-plots" title="Access Plot Options">Plots</button>
-                    <button class="btn btn-secondary" id="toolbar-statistics" title="Access Statistics Options">Statistics</button>
-                    <button class="btn btn-secondary" id="toolbar-predictions" title="Access Prediction Options">Predictions</button>
-                    <button class="btn btn-secondary" id="toolbar-correlations" title="Access Correlation Options">Correlations</button>
-                    <button class="btn btn-secondary" id="toolbar-transformations" title="Access Data Transformation Options">Data Transformations</button>
-                </div>
-            </div>
+  <!-- Combined Section -->
+  <section class="header-section text-light py-4 gradient-background">
+    <div class="container mt-5">
+      <div class="card bg-dark text-white shadow border-0">
+        <div class="card-body text-center">
+          <h1 class="card-title">Data Analytics Tool</h1>
         </div>
-    </section>
-
-    <!-- Dynamic Content Section -->
-    <section>
-        <div class="container py-4" id="dynamicMenuContent">
-            <h4 class="text-center text-light">Welcome to the Data Analytics Tool</h4>
-            <p class="text-center text-light">Choose from the toolbar above to start analyzing your data.</p>
-            <div class="text-center">
-                <div class="spinner-border text-light" role="status" id="loadingSpinner" style="display: none;">
-                    <span class="sr-only">Loading...</span>
-                </div>
-            </div>
+      </div>
+      <!-- Secondary Toolbar -->
+      <div class="bg-dark py-2 rounded shadow-sm mt-3">
+        <div class="d-flex flex-wrap justify-content-center gap-2">
+          <button class="btn btn-primary" id="toolbar-data" title="Access Data Options">Data</button>
+          <button class="btn btn-secondary" id="toolbar-plots" title="Access Plot Options">Plots</button>
+          <button class="btn btn-secondary" id="toolbar-statistics" title="Access Statistics Options">Statistics</button>
+          <button class="btn btn-secondary" id="toolbar-predictions" title="Access Prediction Options">Predictions</button>
+          <button class="btn btn-secondary" id="toolbar-correlations" title="Access Correlation Options">Correlations</button>
+          <button class="btn btn-secondary" id="toolbar-transformations" title="Access Data Transformation Options">Data Transformations</button>
         </div>
-    </section>
+      </div>
+    </div>
+  </section>
 
-    <!-- Footer -->
-    <footer class="text-center text-light py-3 bg-dark">
-        <p>&copy; 2024 Farnaz Nasehi. All rights reserved.</p>
-        <a href="https://linkedin.com/in/farnaz" class="text-light mx-2" aria-label="LinkedIn Profile">LinkedIn</a>
-        <a href="https://github.com/farnaz" class="text-light mx-2" aria-label="GitHub Profile">GitHub</a>
-    </footer>
+  <!-- Dynamic Content Section -->
+  <section>
+    <div class="container py-4" id="dynamicMenuContent">
+      <h4 class="text-center text-light">Welcome to the Data Analytics Tool</h4>
+      <p class="text-center text-light">Choose from the toolbar above to start analyzing your data.</p>
+      <div class="text-center">
+        <div class="spinner-border text-light" role="status" id="loadingSpinner" style="display: none;">
+          <span class="sr-only">Loading...</span>
+        </div>
+      </div>
+      <!-- Chart Options Section -->
+      <div id="chartOptions" class="mt-3">
+        <div class="form-group">
+          <label for="chartType">Chart Type:</label>
+          <select id="chartType" class="form-control">
+            <option value="bar">Bar</option>
+            <option value="line">Line</option>
+            <option value="scatter">Scatter</option>
+            <option value="pie">Pie</option>
+            <option value="doughnut">Doughnut</option>
+            <option value="radar">Radar</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="chartLabel">Chart Label:</label>
+          <input type="text" id="chartLabel" class="form-control" placeholder="Enter chart label" />
+        </div>
+        <div class="form-group">
+          <label for="chartColor">Chart Color:</label>
+          <input type="color" id="chartColor" class="form-control" value="#4b9cdf" />
+        </div>
+        <div class="form-group">
+          <label for="showLegend">Show Legend:</label>
+          <select id="showLegend" class="form-control">
+            <option value="true">Yes</option>
+            <option value="false">No</option>
+          </select>
+        </div>
+        <!-- Extra Options for Pie Chart (hidden by default) -->
+        <div id="pieOptions" style="display: none; margin-top: 10px;">
+          <div class="form-group">
+            <label for="showPercentages">Show Percentages in Tooltips (Pie):</label>
+            <select id="showPercentages" class="form-control">
+              <option value="true">Yes</option>
+              <option value="false">No</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="sliceBorderWidth">Slice Border Width (Pie):</label>
+            <input type="number" id="sliceBorderWidth" class="form-control" value="1" min="0" />
+          </div>
+        </div>
+        <!-- Extra Options for Doughnut (Donut) Chart (hidden by default) -->
+        <div id="donutOptions" style="display: none; margin-top: 10px;">
+          <div class="form-group">
+            <label for="cutoutPercentage">Inner Cutout Percentage (Doughnut):</label>
+            <input type="number" id="cutoutPercentage" class="form-control" value="50" min="0" max="100" />
+          </div>
+          <div class="form-group">
+            <label for="showDonutPercentages">Show Percentages in Tooltips (Doughnut):</label>
+            <select id="showDonutPercentages" class="form-control">
+              <option value="true">Yes</option>
+              <option value="false">No</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="donutSliceBorderWidth">Slice Border Width (Doughnut):</label>
+            <input type="number" id="donutSliceBorderWidth" class="form-control" value="1" min="0" />
+          </div>
+        </div>
+      </div>
+      <!-- Charts Container -->
+      <div id="chartsContainer" class="mt-4"></div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="text-center text-light py-3 bg-dark">
+    <p>&copy; 2024 Farnaz Nasehi. All rights reserved.</p>
+    <a href="https://linkedin.com/in/farnaz" class="text-light mx-2" aria-label="LinkedIn Profile">LinkedIn</a>
+    <a href="https://github.com/farnaz" class="text-light mx-2" aria-label="GitHub Profile">GitHub</a>
+  </footer>
+  <script src="script.js"></script>
 </body>
-<script src="script.js"></script>
 </html>

@@ -37,9 +37,10 @@ body {
     color: #9f9fff;
 }
 
+/* Updated text size for profile section paragraphs */
 .profile-section p {
-    font-size: 1em;
-    color: #0d0d0d;
+    font-size: 1.2em;
+    color: #cccccc;
     margin-top: 10px;
     line-height: 1.6;
 }
@@ -93,6 +94,9 @@ footer {
 .skills-section {
     padding: 80px 20px;
     background-color: #121212;
+    color: #ffffff;
+    font-family: Arial, sans-serif;
+    font-size: 1.2em;
 }
 
 .skills-section h1 {
@@ -103,6 +107,7 @@ footer {
 }
 
 /* Skill Card */
+
 .skill-card {
     background-color: #1e1e1e;
     border-radius: 10px;
@@ -139,22 +144,23 @@ footer {
     transition: height 0.5s ease, opacity 0.5s ease, visibility 0.5s ease;
 }
 
-
 .details-content.show, .skill-details.show, .resume-details.show, .experience-details.show {
     visibility: visible;
-    height: auto; /* Allows for dynamic height adjustment */
+    height: auto;
     opacity: 1;
 }
 
 /* Resume Section */
 .resume-section {
     padding: 80px 20px;
-    background-color: #1a1a1a;
+    background-color: #121212;
     color: #ffffff;
+    font-family: Arial, sans-serif;
+    font-size: 1.5em;
 }
 
 .resume-section h1 {
-    font-size: 2.5em;
+    font-size:  1.1em;
     font-weight: bold;
     text-align: center;
     margin-bottom: 40px;
@@ -164,7 +170,7 @@ footer {
 
 /* Resume Card */
 .resume-card {
-    background-color: #ede2e2;
+    background-color: #1e1e1e;
     color: #ffffff;
     border: 1px solid #444;
     border-radius: 10px;
@@ -180,7 +186,7 @@ footer {
 }
 
 .resume-card h3 {
-    font-size: 1.6em;
+    font-size: 1.5em;
     font-weight: bold;
     margin-bottom: 10px;
     display: flex;
@@ -188,19 +194,9 @@ footer {
     gap: 10px;
 }
 
-.resume-card ul {
-    list-style-type: disc;
-    padding-left: 20px;
-    color: #cccccc;
-}
-
-.resume-card ul li {
-    margin-bottom: 8px;
-    line-height: 1.5;
-}
-
+/* Updated text sizes for resume card paragraphs and list items */
 .resume-card p {
-    font-size: 1em;
+    font-size: 1.2em;
     color: #cccccc;
 }
 
@@ -213,11 +209,12 @@ footer {
 .resume-card ul li {
     margin-bottom: 10px;
     line-height: 1.5;
+    font-size: 1.2em;
 }
 
 /* Experience Card */
 .experience-card {
-    background-color: #2b2b2b;
+    background-color: #1e1e1e;
     border: 1px solid #444;
     border-radius: 8px;
     padding: 20px;
@@ -229,19 +226,19 @@ footer {
 
 .experience-card:hover {
     transform: translateY(-5px);
-    background-color: #3a3a3a;
+    background-color: #151515;
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
 }
 
 .experience-card h3 {
-    font-size: 1.5em;
+    font-size: 1.2em;
     font-weight: bold;
-    color: #ffffff;
+    color: #cccccc;
     margin-bottom: 10px;
 }
 
 .experience-card p {
-    font-size: 1.1em;
+    font-size: 1.2em;
     color: #cccccc;
     margin-bottom: 10px;
 }
@@ -253,8 +250,8 @@ footer {
 }
 
 .experience-details p {
-    font-size: 1em;
-    color: #b3b3b3;
+    font-size: 1.2em;
+    color: #cccccc;
     margin-bottom: 10px;
     line-height: 1.6;
 }
@@ -271,39 +268,48 @@ footer {
 }
 
 .resume-section .btn-primary:hover {
-    background-color: #7a6fff;
+    background-color: #0a0a0a;
     transform: translateY(-2px);
 }
 
 /* General Section Styling */
 .resume-section section {
-    color: #ffffff;
+    color: #cccccc;
 }
 
+/* Contact Card */
 .contact-card {
-    background-color: #1e1e1e; /* Dark background for cards */
+    background-color: #1e1e1e;
     color: #ffffff;
-    cursor: pointer; /* Show pointer cursor on hover */
+    cursor: pointer;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .contact-card:hover {
-    transform: translateY(-5px); /* Subtle hover effect */
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); /* Enhanced shadow on hover */
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
 }
 
 .contact-card h3 {
-    font-size: 1.3em;
+    font-size: 1.2em;
     margin-bottom: 10px;
     font-weight: bold;
 }
 
 .contact-card p {
-    font-size: 1em;
+    font-size: 1.2em;
     color: #cccccc;
 }
 
 /* About Section Styles */
+.about-section {
+    padding: 80px 20px;
+    background-color: #121212;
+    color: #ffffff;
+    font-family: Arial, sans-serif;
+    font-size: 1.2em;
+}
+
 .about-section img {
     border: 5px solid #ffffff;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
@@ -330,7 +336,7 @@ footer {
 
 .about-section ul li {
     margin-bottom: 10px;
-    font-size: 1.1em;
+    font-size: 1.2em;
     display: flex;
     align-items: center;
 }
@@ -338,6 +344,62 @@ footer {
 .about-section ul li i {
     margin-right: 10px;
     font-size: 1.5em;
+}
+
+/* Portfolio Section */
+.portfolio-section {
+    padding: 80px 20px;
+    background-color: #121212;
+    color: #ffffff;
+    font-family: Arial, sans-serif;
+    font-size: 1.2em;
+}
+
+.portfolio-section h1 {
+    font-size: 2.5em;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.portfolio-item {
+    background-color: #1e1e1e;
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 20px;
+    text-align: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.portfolio-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+.portfolio-item h3 {
+    font-size: 1.5em;
+    margin-bottom: 10px;
+}
+
+.portfolio-item p {
+    font-size: 1.2em;
+    color: #cccccc;
+}
+
+/* Improved Button Style */
+.btn-primary {
+    background-color: #6a5acd;
+    border: none;
+    padding: 10px 20px;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.btn-primary:hover {
+    background-color: #7a6fff;
+    transform: translateY(-2px);
 }
 
 /* Footer Styles */
@@ -349,26 +411,25 @@ footer {
     font-size: 0.9em;
 }
 
-
 .table-container {
-    max-height: 400px; /* Set a fixed height for the table */
-    overflow-y: auto; /* Enable vertical scrolling */
+    max-height: 400px;
+    overflow-y: auto;
     border: 1px solid #444;
     border-radius: 8px;
     padding: 10px;
-    background-color: #1e1e2f; /* Dark theme background */
+    background-color: #1e1e2f;
 }
 
 .table {
     width: 100%;
-    margin-bottom: 0; /* No extra margin for the table */
+    margin-bottom: 0;
     color: #ffffff;
 }
 
 .table th {
     position: sticky;
     top: 0;
-    background-color: #2a2a3b; /* Sticky header background */
+    background-color: #2a2a3b;
 }
 
 .data-menu-section {
@@ -400,7 +461,6 @@ footer {
     background-color: #444;
     color: #6dcfe7;
 }
-
 
 .nested-submenu {
     list-style-type: none;
@@ -445,13 +505,13 @@ footer {
 /* Chart Container Styling */
 .chart-wrapper {
     width: 100%;
-    height: 600px; /* Increased height for better visibility */
-    margin-bottom: 50px; /* Add more space between charts */
+    height: 600px;
+    margin-bottom: 50px;
     position: relative;
-    background-color: #f3f3f8; /* Lighter background for better contrast */
+    background-color: #f3f3f8;
     border-radius: 10px;
     padding: 10px;
-    box-shadow: 0 4px 6px rgba(10, 10, 10, 0.3); /* Add subtle shadow */
+    box-shadow: 0 4px 6px rgba(10, 10, 10, 0.3);
 }
 
 /* Chart Titles */
@@ -482,7 +542,6 @@ footer {
     transform: scale(1.1);
 }
 
-
 /* Main Page (Hero Section) */
 .hero-section {
     background-image: url('images/background-main.jpg');
@@ -507,4 +566,3 @@ footer {
 .work-experience-section {
     background-image: url('images/background-work-experience.jpg');
 }
-
