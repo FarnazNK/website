@@ -38,7 +38,7 @@
       <div class="row">
         <!-- Left Column -->
         <div class="col-md-6">
-          <!-- Job Card 1 -->
+          <!-- Job Card 1: Software Developer -->
           <div class="card-item" onclick="toggleDetails(this)">
             <div class="card-indicator"></div>
             <i class="fas fa-code-branch"></i>
@@ -47,29 +47,12 @@
               <p class="lead text-muted">Aug 2024 – Present</p>
               <p class="lead"><strong>Hyperspectral Intelligence Inc, Gibsons, BC, Canada</strong></p>
               <ul class="lead">
-                <li>Led the design and development of robust Python frameworks tailored for processing hyperspectral imaging data.</li>
-                <li>Architected scalable, multi-threaded data pipelines integrating advanced caching strategies for real-time analysis and visualization.</li>
+                <li>Developed a full-stack Python application for hyperspectral imaging, integrating a responsive GUI (tkinter, Matplotlib) with backend data pipelines, featuring advanced workspace management, real-time spectral visualization, and drillcore analysis.</li>
+                <li>Architected scalable systems with multi-tabbed interfaces, file system explorers, and dynamic data caching (EnhancedDataManager), optimizing performance and user interactivity for scientific workflows using threading and event-driven design.</li>
               </ul>
             </div>
           </div>
-          <!-- Job Card 2 -->
-          <div class="card-item" onclick="toggleDetails(this)">
-            <div class="card-indicator"></div>
-            <i class="fas fa-chart-line"></i>
-            <h3>Data Visualization Specialist</h3>
-            <div class="card-details">
-              <p class="lead text-muted">Feb 2024 – July 2024</p>
-              <p class="lead"><strong>Hyperspectral Intelligence Inc, Gibsons, BC, Canada</strong></p>
-              <ul class="lead">
-                <li>Designed and implemented interactive dashboards using Tableau and Power BI, integrating real-time data processing for enhanced visual insights.</li>
-                <li>Optimized business intelligence workflows by incorporating performance-tuned visualization techniques.</li>
-              </ul>
-            </div>
-          </div>
-        </div>
-        <!-- Right Column -->
-        <div class="col-md-6">
-          <!-- Job Card 3 -->
+          <!-- Job Card 2: Data Analyst (Finance Department) -->
           <div class="card-item" onclick="toggleDetails(this)">
             <div class="card-indicator"></div>
             <i class="fas fa-chart-pie"></i>
@@ -78,12 +61,29 @@
               <p class="lead text-muted">May 2023 – Aug 2023</p>
               <p class="lead"><strong>Finance Department, University of Calgary, Calgary, AB, Canada</strong></p>
               <ul class="lead">
-                <li>Conducted comprehensive statistical analysis on extensive financial datasets using optimized data processing pipelines.</li>
-                <li>Streamlined reporting workflows through query optimization and effective data caching techniques.</li>
+                <li>Performed wallet address labeling on Ethereum blockchain data using Julia, developing efficient scripts to categorize and analyze transaction patterns for financial insights.</li>
+                <li>Conducted web scraping to gather supplementary blockchain data, optimizing data pipelines with Julia for real-time processing and reporting, enhancing stakeholder decision-making.</li>
               </ul>
             </div>
           </div>
-          <!-- Job Card 4 -->
+        </div>
+        <!-- Right Column -->
+        <div class="col-md-6">
+          <!-- Job Card 3: Data Visualization Specialist -->
+          <div class="card-item" onclick="toggleDetails(this)">
+            <div class="card-indicator"></div>
+            <i class="fas fa-chart-line"></i>
+            <h3>Data Visualization Specialist</h3>
+            <div class="card-details">
+              <p class="lead text-muted">Feb 2024 – July 2024</p>
+              <p class="lead"><strong>Hyperspectral Intelligence Inc, Gibsons, BC, Canada</strong></p>
+              <ul class="lead">
+                <li>Created interactive dashboards with real-time spectral data visualization using Matplotlib and Tableau, incorporating custom Treeview widgets for data exploration and enhancing user decision-making in hyperspectral analysis.</li>
+                <li>Optimized visualization workflows by integrating performance-tuned data processing and caching techniques within a Python-based framework, supporting multi-format data handling (SLI, CSV, PNG).</li>
+              </ul>
+            </div>
+          </div>
+          <!-- Job Card 4: Data Analyst (Physics Department) -->
           <div class="card-item" onclick="toggleDetails(this)">
             <div class="card-indicator"></div>
             <i class="fas fa-flask"></i>
@@ -92,8 +92,8 @@
               <p class="lead text-muted">Sep 2014 – Sep 2020</p>
               <p class="lead"><strong>Physics Department, University of Tabriz, Tabriz, Iran</strong></p>
               <ul class="lead">
-                <li>Utilized advanced analytical techniques to process experimental physics datasets with a focus on precision and efficiency.</li>
-                <li>Developed detailed technical reports and presentations, highlighting insights derived from optimized data pipelines and caching mechanisms.</li>
+                <li>Applied advanced analytical techniques to process experimental physics datasets, leveraging Python scripts for precision data handling and visualization.</li>
+                <li>Developed technical reports and presentations, utilizing optimized data workflows to communicate actionable insights derived from complex scientific data.</li>
               </ul>
             </div>
           </div>
@@ -104,7 +104,7 @@
 
   <!-- Footer -->
   <footer class="text-center text-light py-3" style="background-color: #333;">
-    <p>© 2024 Farnaz Nasehi. All rights reserved.</p>
+    <p>© 2025 Farnaz Nasehi. All rights reserved.</p>
   </footer>
 
   <!-- Scripts -->
@@ -118,12 +118,12 @@
       details.classList.toggle('show');
     }
 
-    // Initialize: Open first card in each column on page load without overlap
+    // Initialize: No cards open on page load
     document.addEventListener('DOMContentLoaded', function() {
-      const firstLeftCard = document.querySelector('.col-md-6:first-child .card-item:first-child');
-      const firstRightCard = document.querySelector('.col-md-6:nth-child(2) .card-item:first-child');
-      if (firstLeftCard) toggleDetails(firstLeftCard);
-      if (firstRightCard) toggleDetails(firstRightCard);
+      const cardItems = document.querySelectorAll('.card-item.active');
+      cardItems.forEach(card => {
+        toggleDetails(card);
+      });
     });
   </script>
 </body>
