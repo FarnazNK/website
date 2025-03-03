@@ -8,6 +8,8 @@
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
   <!-- Font Awesome for Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <!-- Google Fonts -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Poppins:wght@400;500;600;700&display=swap">
   <!-- Custom Styles -->
   <link rel="stylesheet" href="styles.css">
   <!-- Chart.js -->
@@ -21,36 +23,10 @@
   <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
   <!-- Bootstrap JS -->
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-  
-  <style>
-    .skill-details {
-      display: none;
-    }
-    .skill-details.show {
-      display: block;
-    }
-    .skill-card {
-      cursor: pointer;
-      transition: transform 0.2s;
-      padding: 20px;
-      border: 1px solid #444;
-      border-radius: 10px;
-      background: #1e1e1e;
-      margin-bottom: 20px;
-    }
-    .skill-card:hover {
-      transform: scale(1.02);
-    }
-    .skill-card i {
-      font-size: 40px;
-      margin-bottom: 10px;
-    }
-  </style>
-  
 </head>
 <body>
   <!-- Navbar -->
-  <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top shadow-sm">
+  <nav class="navbar navbar-expand-lg navbar-dark fixed-top shadow-sm">
     <div class="container">
       <a class="navbar-brand" href="index.html">Farnaz Nasehi</a>
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" 
@@ -69,118 +45,259 @@
   </nav>
   
   <!-- Spacer for fixed navbar -->
-  <div style="padding-top: 60px;"></div>
+  <div style="padding-top: 80px;"></div>
+  
+  <!-- Skills Section Header -->
+  <section class="bg-gradient pb-0">
+    <div class="container py-5">
+      <div class="row">
+        <div class="col-lg-8 mx-auto text-center">
+          <h1 class="section-title text-center mb-4">Professional Skills</h1>
+          <p class="lead text-muted mb-5">Specialized expertise in system architecture, data analytics, and blockchain technologies.</p>
+        </div>
+      </div>
+    </div>
+  </section>
   
   <!-- Skills Section -->
-  <section class="skills-section text-light" style="background: linear-gradient(45deg, #121212, #0a0a0a);">
+  <section class="skills-section bg-gradient">
     <div class="container">
-      <h1 class="mb-5">Skills</h1>
       <div class="row">
-        <!-- Left Column (4 Cards) -->
-        <div class="col-md-6 text-center mb-4">
+        <!-- Technical Expertise Category -->
+        <div class="col-12 mb-4">
+          <h2 class="h4 text-muted">Technical Expertise</h2>
+        </div>
+      
+        <!-- Left Column (5 Cards) -->
+        <div class="col-md-6">
           <!-- Card 1: System Design & Architecture -->
-          <div class="skill-card" onclick="toggleDetails(this)">
+          <div class="card-item" onclick="toggleDetails(this)" data-skill-level="90">
+            <div class="card-indicator"></div>
             <i class="fas fa-server"></i>
             <h3>System Design & Architecture</h3>
-            <p class="skill-details">
-              • Microservices & API Design<br>
-              • Distributed, Scalable & Event-Driven Systems<br>
-              <em>Python Standard Library (os, glob, csv), RESTful design patterns</em>
-            </p>
+            <div class="skill-level">
+              <div class="skill-level-bar" style="width: 0%"></div>
+            </div>
+            <div class="card-details">
+              • Modular design with class-based separation (e.g., SpectraSpace, DrillCoreSpace)<br>
+              • State persistence and workspace management for data-intensive applications<br>
+              • Architecture planning for scalable systems with clearly defined interfaces<br>
+              <em>Python (os, glob, json), tkinter, RESTful design concepts</em>
+            </div>
           </div>
+          
           <!-- Card 2: Concurrency & Real-Time Processing -->
-          <div class="skill-card" onclick="toggleDetails(this)">
+          <div class="card-item" onclick="toggleDetails(this)" data-skill-level="85">
+            <div class="card-indicator"></div>
             <i class="fas fa-sync-alt"></i>
             <h3>Concurrency & Real-Time Processing</h3>
-            <p class="skill-details">
-              • Thread-Safe Programming & Multi-Threading<br>
-              • Asynchronous Data Handling & Dynamic UI Updates<br>
-              <em>threading, asyncio, concurrent.futures</em>
-            </p>
+            <div class="skill-level">
+              <div class="skill-level-bar" style="width: 0%"></div>
+            </div>
+            <div class="card-details">
+              • Event-driven updates for interactive plots (e.g., on_cursor_move)<br>
+              • Real-time token balance and fee income tracking for DeFi trading<br>
+              • Multi-threaded data processing for responsive user interfaces<br>
+              <em>tkinter (event bindings), matplotlib (real-time), threading basics</em>
+            </div>
           </div>
+          
           <!-- Card 3: Machine Learning & Data Analytics -->
-          <div class="skill-card" onclick="toggleDetails(this)">
+          <div class="card-item" onclick="toggleDetails(this)" data-skill-level="88">
+            <div class="card-indicator"></div>
             <i class="fas fa-brain"></i>
             <h3>Machine Learning & Data Analytics</h3>
-            <p class="skill-details">
-              • Statistical Analysis & Model Building (Regression, Classification, Clustering)<br>
-              • In-Browser ML with TensorFlow.js & Advanced Data Preprocessing<br>
-              <em>NumPy, Pandas, scikit-learn, TensorFlow.js</em>
-            </p>
+            <div class="skill-level">
+              <div class="skill-level-bar" style="width: 0%"></div>
+            </div>
+            <div class="card-details">
+              • Developed models to track token balances and fee income in DeFi<br>
+              • Preprocessed hyperspectral data for statistical analysis<br>
+              • Predictive analytics for blockchain performance optimization<br>
+              <em>NumPy, Pandas, Julia, scikit-learn (potential), TensorFlow.js (web)</em>
+            </div>
           </div>
+          
           <!-- Card 4: Programming & API Integration -->
-          <div class="skill-card" onclick="toggleDetails(this)">
+          <div class="card-item" onclick="toggleDetails(this)" data-skill-level="95">
+            <div class="card-indicator"></div>
             <i class="fas fa-code"></i>
             <h3>Programming & API Integration</h3>
-            <p class="skill-details">
-              • Expertise in Python, SQL, Julia & JavaScript<br>
-              • Robust Object-Oriented Design & Debugging<br>
-              <em>Python, Node.js (concepts), REST APIs</em>
-            </p>
+            <div class="skill-level">
+              <div class="skill-level-bar" style="width: 0%"></div>
+            </div>
+            <div class="card-details">
+              • Engineered SQL queries in Julia for Ethereum blockchain analysis<br>
+              • Advanced Python with OOP and external module integration (e.g., CMDL)<br>
+              • RESTful API integration for cross-platform data exchange<br>
+              <em>Python, Julia, SQL, sys, os, hiispectro libraries</em>
+            </div>
+          </div>
+          
+          <!-- Card 5: Blockchain & DeFi Analysis -->
+          <div class="card-item" onclick="toggleDetails(this)" data-skill-level="92">
+            <div class="card-indicator"></div>
+            <i class="fas fa-ethereum"></i>
+            <h3>Blockchain & DeFi Analysis</h3>
+            <div class="skill-level">
+              <div class="skill-level-bar" style="width: 0%"></div>
+            </div>
+            <div class="card-details">
+              • Scraped and analyzed high-volume Ethereum data for DeFi trading<br>
+              • Enabled real-time financial adjustments for liquidity providers<br>
+              • Smart contract interaction analysis for optimizing gas usage<br>
+              <em>Julia, SQL, Python (potential), web scraping tools</em>
+            </div>
           </div>
         </div>
+        
         <!-- Right Column (5 Cards) -->
-        <div class="col-md-6 text-center mb-4">
-          <!-- Card 5: Web Development & JavaScript Libraries -->
-          <div class="skill-card" onclick="toggleDetails(this)">
+        <div class="col-md-6">
+          <!-- Card 6: Web Development & JavaScript Libraries -->
+          <div class="card-item" onclick="toggleDetails(this)" data-skill-level="85">
+            <div class="card-indicator"></div>
             <i class="fas fa-globe"></i>
-            <h3>Web Development</h3>
-            <p class="skill-details">
-              • HTML, CSS, Bootstrap & Font Awesome for responsive design<br>
-              • JavaScript libraries: jQuery, Popper.js, Chart.js, TensorFlow.js & ML.js for interactive data apps<br>
+            <h3>Web Development & JavaScript Libraries</h3>
+            <div class="skill-level">
+              <div class="skill-level-bar" style="width: 0%"></div>
+            </div>
+            <div class="card-details">
+              • Responsive portfolio design with HTML, CSS, and Bootstrap<br>
+              • Interactive features using jQuery, Chart.js, and TensorFlow.js<br>
+              • Frontend optimization for performance and user experience<br>
               <em>Bootstrap, Font Awesome, jQuery, Popper.js, Chart.js, TensorFlow.js, ML.js</em>
-            </p>
+            </div>
           </div>
-          <!-- Card 6: GUI & Interactive Applications -->
-          <div class="skill-card" onclick="toggleDetails(this)">
+          
+          <!-- Card 7: GUI & Interactive Applications -->
+          <div class="card-item" onclick="toggleDetails(this)" data-skill-level="90">
+            <div class="card-indicator"></div>
             <i class="fas fa-desktop"></i>
             <h3>GUI & Interactive Applications</h3>
-            <p class="skill-details">
-              • Tkinter-based GUI Development & ttk for widget styling<br>
-              • Integration of Matplotlib for dynamic, interactive plots<br>
-              <em>Tkinter, ttk, Matplotlib, Pillow (PIL)</em>
-            </p>
+            <div class="skill-level">
+              <div class="skill-level-bar" style="width: 0%"></div>
+            </div>
+            <div class="card-details">
+              • Tabbed GUI with dynamic plotting and sidebar controls<br>
+              • Real-time spectral visualization with scrollable areas<br>
+              • User-centric interface design with intuitive workflows<br>
+              <em>tkinter, ttk, Matplotlib (FigureCanvasTkAgg)</em>
+            </div>
           </div>
-          <!-- Card 7: Advanced Data Management -->
-          <div class="skill-card" onclick="toggleDetails(this)">
+          
+          <!-- Card 8: Advanced Data Management -->
+          <div class="card-item" onclick="toggleDetails(this)" data-skill-level="93">
+            <div class="card-indicator"></div>
             <i class="fas fa-database"></i>
             <h3>Advanced Data Management</h3>
-            <p class="skill-details">
-              • Processing & Parsing of CSV, TXT & Image Files<br>
-              • Data Caching, Versioning & Performance Optimization<br>
-              <em>Pandas, NumPy, csv, glob</em>
-            </p>
+            <div class="skill-level">
+              <div class="skill-level-bar" style="width: 0%"></div>
+            </div>
+            <div class="card-details">
+              • Processed complex blockchain datasets with advanced scraping<br>
+              • Managed multi-format files (SLI, HDR, CSV) with caching<br>
+              • Optimized data storage and retrieval for large-scale analytics<br>
+              <em>Pandas, NumPy, csv, glob, json, SQL</em>
+            </div>
           </div>
-          <!-- Card 8: Scientific Computing & Analysis -->
-          <div class="skill-card" onclick="toggleDetails(this)">
+          
+          <!-- Card 9: Scientific Computing & Analysis -->
+          <div class="card-item" onclick="toggleDetails(this)" data-skill-level="87">
+            <div class="card-indicator"></div>
             <i class="fas fa-flask"></i>
             <h3>Scientific Computing & Analysis</h3>
-            <p class="skill-details">
-              • Spectral & Drill Core Data Analysis with custom algorithms<br>
-              <em>NumPy, SciPy, Pandas</em>
-            </p>
+            <div class="skill-level">
+              <div class="skill-level-bar" style="width: 0%"></div>
+            </div>
+            <div class="card-details">
+              • Spectral data processing (e.g., wavelength subsetting, reflectance)<br>
+              • Drillcore log analysis with depth-based visualization<br>
+              • Statistical modeling for scientific data interpretation<br>
+              <em>NumPy, Pandas, custom algorithms</em>
+            </div>
           </div>
-          <!-- Card 9: Data Visualization & Reporting -->
-          <div class="skill-card" onclick="toggleDetails(this)">
+          
+          <!-- Card 10: Data Visualization & Reporting -->
+          <div class="card-item" onclick="toggleDetails(this)" data-skill-level="91">
+            <div class="card-indicator"></div>
             <i class="fas fa-chart-line"></i>
             <h3>Data Visualization & Reporting</h3>
-            <p class="skill-details">
-              • Interactive Dashboards using Matplotlib, Chart.js & Power BI<br>
-              • Real-Time Plot Updates & Dynamic User Interaction<br>
-              <em>Matplotlib, Chart.js, Power BI, Plotly</em>
-            </p>
+            <div class="skill-level">
+              <div class="skill-level-bar" style="width: 0%"></div>
+            </div>
+            <div class="card-details">
+              • Interactive dashboards with line, scatter, and stacked bar plots<br>
+              • Dynamic legend and control widgets for user interaction<br>
+              • Executive reporting with clear, actionable insights<br>
+              <em>Matplotlib, Chart.js (web), Plotly (potential)</em>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Systems Operations Category -->
+        <div class="col-12 mt-5 mb-4">
+          <h2 class="h4 text-muted">Systems Operations</h2>
+        </div>
+        
+        <!-- Server Administration -->
+        <div class="col-md-6 mx-auto">
+          <!-- Card 11: Server Administration -->
+          <div class="card-item" onclick="toggleDetails(this)" data-skill-level="88">
+            <div class="card-indicator"></div>
+            <i class="fas fa-cogs"></i>
+            <h3>Server Administration</h3>
+            <div class="skill-level">
+              <div class="skill-level-bar" style="width: 0%"></div>
+            </div>
+            <div class="card-details">
+              • Administered Linux servers for blockchain and financial analytics<br>
+              • Optimized configurations for high-performance quantitative operations<br>
+              • Security hardening and automated backup implementation<br>
+              <em>Linux, Bash, system configuration tools</em>
+            </div>
           </div>
         </div>
       </div>
     </div>
   </section>
   
-  <!-- Toggle Function -->
+  <!-- Footer -->
+  <footer class="py-4 bg-dark text-center text-white-50">
+    <div class="container">
+      <small>© 2025 Farnaz Nasehi. All Rights Reserved.</small>
+      <div class="mt-3">
+        <a href="#" class="text-white mx-2"><i class="fab fa-linkedin"></i></a>
+        <a href="#" class="text-white mx-2"><i class="fab fa-github"></i></a>
+        <a href="#" class="text-white mx-2"><i class="far fa-envelope"></i></a>
+      </div>
+    </div>
+  </footer>
+  
+  <!-- Custom JS -->
   <script>
     function toggleDetails(element) {
-      const details = element.querySelector('.skill-details');
+      element.classList.toggle('active');
+      const details = element.querySelector('.card-details');
       details.classList.toggle('show');
+      const skillLevel = element.getAttribute('data-skill-level');
+      const skillLevelBar = element.querySelector('.skill-level-bar');
+      if (element.classList.contains('active')) {
+        setTimeout(() => {
+          skillLevelBar.style.width = skillLevel + '%';
+        }, 100);
+      } else {
+        skillLevelBar.style.width = '0%';
+      }
     }
+    
+    document.addEventListener('DOMContentLoaded', function() {
+      const firstCards = document.querySelectorAll('.col-md-6:first-child .card-item:first-child, .col-md-6:nth-child(2) .card-item:first-child');
+      firstCards.forEach(card => {
+        setTimeout(() => {
+          toggleDetails(card);
+        }, 500);
+      });
+    });
   </script>
 </body>
 </html>

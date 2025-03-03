@@ -1,3 +1,22 @@
+/* CSS Variables for Consistent Theming */
+:root {
+    --primary-color: #007bff;
+    --primary-hover: #0069d9;
+    --secondary-color: #6c757d;
+    --dark-bg: #121212;
+    --card-bg: #1e1e1e;
+    --card-bg-hover: #333333;
+    --text-light: #f8f9fa;
+    --text-muted: #adb5bd;
+    --text-accent: #9f9fff;
+    --card-border: rgba(255, 255, 255, 0.1);
+    --card-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    --card-shadow-hover: 0 8px 16px rgba(0, 0, 0, 0.2);
+    --hover-transform: scale(1.03);
+    --transition-speed: 0.3s;
+    --primary-color-rgb: 0, 123, 255;
+}
+
 /* General Layout */
 * {
     box-sizing: border-box;
@@ -6,484 +25,376 @@
 }
 
 body {
-    font-family: Arial, sans-serif;
+    font-family: 'Roboto', sans-serif;
+    background-color: var(--dark-bg);
+    color: var(--text-light);
     line-height: 1.6;
-    background-color: #121212;
-    color: #ffffff;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
 }
 
 /* Navbar */
 .navbar {
-    transition: box-shadow 0.3s;
+    padding: 1rem 0;
+    background: rgba(18, 18, 18, 0.95) !important;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    transition: box-shadow var(--transition-speed);
 }
 
 .navbar.shadow-sm {
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--card-shadow);
 }
 
-/* Profile Section */
+.navbar-brand {
+    font-weight: 700;
+    font-size: 1.5rem;
+    color: var(--primary-color) !important;
+}
+
+.nav-link {
+    font-weight: 500;
+    transition: color var(--transition-speed);
+    padding: 0.5rem 1rem;
+    margin: 0 0.25rem;
+}
+
+.nav-link:hover, .nav-link.active {
+    color: var(--primary-color) !important;
+}
+
+/* Section Title */
+.section-title {
+    position: relative;
+    display: inline-block;
+    margin-bottom: 2.5rem;
+    font-weight: 700;
+    color: var(--text-light);
+}
+
+.section-title::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: -10px;
+    width: 50px;
+    height: 3px;
+    background: var(--primary-color);
+}
+
+/* Shared Card Styling for Skills and Resume */
+.card-item {
+    cursor: pointer;
+    transition: all var(--transition-speed);
+    padding: 2rem 1.5rem;
+    border: 1px solid var(--card-border);
+    border-radius: 12px;
+    background: var(--card-bg);
+    margin-bottom: 1.5rem;
+    box-shadow: var(--card-shadow);
+    position: relative;
+    overflow: hidden;
+}
+
+.card-item:hover {
+    transform: var(--hover-transform);
+    box-shadow: var(--card-shadow-hover);
+    border-color: rgba(var(--primary-color-rgb), 0.3);
+}
+
+.card-item i {
+    font-size: 2.5rem;
+    color: var(--primary-color);
+    margin-bottom: 1.25rem;
+    transition: transform var(--transition-speed);
+}
+
+.card-item:hover i {
+    transform: scale(1.1);
+}
+
+.card-item h3 {
+    font-size: 1.3rem;
+    margin-bottom: 1rem;
+    text-align: center;
+    transition: color var(--transition-speed);
+}
+
+.card-item:hover h3 {
+    color: var(--primary-color);
+}
+
+.card-details {
+    display: none;
+    margin-top: 1rem;
+    color: var(--text-muted);
+    font-size: 0.95rem;
+    line-height: 1.7;
+    text-align: left;
+    width: 100%;
+}
+
+.card-details.show {
+    display: block;
+    animation: fadeIn 0.5s ease;
+}
+
+.card-details em {
+    display: block;
+    margin-top: 0.75rem;
+    font-style: italic;
+    font-size: 0.9rem;
+    color: var(--primary-color);
+}
+
+.card-details ul {
+    list-style-type: disc;
+    padding-left: 20px;
+    margin-top: 1rem;
+}
+
+.card-details ul li {
+    margin-bottom: 0.5rem;
+}
+
+.card-indicator {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: transparent;
+    border: 2px solid var(--primary-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all var(--transition-speed);
+}
+
+.card-indicator::after {
+    content: '+';
+    color: var(--primary-color);
+    font-size: 1rem;
+    font-weight: bold;
+    transition: all var(--transition-speed);
+}
+
+.card-item.active .card-indicator::after {
+    content: '-';
+    transform: translateY(-1px);
+}
+
+/* Skills Section (skills.html) */
+.skills-section {
+    padding: 5rem 0;
+    background-color: var(--dark-bg);
+}
+
+.skills-section .h4 {
+    color: var(--text-muted);
+    margin-bottom: 2rem;
+}
+
+/* Resume Section (resume.html) */
+.resume-section {
+    padding: 5rem 0;
+    background-color: var(--dark-bg);
+}
+
+/* Profile Section (index.html) */
 .profile-section {
     padding: 80px 20px;
     text-align: center;
 }
 
 .profile-section h1 {
-    font-size: 2.5em;
+    font-size: 2.5rem;
     font-weight: bold;
 }
 
 .profile-section h2 {
-    font-size: 1.5em;
-    color: #9f9fff;
+    font-size: 1.5rem;
+    color: var(--text-accent);
 }
 
-/* Updated text size for profile section paragraphs */
 .profile-section p {
-    font-size: 1.2em;
-    color: #cccccc;
+    font-size: 1.2rem;
+    color: var(--text-muted);
     margin-top: 10px;
-    line-height: 1.6;
 }
 
 .profile-section .btn-primary {
-    background-color: #6a5acd;
+    background-color: var(--primary-color);
     border: none;
     padding: 10px 20px;
     font-weight: bold;
-    transition: background-color 0.3s ease;
+    transition: background-color var(--transition-speed);
 }
 
 .profile-section .btn-primary:hover {
-    background-color: #7a6fff;
+    background-color: var(--primary-hover);
 }
 
-/* Social Icons */
-.social-icons {
-    margin-top: 20px;
+/* About Section (about.html) */
+main.container {
+    padding-top: 5rem;
 }
 
-.social-icons a {
-    color: #9f9fff;
-    font-size: 1.5em;
-    margin: 0 10px;
-    transition: color 0.3s ease;
-}
-
-.social-icons a:hover {
-    color: #ffffff;
-}
-
-/* Profile Image */
-.profile-image img {
+.profile-img {
     border-radius: 50%;
-    width: 200px;
-    height: 200px;
+    width: 220px;
+    height: 220px;
     object-fit: cover;
-    margin-top: 20px;
+    transition: transform var(--transition-speed), box-shadow var(--transition-speed);
 }
 
-/* Footer */
-footer {
-    text-align: center;
-    padding: 20px;
-    background-color: #b3a6a6;
-    color: #342222;
+.profile-img:hover {
+    transform: scale(1.05);
+    box-shadow: var(--card-shadow-hover);
 }
 
-/* Skills Section */
-.skills-section {
-    padding: 80px 20px;
-    background-color: #121212;
-    color: #ffffff;
-    font-family: Arial, sans-serif;
-    font-size: 1.2em;
+main .lead {
+    font-size: 1.25rem;
 }
 
-.skills-section h1 {
-    font-size: 2.5em;
-    font-weight: bold;
-    text-align: center;
-    margin-bottom: 40px;
-}
-
-/* Skill Card */
-
-.skill-card {
-    background-color: #1e1e1e;
-    border-radius: 10px;
-    padding: 20px;
-    margin-bottom: 20px;
-    text-align: center;
-    cursor: pointer;
-    transition: transform 0.3s, background-color 0.3s;
-}
-
-.skill-card:hover {
-    transform: translateY(-5px);
-    background-color: #333333;
-}
-
-.skill-card i {
-    font-size: 2em;
-    color: #6a5acd;
-    margin-bottom: 10px;
-}
-
-.skill-card h3 {
-    font-size: 1.3em;
-    color: #ffffff;
-    margin-bottom: 10px;
-}
-
-/* Toggle Section Smooth Transition */
-.details-content, .skill-details, .resume-details, .experience-details {
-    visibility: hidden;
-    height: 0;
-    opacity: 0;
-    overflow: hidden;
-    transition: height 0.5s ease, opacity 0.5s ease, visibility 0.5s ease;
-}
-
-.details-content.show, .skill-details.show, .resume-details.show, .experience-details.show {
-    visibility: visible;
-    height: auto;
-    opacity: 1;
-}
-
-/* Resume Section */
-.resume-section {
-    padding: 80px 20px;
-    background-color: #121212;
-    color: #ffffff;
-    font-family: Arial, sans-serif;
-    font-size: 1.5em;
-}
-
-.resume-section h1 {
-    font-size:  1.1em;
-    font-weight: bold;
-    text-align: center;
-    margin-bottom: 40px;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-}
-
-/* Resume Card */
-.resume-card {
-    background-color: #1e1e1e;
-    color: #ffffff;
-    border: 1px solid #444;
-    border-radius: 10px;
-    padding: 25px;
-    margin-bottom: 20px;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
-.resume-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 16px rgba(233, 229, 229, 0.2);
-}
-
-.resume-card h3 {
-    font-size: 1.5em;
-    font-weight: bold;
+main ul.list-unstyled li {
     margin-bottom: 10px;
     display: flex;
     align-items: center;
-    gap: 10px;
 }
 
-/* Updated text sizes for resume card paragraphs and list items */
-.resume-card p {
-    font-size: 1.2em;
-    color: #cccccc;
+main ul.list-unstyled li i {
+    margin-right: 10px;
+    font-size: 1.5rem;
 }
 
-.resume-card ul {
-    list-style-type: disc;
-    padding-left: 20px;
-    color: #cccccc;
+/* Contact Section (contact.html) */
+.contact-section {
+    padding: 80px 20px;
 }
 
-.resume-card ul li {
-    margin-bottom: 10px;
-    line-height: 1.5;
-    font-size: 1.2em;
-}
-
-/* Experience Card */
-.experience-card {
-    background-color: #1e1e1e;
-    border: 1px solid #444;
-    border-radius: 8px;
-    padding: 20px;
-    margin-bottom: 20px;
-    transition: transform 0.3s ease, background-color 0.3s ease, box-shadow 0.3s ease;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    cursor: pointer;
-}
-
-.experience-card:hover {
-    transform: translateY(-5px);
-    background-color: #151515;
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
-}
-
-.experience-card h3 {
-    font-size: 1.2em;
-    font-weight: bold;
-    color: #cccccc;
-    margin-bottom: 10px;
-}
-
-.experience-card p {
-    font-size: 1.2em;
-    color: #cccccc;
-    margin-bottom: 10px;
-}
-
-.experience-details {
-    margin-top: 15px;
-    padding-left: 10px;
-    border-left: 2px solid #444;
-}
-
-.experience-details p {
-    font-size: 1.2em;
-    color: #cccccc;
-    margin-bottom: 10px;
-    line-height: 1.6;
-}
-
-/* Improved Button Style */
-.resume-section .btn-primary {
-    background-color: #6a5acd;
-    border: none;
-    padding: 10px 20px;
-    font-weight: bold;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    transition: background-color 0.3s ease, transform 0.2s ease;
-}
-
-.resume-section .btn-primary:hover {
-    background-color: #0a0a0a;
-    transform: translateY(-2px);
-}
-
-/* General Section Styling */
-.resume-section section {
-    color: #cccccc;
-}
-
-/* Contact Card */
 .contact-card {
-    background-color: #1e1e1e;
-    color: #ffffff;
+    background-color: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 10px;
+    padding: 20px;
+    transition: transform var(--transition-speed), box-shadow var(--transition-speed);
     cursor: pointer;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .contact-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    transform: var(--hover-transform);
+    box-shadow: var(--card-shadow-hover);
+}
+
+.contact-card i {
+    font-size: 3rem;
+    margin-bottom: 1rem;
 }
 
 .contact-card h3 {
-    font-size: 1.2em;
-    margin-bottom: 10px;
+    font-size: 1.2rem;
     font-weight: bold;
 }
 
 .contact-card p {
-    font-size: 1.2em;
-    color: #cccccc;
+    font-size: 1rem;
+    color: var(--text-light);
 }
 
-/* About Section Styles */
-.about-section {
-    padding: 80px 20px;
-    background-color: #121212;
-    color: #ffffff;
-    font-family: Arial, sans-serif;
-    font-size: 1.2em;
+/* Portfolio Section (portfolio.html) */
+.header-section {
+    padding: 4rem 0;
 }
 
-.about-section img {
-    border: 5px solid #ffffff;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+.gradient-background {
+    background: linear-gradient(115deg, #6dcfe7, #1e1e1e);
 }
 
-.about-section img:hover {
-    transform: scale(1.05);
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
-}
-
-.about-section .btn-primary {
-    background-color: #6a5acd;
+.card.bg-dark {
     border: none;
-    padding: 10px 20px;
-    font-size: 1.1em;
-    font-weight: bold;
-    transition: background-color 0.3s ease, transform 0.2s ease;
 }
 
-.about-section .btn-primary:hover {
-    background-color: #7a6fff;
-    transform: translateY(-2px);
+.card-body h1 {
+    font-size: 2rem;
 }
 
-.about-section ul li {
-    margin-bottom: 10px;
-    font-size: 1.2em;
-    display: flex;
-    align-items: center;
+.bg-dark.py-2 {
+    background-color: rgba(18, 18, 18, 0.95) !important;
 }
 
-.about-section ul li i {
-    margin-right: 10px;
-    font-size: 1.5em;
-}
-
-/* Portfolio Section */
-.portfolio-section {
-    padding: 80px 20px;
-    background-color: #121212;
-    color: #ffffff;
-    font-family: Arial, sans-serif;
-    font-size: 1.2em;
-}
-
-.portfolio-section h1 {
-    font-size: 2.5em;
-    font-weight: bold;
-    text-align: center;
-    margin-bottom: 40px;
-}
-
-.portfolio-item {
-    background-color: #1e1e1e;
-    border-radius: 10px;
-    padding: 20px;
-    margin-bottom: 20px;
-    text-align: center;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.portfolio-item:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-}
-
-.portfolio-item h3 {
-    font-size: 1.5em;
-    margin-bottom: 10px;
-}
-
-.portfolio-item p {
-    font-size: 1.2em;
-    color: #cccccc;
-}
-
-/* Improved Button Style */
-.btn-primary {
-    background-color: #6a5acd;
-    border: none;
-    padding: 10px 20px;
-    font-weight: bold;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    transition: background-color 0.3s ease, transform 0.2s ease;
+.btn-primary, .btn-secondary {
+    transition: background-color var(--transition-speed), transform 0.2s ease;
 }
 
 .btn-primary:hover {
-    background-color: #7a6fff;
+    background-color: var(--primary-hover);
     transform: translateY(-2px);
 }
 
-/* Footer Styles */
-footer {
-    background-color: #333;
-    color: #fff;
-    padding: 20px;
-    text-align: center;
-    font-size: 0.9em;
+.btn-secondary:hover {
+    background-color: var(--secondary-color);
+    transform: translateY(-2px);
+}
+
+#dynamicMenuContent {
+    padding: 4rem 0;
 }
 
 .table-container {
     max-height: 400px;
     overflow-y: auto;
-    border: 1px solid #444;
+    border: 1px solid var(--card-border);
     border-radius: 8px;
     padding: 10px;
-    background-color: #1e1e2f;
+    background-color: var(--card-bg);
 }
 
 .table {
     width: 100%;
     margin-bottom: 0;
-    color: #ffffff;
+    color: var(--text-light);
 }
 
 .table th {
     position: sticky;
     top: 0;
-    background-color: #2a2a3b;
-}
-
-.data-menu-section {
-    margin-top: 20px;
-}
-
-.menu-item {
-    cursor: pointer;
-    text-align: left;
-}
-
-.menu-item:hover {
-    background-color: #6dcfe7;
-    color: #fff;
-}
-
-#dynamicMenuContent {
-    min-height: 300px;
+    background-color: var(--card-bg);
 }
 
 .list-group-item {
-    background-color: #333;
-    color: #fff;
+    background-color: var(--card-bg);
+    color: var(--text-light);
     border: none;
     margin-bottom: 5px;
 }
 
 .list-group-item:hover {
-    background-color: #444;
-    color: #6dcfe7;
+    background-color: var(--card-bg-hover);
+    color: var(--text-accent);
 }
 
 .nested-submenu {
     list-style-type: none;
     margin: 0;
     padding: 0;
-    background-color: #343a40;
-    border-left: 2px solid #6c757d;
+    background-color: var(--card-bg-hover);
+    border-left: 2px solid var(--secondary-color);
 }
 
 .nested-submenu-item {
     padding: 8px 15px;
-    color: white;
+    color: var(--text-light);
     cursor: pointer;
-    border-bottom: 1px solid #444;
+    border-bottom: 1px solid var(--card-border);
 }
 
 .nested-submenu-item:hover {
-    background-color: #495057;
-}
-
-.submenu-item {
-    position: relative;
-    cursor: pointer;
+    background-color: var(--card-bg);
 }
 
 .nested-menu {
@@ -491,78 +402,109 @@ footer {
     list-style-type: none;
     margin: 0;
     padding: 0 0 0 15px;
-    background-color: #495057;
+    background-color: var(--card-bg);
 }
 
-.nested-menu .nested-submenu-item {
-    padding: 8px 15px;
+.submenu-item.active .nested-menu {
+    display: block;
 }
 
-.nested-menu .nested-submenu-item:hover {
-    background-color: #6c757d;
-}
-
-/* Chart Container Styling */
 .chart-wrapper {
-    width: 100%;
-    height: 600px;
-    margin-bottom: 50px;
+    width: 45%;
+    min-width: 300px;
+    height: 400px;
+    margin-bottom: 20px;
     position: relative;
-    background-color: #f3f3f8;
+    background-color: #fff;
     border-radius: 10px;
     padding: 10px;
-    box-shadow: 0 4px 6px rgba(10, 10, 10, 0.3);
+    box-shadow: var(--card-shadow);
 }
 
-/* Chart Titles */
-.chart-wrapper h4 {
+/* Footer */
+footer {
     text-align: center;
-    font-size: 1.2em;
-    color: #ffffff;
-    margin-bottom: 10px;
+    padding: 20px;
+    background-color: #333;
+    color: var(--text-light);
+    font-size: 0.9rem;
 }
 
-/* "Remove Chart" Button Styling */
-.remove-chart-btn {
-    position: absolute;
-    top: 15px;
-    right: 15px;
-    background-color: #ff4d4f;
-    color: #fff;
-    border: none;
-    padding: 8px 12px;
-    font-size: 0.9em;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s ease, transform 0.2s ease;
+footer a {
+    color: var(--text-light);
+    margin: 0 10px;
+    transition: color var(--transition-speed);
 }
 
-.remove-chart-btn:hover {
-    background-color: #d9363e;
-    transform: scale(1.1);
+footer a:hover {
+    color: var(--primary-color);
 }
 
-/* Main Page (Hero Section) */
-.hero-section {
-    background-image: url('images/background-main.jpg');
+/* Background Styles */
+.bg-gradient {
+    background: linear-gradient(135deg, #121212 0%, #1a1a1a 100%);
 }
 
-/* About Section */
-.about-section {
-    background-image: url('images/background-about.jpg');
+/* Animations */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
-/* Skills Section */
-.skills-section {
-    background-image: url('C:\Users\gradu\Web_Development\Web_Development\images');
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .skills-section, .resume-section, .contact-section, .profile-section, .header-section {
+        padding: 3rem 15px;
+    }
+
+    .card-item, .contact-card {
+        padding: 1.5rem 1rem;
+    }
+
+    .card-item i {
+        font-size: 2rem;
+    }
+
+    .card-item h3 {
+        font-size: 1.2rem;
+    }
+
+    .card-details {
+        font-size: 0.9rem;
+    }
+
+    .profile-section h1 {
+        font-size: 2rem;
+    }
+
+    .profile-img {
+        width: 150px;
+        height: 150px;
+    }
+
+    .chart-wrapper {
+        width: 100%;
+    }
 }
 
-/* Portfolio Section */
-.portfolio-section {
-    background-image: url('images/background-portfolio.jpg');
-}
+@media (max-width: 576px) {
+    .card-item, .contact-card {
+        padding: 1rem 0.75rem;
+    }
 
-/* Work Experience Section */
-.work-experience-section {
-    background-image: url('images/background-work-experience.jpg');
+    .card-item i {
+        font-size: 1.75rem;
+    }
+
+    .card-item h3 {
+        font-size: 1.1rem;
+    }
+
+    .profile-section h1 {
+        font-size: 1.8rem;
+    }
+
+    .profile-section h2 {
+        font-size: 1.2rem;
+    }
 }

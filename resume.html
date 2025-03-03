@@ -23,7 +23,6 @@
           <li class="nav-item active"><a class="nav-link" href="resume.html">Work Experience</a></li>
           <li class="nav-item"><a class="nav-link" href="skills.html">Skills</a></li>
           <li class="nav-item"><a class="nav-link" href="portfolio.html">Data Analytics Tool</a></li>
-
         </ul>
       </div>
     </div>
@@ -32,58 +31,71 @@
   <!-- Spacer for fixed navbar -->
   <div style="padding-top: 80px;"></div>
 
-
-        <!-- Main Content -->
-  <main class="container my-5 pt-5">
-    <h1 class="text-center mb-5">Work Experience</h1>
-    <div class="row align-items-center">
-     
-        <!-- Job Card 1 -->
-        <div class="col-md-6 mb-4">
-          <div class="resume-card shadow-sm p-4 rounded">
-            <h3 class="mb-2"><i class="fas fa-code-branch"></i> Software Developer</h3>
-            <p class="text-muted lead">Aug 2024 – Present</p>
-            <p class="lead"><strong>Hyperspectral Intelligence Inc, Gibsons, BC, Canada</strong></p>
-            <ul class="lead">
-              <li>Led the design and development of robust Python frameworks tailored for processing hyperspectral imaging data.</li>
-              <li>Architected scalable, multi-threaded data pipelines integrating advanced caching strategies for real-time analysis and visualization.</li>
-            </ul>
+  <!-- Resume Section -->
+  <section class="resume-section bg-gradient">
+    <div class="container">
+      <h1 class="text-center mb-5">Work Experience</h1>
+      <div class="row">
+        <!-- Left Column -->
+        <div class="col-md-6">
+          <!-- Job Card 1 -->
+          <div class="card-item" onclick="toggleDetails(this)">
+            <div class="card-indicator"></div>
+            <i class="fas fa-code-branch"></i>
+            <h3>Software Developer</h3>
+            <div class="card-details">
+              <p class="lead text-muted">Aug 2024 – Present</p>
+              <p class="lead"><strong>Hyperspectral Intelligence Inc, Gibsons, BC, Canada</strong></p>
+              <ul class="lead">
+                <li>Led the design and development of robust Python frameworks tailored for processing hyperspectral imaging data.</li>
+                <li>Architected scalable, multi-threaded data pipelines integrating advanced caching strategies for real-time analysis and visualization.</li>
+              </ul>
+            </div>
+          </div>
+          <!-- Job Card 2 -->
+          <div class="card-item" onclick="toggleDetails(this)">
+            <div class="card-indicator"></div>
+            <i class="fas fa-chart-line"></i>
+            <h3>Data Visualization Specialist</h3>
+            <div class="card-details">
+              <p class="lead text-muted">Feb 2024 – July 2024</p>
+              <p class="lead"><strong>Hyperspectral Intelligence Inc, Gibsons, BC, Canada</strong></p>
+              <ul class="lead">
+                <li>Designed and implemented interactive dashboards using Tableau and Power BI, integrating real-time data processing for enhanced visual insights.</li>
+                <li>Optimized business intelligence workflows by incorporating performance-tuned visualization techniques.</li>
+              </ul>
+            </div>
           </div>
         </div>
-        <!-- Job Card 2 -->
-        <div class="col-md-6 mb-4">
-          <div class="resume-card shadow-sm p-4 rounded">
-            <h3 class="mb-2"><i class="fas fa-chart-line"></i> Data Visualization Specialist</h3>
-            <p class="text-muted lead">Feb 2024 – July 2024</p>
-            <p class="lead"><strong>Hyperspectral Intelligence Inc, Gibsons, BC, Canada</strong></p>
-            <ul class="lead">
-              <li>Designed and implemented interactive dashboards using Tableau and Power BI, integrating real-time data processing for enhanced visual insights.</li>
-              <li>Optimized business intelligence workflows by incorporating performance-tuned visualization techniques.</li>
-            </ul>
+        <!-- Right Column -->
+        <div class="col-md-6">
+          <!-- Job Card 3 -->
+          <div class="card-item" onclick="toggleDetails(this)">
+            <div class="card-indicator"></div>
+            <i class="fas fa-chart-pie"></i>
+            <h3>Data Analyst</h3>
+            <div class="card-details">
+              <p class="lead text-muted">May 2023 – Aug 2023</p>
+              <p class="lead"><strong>Finance Department, University of Calgary, Calgary, AB, Canada</strong></p>
+              <ul class="lead">
+                <li>Conducted comprehensive statistical analysis on extensive financial datasets using optimized data processing pipelines.</li>
+                <li>Streamlined reporting workflows through query optimization and effective data caching techniques.</li>
+              </ul>
+            </div>
           </div>
-        </div>
-        <!-- Job Card 3 -->
-        <div class="col-md-6 mb-4">
-          <div class="resume-card shadow-sm p-4 rounded">
-            <h3 class="mb-2"><i class="fas fa-chart-pie"></i> Data Analyst</h3>
-            <p class="text-muted lead">May 2023 – Aug 2023</p>
-            <p class="lead"><strong>Finance Department, University of Calgary, Calgary, AB, Canada</strong></p>
-            <ul class="lead">
-              <li>Conducted comprehensive statistical analysis on extensive financial datasets using optimized data processing pipelines.</li>
-              <li>Streamlined reporting workflows through query optimization and effective data caching techniques.</li>
-            </ul>
-          </div>
-        </div>
-        <!-- Job Card 4 -->
-        <div class="col-md-6 mb-4">
-          <div class="resume-card shadow-sm p-4 rounded">
-            <h3 class="mb-2"><i class="fas fa-flask"></i> Data Analyst</h3>
-            <p class="text-muted lead">Sep 2014 – Sep 2020</p>
-            <p class="lead"><strong>Physics Department, University of Tabriz, Tabriz, Iran</strong></p>
-            <ul class="lead">
-              <li>Utilized advanced analytical techniques to process experimental physics datasets with a focus on precision and efficiency.</li>
-              <li>Developed detailed technical reports and presentations, highlighting insights derived from optimized data pipelines and caching mechanisms.</li>
-            </ul>
+          <!-- Job Card 4 -->
+          <div class="card-item" onclick="toggleDetails(this)">
+            <div class="card-indicator"></div>
+            <i class="fas fa-flask"></i>
+            <h3>Data Analyst</h3>
+            <div class="card-details">
+              <p class="lead text-muted">Sep 2014 – Sep 2020</p>
+              <p class="lead"><strong>Physics Department, University of Tabriz, Tabriz, Iran</strong></p>
+              <ul class="lead">
+                <li>Utilized advanced analytical techniques to process experimental physics datasets with a focus on precision and efficiency.</li>
+                <li>Developed detailed technical reports and presentations, highlighting insights derived from optimized data pipelines and caching mechanisms.</li>
+              </ul>
+            </div>
           </div>
         </div>
       </div>
@@ -92,12 +104,27 @@
 
   <!-- Footer -->
   <footer class="text-center text-light py-3" style="background-color: #333;">
-    <p>&copy; 2024 Farnaz Nasehi. All rights reserved.</p>
+    <p>© 2024 Farnaz Nasehi. All rights reserved.</p>
   </footer>
 
   <!-- Scripts -->
   <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  <script>
+    function toggleDetails(element) {
+      element.classList.toggle('active');
+      const details = element.querySelector('.card-details');
+      details.classList.toggle('show');
+    }
+
+    // Initialize: Open first card in each column on page load without overlap
+    document.addEventListener('DOMContentLoaded', function() {
+      const firstLeftCard = document.querySelector('.col-md-6:first-child .card-item:first-child');
+      const firstRightCard = document.querySelector('.col-md-6:nth-child(2) .card-item:first-child');
+      if (firstLeftCard) toggleDetails(firstLeftCard);
+      if (firstRightCard) toggleDetails(firstRightCard);
+    });
+  </script>
 </body>
 </html>
