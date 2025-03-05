@@ -528,3 +528,177 @@ footer a:hover {
         font-size: 1.2rem;
     }
 }
+/* Data Transformation Section Styling */
+.transformation-section {
+    min-height: calc(100vh - 150px);
+    padding: 4rem 0 2rem 0;
+}
+
+/* Transform Menu Styling */
+.transform-menu {
+    max-height: 75vh;
+    overflow-y: auto;
+    scrollbar-width: thin;
+}
+
+.transform-menu::-webkit-scrollbar {
+    width: 6px;
+}
+
+.transform-menu::-webkit-scrollbar-thumb {
+    background-color: rgba(255, 255, 255, 0.3);
+    border-radius: 3px;
+}
+
+.transform-category-header {
+    font-weight: 600;
+    cursor: pointer;
+    background-color: var(--card-bg-hover) !important;
+    color: var(--text-light) !important;
+    border-left: 3px solid var(--secondary-color);
+    transition: all var(--transition-speed);
+}
+
+.transform-category-header:hover {
+    background-color: var(--secondary-color) !important;
+}
+
+.transform-items {
+    background-color: var(--card-bg);
+    border-left: 2px solid var(--card-border);
+}
+
+.transform-item {
+    padding: 10px 15px;
+    transition: all var(--transition-speed);
+    color: var(--text-light);
+    border-left: 3px solid transparent;
+    background-color: var(--card-bg);
+    border-bottom: 1px solid var(--card-border);
+}
+
+.transform-item:hover {
+    background-color: var(--card-bg-hover);
+    border-left: 3px solid var(--primary-color);
+    color: var(--text-accent);
+}
+
+.transform-item.active {
+    background-color: rgba(var(--primary-color-rgb), 0.2);
+    border-left: 3px solid var(--primary-color);
+    font-weight: 500;
+    color: var(--primary-color);
+}
+
+.transform-info {
+    opacity: 0.6;
+    transition: opacity var(--transition-speed);
+    color: var(--text-muted);
+}
+
+.transform-info:hover {
+    opacity: 1;
+    color: var(--text-accent);
+}
+
+/* Highlight changed cells */
+.cell-changed {
+    background-color: rgba(var(--primary-color-rgb), 0.2) !important;
+    transition: background-color 0.5s;
+    position: relative;
+}
+
+.cell-changed::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(var(--primary-color-rgb), 0.3);
+    animation: highlightFade 2s forwards;
+}
+
+@keyframes highlightFade {
+    from { opacity: 1; }
+    to { opacity: 0; }
+}
+
+/* Form Controls for transformations */
+.transform-form-container {
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.column-selector {
+    max-height: 150px;
+    overflow-y: auto;
+    border: 1px solid var(--card-border);
+    border-radius: 0.25rem;
+    padding: 0.5rem;
+}
+
+/* Button styling */
+.btn-apply {
+    min-width: 100px;
+}
+
+/* Form elements in dark theme for transformations */
+.transformation-section .form-control,
+.transformation-section .form-select {
+    background-color: #363636;
+    border: 1px solid var(--card-border);
+    color: var(--text-light);
+}
+
+.transformation-section .form-control:focus,
+.transformation-section .form-select:focus {
+    background-color: #404040;
+    color: var(--text-light);
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.25rem rgba(var(--primary-color-rgb), 0.25);
+}
+
+.transformation-section .form-check-input {
+    background-color: #363636;
+    border: 1px solid var(--card-border);
+}
+
+.transformation-section .form-check-input:checked {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.transformation-section .form-text {
+    color: var(--text-muted);
+}
+
+/* Alert styling for transformations */
+.transformation-section .alert {
+    background-color: rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.transformation-section .alert-success {
+    background-color: rgba(40, 167, 69, 0.2);
+    border-color: rgba(40, 167, 69, 0.3);
+    color: #75b798;
+}
+
+.transformation-section .alert-info {
+    background-color: rgba(13, 202, 240, 0.2);
+    border-color: rgba(13, 202, 240, 0.3);
+    color: #6edff6;
+}
+
+.transformation-section .alert-warning {
+    background-color: rgba(255, 193, 7, 0.2);
+    border-color: rgba(255, 193, 7, 0.3);
+    color: #ffda6a;
+}
+
+.transformation-section .alert-danger {
+    background-color: rgba(220, 53, 69, 0.2);
+    border-color: rgba(220, 53, 69, 0.3);
+    color: #ea868f;
+}
