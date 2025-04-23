@@ -1,1 +1,1 @@
-https://farnaznk.github.io/webiste/
+https://farnaznk.github.io/website/
