@@ -1,3 +1,4 @@
+# Open robots.md in an editor and replace all content with:
 User-agent: *
 Allow: /
 
