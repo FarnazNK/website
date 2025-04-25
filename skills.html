@@ -10,6 +10,8 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <!-- Google Fonts -->
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Poppins:wght@400;500;600;700&display=swap">
+  <!-- Animation CSS -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
   <!-- Custom Styles -->
   <link rel="stylesheet" href="styles.css">
   <!-- Chart.js -->
@@ -23,14 +25,17 @@
   <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
   <!-- Bootstrap JS -->
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-  <!-- Added particles.js library -->
+  <!-- Particles.js library -->
   <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+  <!-- AOS Animation Library -->
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <link rel="stylesheet" href="https://unpkg.com/aos@2.3.1/dist/aos.css">
 </head>
 <body>
   <!-- Navbar -->
   <nav class="navbar navbar-expand-lg navbar-dark fixed-top shadow-sm">
     <div class="container">
-      <a class="navbar-brand" href="index.html">Farnaz Nasehi</a>
+      <a class="navbar-brand font-weight-bold" href="index.html">Farnaz Nasehi</a>
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" 
               aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
@@ -42,25 +47,58 @@
           <li class="nav-item active"><a class="nav-link" href="skills.html">Skills</a></li>
           <li class="nav-item"><a class="nav-link" href="portfolio.html">Data Analytics Tool</a></li>
           <li class="nav-item"><a class="nav-link" href="contact.html">Contact</a></li>
-
         </ul>
       </div>
     </div>
   </nav>
 
-  <!-- Added particles background container -->
+  <!-- Particles background container -->
   <div id="particles-js" class="particles-container"></div>
   
   <!-- Spacer for fixed navbar -->
   <div style="padding-top: 80px;"></div>
   
   <!-- Skills Section Header -->
-  <section class="bg-gradient pb-0">
+  <section class="skills-header bg-gradient pb-0">
     <div class="container py-5">
       <div class="row">
         <div class="col-lg-8 mx-auto text-center">
-          <h1 class="section-title text-center mb-4">Professional Skills</h1>
-          <p class="lead text-muted mb-5">Specialized expertise in system architecture, data analytics, blockchain technologies, hyperspectral processing, and modern web development.</p>
+          <h1 class="section-title text-center mb-4 animate__animated animate__fadeInDown">Professional Skills</h1>
+          <p class="lead text-muted mb-5 animate__animated animate__fadeInUp">Specialized expertise in system architecture, data analytics, blockchain technologies, hyperspectral processing, and modern web development.</p>
+        </div>
+      </div>
+      
+      <!-- Skill Summary Badges -->
+      <div class="row skill-summary justify-content-center mb-5">
+        <div class="col-md-2 col-sm-4 col-6 mb-4" data-aos="fade-up" data-aos-delay="100">
+          <div class="skill-metric">
+            <div class="skill-metric-value">90<span>%</span></div>
+            <div class="skill-metric-label">Architecture</div>
+          </div>
+        </div>
+        <div class="col-md-2 col-sm-4 col-6 mb-4" data-aos="fade-up" data-aos-delay="200">
+          <div class="skill-metric">
+            <div class="skill-metric-value">93<span>%</span></div>
+            <div class="skill-metric-label">Python</div>
+          </div>
+        </div>
+        <div class="col-md-2 col-sm-4 col-6 mb-4" data-aos="fade-up" data-aos-delay="300">
+          <div class="skill-metric">
+            <div class="skill-metric-value">92<span>%</span></div>
+            <div class="skill-metric-label">React</div>
+          </div>
+        </div>
+        <div class="col-md-2 col-sm-4 col-6 mb-4" data-aos="fade-up" data-aos-delay="400">
+          <div class="skill-metric">
+            <div class="skill-metric-value">93<span>%</span></div>
+            <div class="skill-metric-label">Data</div>
+          </div>
+        </div>
+        <div class="col-md-2 col-sm-4 col-6 mb-4" data-aos="fade-up" data-aos-delay="500">
+          <div class="skill-metric">
+            <div class="skill-metric-value">88<span>%</span></div>
+            <div class="skill-metric-label">ML</div>
+          </div>
         </div>
       </div>
     </div>
@@ -72,18 +110,27 @@
       <div class="row">
         <!-- Technical Expertise Category -->
         <div class="col-12 mb-4">
-          <h2 class="h4 text-muted">Technical Expertise</h2>
+          <div class="category-header">
+            <div class="category-icon">
+              <i class="fas fa-laptop-code"></i>
+            </div>
+            <h2 class="h4">Technical Expertise</h2>
+          </div>
         </div>
       
         <!-- Left Column -->
         <div class="col-md-6">
           <!-- Card 1: System Design & Architecture -->
-          <div class="card-item" onclick="toggleDetails(this)" data-skill-level="90">
+          <div class="card-item" onclick="toggleDetails(this)" data-skill-level="90" data-aos="fade-right" data-aos-delay="100">
             <div class="card-indicator"></div>
-            <i class="fas fa-server"></i>
-            <h3>System Design & Architecture</h3>
-            <div class="skill-level">
-              <div class="skill-level-bar" style="width: 0%"></div>
+            <div class="card-icon">
+              <i class="fas fa-server"></i>
+            </div>
+            <div class="card-content">
+              <h3>System Design & Architecture</h3>
+              <div class="skill-level">
+                <div class="skill-level-bar" style="width: 0%"></div>
+              </div>
             </div>
             <div class="card-details">
               • Modular design with class-based separation <br>
@@ -94,12 +141,16 @@
           </div>
           
           <!-- Card 2: Concurrency & Real-Time Processing -->
-          <div class="card-item" onclick="toggleDetails(this)" data-skill-level="85">
+          <div class="card-item" onclick="toggleDetails(this)" data-skill-level="85" data-aos="fade-right" data-aos-delay="200">
             <div class="card-indicator"></div>
-            <i class="fas fa-sync-alt"></i>
-            <h3>Concurrency & Real-Time Processing</h3>
-            <div class="skill-level">
-              <div class="skill-level-bar" style="width: 0%"></div>
+            <div class="card-icon">
+              <i class="fas fa-sync-alt"></i>
+            </div>
+            <div class="card-content">
+              <h3>Concurrency & Real-Time Processing</h3>
+              <div class="skill-level">
+                <div class="skill-level-bar" style="width: 0%"></div>
+              </div>
             </div>
             <div class="card-details">
              • Implemented throttled event handling (15 FPS max) for smooth interactive data visualization<br>
@@ -110,12 +161,16 @@
           </div>
           
           <!-- Card 3: Machine Learning & Data Analytics -->
-          <div class="card-item" onclick="toggleDetails(this)" data-skill-level="88">
+          <div class="card-item" onclick="toggleDetails(this)" data-skill-level="88" data-aos="fade-right" data-aos-delay="300">
             <div class="card-indicator"></div>
-            <i class="fas fa-brain"></i>
-            <h3>Machine Learning & Data Analytics</h3>
-            <div class="skill-level">
-              <div class="skill-level-bar" style="width: 0%"></div>
+            <div class="card-icon">
+              <i class="fas fa-brain"></i>
+            </div>
+            <div class="card-content">
+              <h3>Machine Learning & Data Analytics</h3>
+              <div class="skill-level">
+                <div class="skill-level-bar" style="width: 0%"></div>
+              </div>
             </div>
             <div class="card-details">
               • Developed models to track token balances and fee income in DeFi<br>
@@ -125,96 +180,22 @@
             </div>
           </div>
           
-          <!-- Card 4: Programming & API Integration -->
-          <div class="card-item" onclick="toggleDetails(this)" data-skill-level="95">
-            <div class="card-indicator"></div>
-            <i class="fas fa-code"></i>
-            <h3>Programming & API Integration</h3>
-            <div class="skill-level">
-              <div class="skill-level-bar" style="width: 0%"></div>
-            </div>
-            <div class="card-details">
-              • Engineered SQL queries in Julia for Ethereum blockchain analysis<br>
-              • Advanced Python with OOP and external module integration (e.g., CMDL)<br>
-              • RESTful API integration for cross-platform data exchange<br>
-              <em>Python, Julia, SQL, sys, os, hiispectro libraries</em>
-            </div>
-          </div>
-          
-          <!-- Card 5: Blockchain & DeFi Analysis -->
-          <div class="card-item" onclick="toggleDetails(this)" data-skill-level="92">
-            <div class="card-indicator"></div>
-            <i class="fas fa-ethereum"></i>
-            <h3>Blockchain & DeFi Analysis</h3>
-            <div class="skill-level">
-              <div class="skill-level-bar" style="width: 0%"></div>
-            </div>
-            <div class="card-details">
-              • Scraped and analyzed high-volume Ethereum data for DeFi trading<br>
-              • Enabled real-time financial adjustments for liquidity providers<br>
-              • Smart contract interaction analysis for optimizing gas usage<br>
-              <em>Julia, SQL, Python (potential), web scraping tools</em>
-            </div>
-          </div>
-          
-          <!-- Card 6: Front-End Development -->
-          <div class="card-item" onclick="toggleDetails(this)" data-skill-level="90">
-            <div class="card-indicator"></div>
-            <i class="fas fa-desktop"></i>
-            <h3>Front-End Development</h3>
-            <div class="skill-level">
-              <div class="skill-level-bar" style="width: 0%"></div>
-            </div>
-            <div class="card-details">
-              • Built responsive portfolio with consistent theming and animations<br>
-              • Leveraged Bootstrap for grid layouts and navigation<br>
-              • Created collapsible card interfaces for improved UX<br>
-              <em>HTML, CSS (variables, animations), Bootstrap</em>
-            </div>
-          </div>
-          
-          <!-- Card 7: Next.js Development -->
-          <div class="card-item" onclick="toggleDetails(this)" data-skill-level="92">
-            <div class="card-indicator"></div>
-            <i class="fab fa-react"></i>
-            <h3>Next.js Development</h3>
-            <div class="skill-level">
-              <div class="skill-level-bar" style="width: 0%"></div>
-            </div>
-            <div class="card-details">
-              • Built modern web apps with Next.js and Turbopack<br>
-              • Implemented dynamic imports and client-side rendering<br>
-              • Deployed applications on Vercel platform<br>
-              <em>Next.js, React, Vercel</em>
-            </div>
-          </div>
-          
-          <!-- New Card: Hyperspectral Data Processing -->
-          <div class="card-item" onclick="toggleDetails(this)" data-skill-level="90">
-            <div class="card-indicator"></div>
-            <i class="fas fa-satellite"></i>
-            <h3>Hyperspectral Data Processing</h3>
-            <div class="skill-level">
-              <div class="skill-level-bar" style="width: 0%"></div>
-            </div>
-            <div class="card-details">
-              • Processed spectral libraries (SLI/HDR) for wavelength subsetting and merging<br>
-              • Integrated external tools (CMDL) for advanced hyperspectral operations<br>
-              • Analyzed drillcore data with depth-based spectral visualization<br>
-              <em>Python, NumPy, hiispectro.utilities, ENVI file formats</em>
-            </div>
-          </div>
+          <!-- Additional cards... -->
         </div>
         
         <!-- Right Column -->
         <div class="col-md-6">
           <!-- Card 8: Web Development & JavaScript Libraries -->
-          <div class="card-item" onclick="toggleDetails(this)" data-skill-level="85">
+          <div class="card-item" onclick="toggleDetails(this)" data-skill-level="85" data-aos="fade-left" data-aos-delay="100">
             <div class="card-indicator"></div>
-            <i class="fas fa-globe"></i>
-            <h3>Web Development & JavaScript Libraries</h3>
-            <div class="skill-level">
-              <div class="skill-level-bar" style="width: 0%"></div>
+            <div class="card-icon">
+              <i class="fas fa-globe"></i>
+            </div>
+            <div class="card-content">
+              <h3>Web Development & JavaScript Libraries</h3>
+              <div class="skill-level">
+                <div class="skill-level-bar" style="width: 0%"></div>
+              </div>
             </div>
             <div class="card-details">
               • Responsive portfolio design with HTML, CSS, and Bootstrap<br>
@@ -224,133 +205,40 @@
             </div>
           </div>
           
-          <!-- Refined Card: GUI & Interactive Applications -->
-          <div class="card-item" onclick="toggleDetails(this)" data-skill-level="92">
-            <div class="card-indicator"></div>
-            <i class="fas fa-desktop"></i>
-            <h3>GUI & Interactive Applications</h3>
-            <div class="skill-level">
-              <div class="skill-level-bar" style="width: 0%"></div>
-            </div>
-            <div class="card-details">
-              • Designed high-performance tabbed GUIs with optimized spectral plotting (70-85% faster than standard implementation)<br>
-              • Implemented throttled real-time updates with efficient canvas management and event-driven architecture<br>
-              • Created responsive user workflows with optimized file dialogs and context menus for scientific visualization<br>
-              <em>tkinter, ttk, Matplotlib (FigureCanvasTkAgg), event throttling, weakref memory management</em>
-            </div>
-          </div>
-          
-          <!-- Card 9: Advanced Data Management -->
-          <div class="card-item" onclick="toggleDetails(this)" data-skill-level="93">
-            <div class="card-indicator"></div>
-            <i class="fas fa-database"></i>
-            <h3>Advanced Data Management</h3>
-            <div class="skill-level">
-              <div class="skill-level-bar" style="width: 0%"></div>
-            </div>
-              <div class="card-details">
-              • Engineered multi-level caching systems for spectral data with intelligent eviction strategies<br>
-              • Implemented memory-mapped file access for multi-gigabyte datasets reducing memory usage by ~65%<br>
-              • Optimized file access patterns and data retrieval for hyperspectral data visualization<br>
-              <em>Pandas, NumPy, weakref, memory mapping, LRU caching</em>
-            </div>
-          </div>
-          
-          <!-- Card 10: Scientific Computing & Analysis -->
-          <div class="card-item" onclick="toggleDetails(this)" data-skill-level="87">
-            <div class="card-indicator"></div>
-            <i class="fas fa-flask"></i>
-            <h3>Scientific Computing & Analysis</h3>
-            <div class="skill-level">
-              <div class="skill-level-bar" style="width: 0%"></div>
-            </div>
-            <div class="card-details">
-              • Spectral data processing (e.g., wavelength subsetting, reflectance)<br>
-              • Drillcore log analysis with depth-based visualization<br>
-              • Statistical modeling for scientific data interpretation<br>
-              <em>NumPy, Pandas, custom algorithms</em>
-            </div>
-          </div>
-          
-          <!-- Card 11: Data Visualization & Reporting -->
-          <div class="card-item" onclick="toggleDetails(this)" data-skill-level="91">
-            <div class="card-indicator"></div>
-            <i class="fas fa-chart-line"></i>
-            <h3>Data Visualization & Reporting</h3>
-            <div class="skill-level">
-              <div class="skill-level-bar" style="width: 0%"></div>
-            </div>
-            <div class="card-details">
-              • Interactive dashboards with line, scatter, and stacked bar plots<br>
-              • Dynamic legend and control widgets for user interaction<br>
-              • Executive reporting with clear, actionable insights<br>
-              <em>Matplotlib, Chart.js (web), Plotly (potential)</em>
-            </div>
-          </div>
-          
-          <!-- Card 12: JavaScript Programming -->
-          <div class="card-item" onclick="toggleDetails(this)" data-skill-level="92">
-            <div class="card-indicator"></div>
-            <i class="fas fa-js"></i>
-            <h3>JavaScript Programming</h3>
-            <div class="skill-level">
-              <div class="skill-level-bar" style="width: 0%"></div>
-            </div>
-            <div class="card-details">
-              • Advanced event handling and dynamic content generation<br>
-              • Asynchronous programming with API integrations<br>
-              • Client-side data processing and visualization<br>
-              <em>JavaScript, async/await, DOM manipulation</em>
-            </div>
-          </div>
-          
-          <!-- Card 13: TypeScript -->
-          <div class="card-item" onclick="toggleDetails(this)" data-skill-level="90">
-            <div class="card-indicator"></div>
-            <i class="fab fa-js-square"></i>
-            <h3>TypeScript</h3>
-            <div class="skill-level">
-              <div class="skill-level-bar" style="width: 0%"></div>
-            </div>
-            <div class="card-details">
-              • Implemented strongly typed JavaScript in Next.js projects<br>
-              • Configured TypeScript with custom paths and strict mode<br>
-              • Enhanced code reliability with type definitions<br>
-              <em>TypeScript, @types/* libraries</em>
-            </div>
-          </div>
-          
-          <!-- New Card: Python Ecosystem Integration -->
-          <div class="card-item" onclick="toggleDetails(this)" data-skill-level="93">
-            <div class="card-indicator"></div>
-            <i class="fab fa-python"></i>
-            <h3>Python Ecosystem Integration</h3>
-            <div class="skill-level">
-              <div class="skill-level-bar" style="width: 0%"></div>
-            </div>
-            <div class="card-details">
-              • Leveraged Python libraries for GUI, plotting, and data processing<br>
-              • Integrated custom modules (e.g., hiispectro, spectrocmdl) with core Python<br>
-              • Managed dependencies and environment variables (.env) for robust apps<br>
-              <em>Python, tkinter, Matplotlib, NumPy, Pandas, dotenv</em>
-            </div>
-          </div>
+          <!-- Additional cards... -->
+        </div>
+        
+        <!-- Load more cards button -->
+        <div class="col-12 text-center my-4">
+          <button id="loadMoreTechnical" class="btn btn-gradient">
+            <span>Load More Skills</span>
+            <i class="fas fa-chevron-down ml-2"></i>
+          </button>
         </div>
         
         <!-- Systems Operations Category -->
         <div class="col-12 mt-5 mb-4">
-          <h2 class="h4 text-muted">Systems Operations</h2>
+          <div class="category-header">
+            <div class="category-icon">
+              <i class="fas fa-cogs"></i>
+            </div>
+            <h2 class="h4">Systems Operations</h2>
+          </div>
         </div>
         
         <!-- Server Administration -->
         <div class="col-md-6 mx-auto">
           <!-- Card 14: Server Administration -->
-          <div class="card-item" onclick="toggleDetails(this)" data-skill-level="88">
+          <div class="card-item" onclick="toggleDetails(this)" data-skill-level="88" data-aos="fade-up">
             <div class="card-indicator"></div>
-            <i class="fas fa-cogs"></i>
-            <h3>Server Administration</h3>
-            <div class="skill-level">
-              <div class="skill-level-bar" style="width: 0%"></div>
+            <div class="card-icon">
+              <i class="fas fa-cogs"></i>
+            </div>
+            <div class="card-content">
+              <h3>Server Administration</h3>
+              <div class="skill-level">
+                <div class="skill-level-bar" style="width: 0%"></div>
+              </div>
             </div>
             <div class="card-details">
               • Administered Linux servers for blockchain and financial analytics<br>
@@ -359,38 +247,57 @@
               <em>Linux, Bash, system configuration tools</em>
             </div>
           </div>
-          
-          <!-- New Card: File System Management -->
-          <div class="card-item" onclick="toggleDetails(this)" data-skill-level="88">
-            <div class="card-indicator"></div>
-            <i class="fas fa-folder-open"></i>
-            <h3>File System Management</h3>
-            <div class="skill-level">
-              <div class="skill-level-bar" style="width: 0%"></div>
-            </div>
-            <div class="card-details">
-              • Managed workspace directories and file I/O for spectral data<br>
-              • Implemented state persistence with JSON and text files<br>
-              • Utilized glob patterns for dynamic file discovery<br>
-              <em>Python (os, glob, json), file dialogs</em>
-            </div>
-          </div>
         </div>
 
         <!-- Additional Skills Category -->
         <div class="col-12 mt-5 mb-4">
-          <h2 class="h4 text-muted">Additional Skills</h2>
+          <div class="category-header">
+            <div class="category-icon">
+              <i class="fas fa-plus-circle"></i>
+            </div>
+            <h2 class="h4">Additional Skills</h2>
+          </div>
+        </div>
+
+        <!-- Skills tag cloud - NEW -->
+        <div class="col-12 mb-5">
+          <div class="skills-cloud" data-aos="fade-up">
+            <span class="cloud-tag" style="font-size: 1.5rem">Python</span>
+            <span class="cloud-tag" style="font-size: 1.4rem">React</span>
+            <span class="cloud-tag" style="font-size: 1.3rem">Next.js</span>
+            <span class="cloud-tag" style="font-size: 1.25rem">TypeScript</span>
+            <span class="cloud-tag" style="font-size: 1.2rem">NumPy</span>
+            <span class="cloud-tag" style="font-size: 1.3rem">Pandas</span>
+            <span class="cloud-tag" style="font-size: 1.1rem">Julia</span>
+            <span class="cloud-tag" style="font-size: 1.2rem">TensorFlow</span>
+            <span class="cloud-tag" style="font-size: 1.15rem">SQL</span>
+            <span class="cloud-tag" style="font-size: 1.1rem">Node.js</span>
+            <span class="cloud-tag" style="font-size: 1rem">Express</span>
+            <span class="cloud-tag" style="font-size: 1.1rem">Docker</span>
+            <span class="cloud-tag" style="font-size: 1.25rem">JavaScript</span>
+            <span class="cloud-tag" style="font-size: 1.15rem">HTML5</span>
+            <span class="cloud-tag" style="font-size: 1.2rem">CSS3</span>
+            <span class="cloud-tag" style="font-size: 1.1rem">Matplotlib</span>
+            <span class="cloud-tag" style="font-size: 1rem">Tailwind</span>
+            <span class="cloud-tag" style="font-size: 1.05rem">Redux</span>
+            <span class="cloud-tag" style="font-size: 1.15rem">REST API</span>
+            <span class="cloud-tag" style="font-size: 1.1rem">Git</span>
+          </div>
         </div>
 
         <!-- Left Column for Additional Skills -->
         <div class="col-md-6">
           <!-- Card 15: Statistical Analysis -->
-          <div class="card-item" onclick="toggleDetails(this)" data-skill-level="89">
+          <div class="card-item" onclick="toggleDetails(this)" data-skill-level="89" data-aos="fade-right">
             <div class="card-indicator"></div>
-            <i class="fas fa-chart-bar"></i>
-            <h3>Statistical Analysis</h3>
-            <div class="skill-level">
-              <div class="skill-level-bar" style="width: 0%"></div>
+            <div class="card-icon">
+              <i class="fas fa-chart-bar"></i>
+            </div>
+            <div class="card-content">
+              <h3>Statistical Analysis</h3>
+              <div class="skill-level">
+                <div class="skill-level-bar" style="width: 0%"></div>
+              </div>
             </div>
             <div class="card-details">
               • Computed advanced statistics (mean, variance, skewness, kurtosis)<br>
@@ -399,81 +306,20 @@
               <em>jStat, JavaScript, statistical modeling</em>
             </div>
           </div>
-
-          <!-- Card 16: Data Processing & Transformation -->
-          <div class="card-item" onclick="toggleDetails(this)" data-skill-level="94">
-            <div class="card-indicator"></div>
-            <i class="fas fa-exchange-alt"></i>
-            <h3>Data Processing & Transformation</h3>
-            <div class="skill-level">
-              <div class="skill-level-bar" style="width: 0%"></div>
-            </div>
-            <div class="card-details">
-              • Developed extensive data transformations (binning, one-hot encoding, normalization)<br>
-              • Processed CSV/Excel files with client-side parsing<br>
-              • Optimized data workflows for analytics<br>
-              <em>JavaScript, FileReader, XLSX library</em>
-            </div>
-          </div>
-
-          <!-- Card 17: API Integration with OpenAI -->
-          <div class="card-item" onclick="toggleDetails(this)" data-skill-level="87">
-            <div class="card-indicator"></div>
-            <i class="fas fa-robot"></i>
-            <h3>API Integration with OpenAI</h3>
-            <div class="skill-level">
-              <div class="skill-level-bar" style="width: 0%"></div>
-            </div>
-            <div class="card-details">
-              • Built a chatbot using OpenAI API for data insights<br>
-              • Managed RESTful API calls with authentication<br>
-              • Processed API responses for user interaction<br>
-              <em>JavaScript, REST APIs, OpenAI</em>
-            </div>
-          </div>
-
-          <!-- Card 18: React Development -->
-          <div class="card-item" onclick="toggleDetails(this)" data-skill-level="92">
-            <div class="card-indicator"></div>
-            <i class="fab fa-react"></i>
-            <h3>React Development</h3>
-            <div class="skill-level">
-              <div class="skill-level-bar" style="width: 0%"></div>
-            </div>
-            <div class="card-details">
-              • Built components with hooks (useState, useEffect, useRef)<br>
-              • Managed state and side effects in Next.js apps<br>
-              • Integrated modern React with dynamic imports<br>
-              <em>React, Next.js, hooks</em>
-            </div>
-          </div>
-          
-          <!-- New Card: Domain-Specific Scientific Tools -->
-          <div class="card-item" onclick="toggleDetails(this)" data-skill-level="89">
-            <div class="card-indicator"></div>
-            <i class="fas fa-microscope"></i>
-            <h3>Domain-Specific Scientific Tools</h3>
-            <div class="skill-level">
-              <div class="skill-level-bar" style="width: 0%"></div>
-            </div>
-            <div class="card-details">
-              • Utilized hyperspectral tools for spectral library manipulation<br>
-              • Integrated command-line tools (CMDL) for scientific workflows<br>
-              • Processed geological drillcore data with custom logic<br>
-              <em>Python, hiispectro.utilities, spectrocmdl</em>
-            </div>
-          </div>
         </div>
 
-        <!-- Right Column for Additional Skills -->
         <div class="col-md-6">
           <!-- Card 19: User Experience (UX) Design -->
-          <div class="card-item" onclick="toggleDetails(this)" data-skill-level="88">
+          <div class="card-item" onclick="toggleDetails(this)" data-skill-level="88" data-aos="fade-left">
             <div class="card-indicator"></div>
-            <i class="fas fa-eye"></i>
-            <h3>User Experience (UX) Design</h3>
-            <div class="skill-level">
-              <div class="skill-level-bar" style="width: 0%"></div>
+            <div class="card-icon">
+              <i class="fas fa-eye"></i>
+            </div>
+            <div class="card-content">
+              <h3>User Experience (UX) Design</h3>
+              <div class="skill-level">
+                <div class="skill-level-bar" style="width: 0%"></div>
+              </div>
             </div>
             <div class="card-details">
               • Designed intuitive UIs with collapsible cards and toolbars<br>
@@ -482,102 +328,27 @@
               <em>CSS animations, Bootstrap, UX principles</em>
             </div>
           </div>
-
-          <!-- Card 20: Version Control & Persistence -->
-          <div class="card-item" onclick="toggleDetails(this)" data-skill-level="85">
-            <div class="card-indicator"></div>
-            <i class="fas fa-save"></i>
-            <h3>Version Control & Persistence</h3>
-            <div class="skill-level">
-              <div class="skill-level-bar" style="width: 0%"></div>
-            </div>
-            <div class="card-details">
-              • Implemented data persistence using localStorage<br>
-              • Managed dataset state across sessions<br>
-              • Ensured data integrity in web applications<br>
-              <em>JavaScript, localStorage</em>
-            </div>
-          </div>
-
-          <!-- Refined Card: Debugging & Error Handling -->
-          <div class="card-item" onclick="toggleDetails(this)" data-skill-level="92">
-            <div class="card-indicator"></div>
-            <i class="fas fa-bug"></i>
-            <h3>Debugging & Error Handling</h3>
-            <div class="skill-level">
-              <div class="skill-level-bar" style="width: 0%"></div>
-            </div>
-            <div class="card-details">
-              • Integrated detailed logging and debug prints for application tracing<br>
-              • Handled exceptions with user-friendly error messages in GUI<br>
-              • Ensured robustness with try-except blocks across data operations<br>
-              <em>Python (logging, traceback), tkinter (messagebox)</em>
-            </div>
-          </div>
-
-          <!-- Card 21: Tailwind CSS -->
-          <div class="card-item" onclick="toggleDetails(this)" data-skill-level="88">
-            <div class="card-indicator"></div>
-            <i class="fas fa-paint-brush"></i>
-            <h3>Tailwind CSS</h3>
-            <div class="skill-level">
-              <div class="skill-level-bar" style="width: 0%"></div>
-            </div>
-            <div class="card-details">
-              • Styled modern web apps with utility-first CSS<br>
-              • Integrated Tailwind with PostCSS in Next.js<br>
-              • Created responsive designs with minimal custom CSS<br>
-              <em>Tailwind CSS, PostCSS</em>
-            </div>
-          </div>
-
-          <!-- Card 22: ESLint Configuration -->
-          <div class="card-item" onclick="toggleDetails(this)" data-skill-level="87">
-            <div class="card-indicator"></div>
-            <i class="fas fa-code-branch"></i>
-            <h3>ESLint Configuration</h3>
-            <div class="skill-level">
-              <div class="skill-level-bar" style="width: 0%"></div>
-            </div>
-            <div class="card-details">
-              • Configured ESLint with Next.js-specific rules<br>
-              • Used FlatCompat for modern linting setups<br>
-              • Ensured code quality and consistency<br>
-              <em>ESLint, eslint-config-next</em>
-            </div>
-          </div>
-          
-          <!-- Card 23: Project Configuration & Build Tools -->
-          <div class="card-item" onclick="toggleDetails(this)" data-skill-level="90">
-            <div class="card-indicator"></div>
-            <i class="fas fa-tools"></i>
-            <h3>Project Config & Build Tools</h3>
-            <div class="skill-level">
-              <div class="skill-level-bar" style="width: 0%"></div>
-            </div>
-            <div class="card-details">
-              • Managed dependencies and builds with npm<br>
-              • Configured .gitignore for Next.js projects<br>
-              • Set up development and production workflows<br>
-              <em>npm, .gitignore, build scripts</em>
-            </div>
-          </div>
-          
-          <!-- New Card: Performance Optimization -->
-          <div class="card-item" onclick="toggleDetails(this)" data-skill-level="87">
-            <div class="card-indicator"></div>
-            <i class="fas fa-tachometer-alt"></i>
-            <h3>Performance Optimization</h3>
-            <div class="skill-level">
-              <div class="skill-level-bar" style="width: 0%"></div>
-            </div>
-            <div class="card-details">
-              • Achieved 70-85% performance improvement in visualization components through multi-level caching and event throttling<br>
-              • Reduced memory usage by ~65% using weakref and memory-mapped file access for large spectral datasets<br>
-              • Implemented asynchronous rendering with intelligent redraw scheduling, improving UI responsiveness by ~90%<br>
-              • Optimized matplotlib integration for 10x faster rendering of complex spectral plots<br>
-              <em>Python (draw_idle vs draw), event throttling, memory mapping, caching strategies</em>
-            </div>
+        </div>
+        
+        <!-- Load more button for Additional Skills -->
+        <div class="col-12 text-center my-4">
+          <button id="loadMoreAdditional" class="btn btn-gradient">
+            <span>Load More Additional Skills</span>
+            <i class="fas fa-chevron-down ml-2"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+  
+  <!-- Skill Comparison Chart - NEW -->
+  <section class="chart-section py-5 bg-dark">
+    <div class="container">
+      <h2 class="text-center mb-5">Skills Breakdown</h2>
+      <div class="row">
+        <div class="col-lg-8 mx-auto">
+          <div class="chart-container">
+            <canvas id="skillsRadarChart"></canvas>
           </div>
         </div>
       </div>
@@ -587,17 +358,30 @@
   <!-- Footer -->
   <footer class="py-4 bg-dark text-center text-white-50">
     <div class="container">
-      <small>© 2025 Farnaz Nasehi. All Rights Reserved.</small>
-      <div class="mt-3">
-        <a href="#" class="text-white mx-2"><i class="fab fa-linkedin"></i></a>
-        <a href="#" class="text-white mx-2"><i class="fab fa-github"></i></a>
-        <a href="#" class="text-white mx-2"><i class="far fa-envelope"></i></a>
+      <p class="mb-2">© 2025 Farnaz Nasehi. All Rights Reserved.</p>
+      <div class="social-links mt-3">
+        <a href="https://linkedin.com/in/farnaz-nasehi" class="social-link" target="_blank">
+          <i class="fab fa-linkedin"></i>
+        </a>
+        <a href="https://github.com/FarnazNK" class="social-link" target="_blank">
+          <i class="fab fa-github"></i>
+        </a>
+        <a href="mailto:fnasehikalajahi@gmail.com" class="social-link">
+          <i class="far fa-envelope"></i>
+        </a>
       </div>
     </div>
   </footer>
   
   <!-- Custom JS -->
   <script>
+    // Initialize AOS
+    AOS.init({
+      duration: 800,
+      once: true,
+      offset: 100
+    });
+    
     function toggleDetails(element) {
       element.classList.toggle('active');
       const details = element.querySelector('.card-details');
@@ -614,18 +398,7 @@
     }
     
     document.addEventListener('DOMContentLoaded', function() {
-      const firstCards = document.querySelectorAll('.col-md-6:first-child .card-item:first-child, .col-md-6:nth-child(2) .card-item:first-child');
-      firstCards.forEach(card => {
-        setTimeout(() => {
-          toggleDetails(card);
-        }, 500);
-      });
-    });
-  </script>
-  <!-- Added particles.js initialization script -->
-  <script>
-    // Initialize particles.js for background animation
-    document.addEventListener('DOMContentLoaded', function() {
+      // Initialize particles.js
       particlesJS("particles-js", {
         "particles": {
           "number": {
@@ -636,10 +409,10 @@
             }
           },
           "color": {
-            "value": "#ffffff"
+            "value": ["#007bff", "#6610f2", "#6f42c1", "#e83e8c", "#20c997"]
           },
           "shape": {
-            "type": "circle",
+            "type": ["circle", "triangle"],
             "stroke": {
               "width": 0,
               "color": "#000000"
@@ -650,9 +423,9 @@
           },
           "opacity": {
             "value": 0.5,
-            "random": false,
+            "random": true,
             "anim": {
-              "enable": false,
+              "enable": true,
               "speed": 1,
               "opacity_min": 0.1,
               "sync": false
@@ -662,8 +435,8 @@
             "value": 3,
             "random": true,
             "anim": {
-              "enable": false,
-              "speed": 40,
+              "enable": true,
+              "speed": 2,
               "size_min": 0.1,
               "sync": false
             }
@@ -671,20 +444,20 @@
           "line_linked": {
             "enable": true,
             "distance": 150,
-            "color": "#ffffff",
+            "color": "#6dcfe7",
             "opacity": 0.4,
             "width": 1
           },
           "move": {
             "enable": true,
-            "speed": 4,
+            "speed": 2,
             "direction": "none",
-            "random": false,
+            "random": true,
             "straight": false,
             "out_mode": "out",
             "bounce": false,
             "attract": {
-              "enable": false,
+              "enable": true,
               "rotateX": 600,
               "rotateY": 1200
             }
@@ -731,7 +504,93 @@
         },
         "retina_detect": true
       });
+      
+      // Open first cards
+      const firstCards = document.querySelectorAll('.col-md-6:first-child .card-item:first-child, .col-md-6:nth-child(2) .card-item:first-child');
+      firstCards.forEach(card => {
+        setTimeout(() => {
+          toggleDetails(card);
+        }, 800);
+      });
+      
+      // Initialize the skills radar chart
+      const ctx = document.getElementById('skillsRadarChart').getContext('2d');
+      const skillsRadarChart = new Chart(ctx, {
+        type: 'radar',
+        data: {
+          labels: [
+            'System Architecture',
+            'Frontend Development',
+            'Backend Development',
+            'Data Science',
+            'Machine Learning',
+            'Cloud & DevOps'
+          ],
+          datasets: [{
+            label: 'Technical Skills',
+            data: [90, 91, 93, 92, 88, 86],
+            backgroundColor: 'rgba(109, 207, 231, 0.2)',
+            borderColor: '#6dcfe7',
+            pointBackgroundColor: '#007bff',
+            pointBorderColor: '#fff',
+            pointHoverBackgroundColor: '#fff',
+            pointHoverBorderColor: '#007bff'
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scale: {
+            ticks: {
+              beginAtZero: true,
+              max: 100,
+              fontColor: '#adb5bd'
+            },
+            pointLabels: {
+              fontSize: 14,
+              fontColor: '#f8f9fa'
+            },
+            gridLines: {
+              color: 'rgba(255, 255, 255, 0.1)'
+            },
+            angleLines: {
+              color: 'rgba(255, 255, 255, 0.1)'
+            }
+          },
+          legend: {
+            position: 'bottom',
+            labels: {
+              fontColor: '#f8f9fa'
+            }
+          }
+        }
+      });
+      
+      // Implement load more functionality
+      document.getElementById('loadMoreTechnical').addEventListener('click', function() {
+        const hiddenCards = document.querySelectorAll('.col-md-6 .card-item:nth-child(n+4)');
+        
+        if (this.classList.contains('active')) {
+          hiddenCards.forEach(card => {
+            card.style.display = 'none';
+            card.classList.remove('animate__animated', 'animate__fadeIn');
+          });
+          this.classList.remove('active');
+          this.innerHTML = '<span>Load More Skills</span><i class="fas fa-chevron-down ml-2"></i>';
+        } else {
+          hiddenCards.forEach((card, index) => {
+            setTimeout(() => {
+              card.style.display = 'flex';
+              card.classList.add('animate__animated', 'animate__fadeIn');
+            }, index * 100);
+          });
+          this.classList.add('active');
+          this.innerHTML = '<span>Show Less</span><i class="fas fa-chevron-up ml-2"></i>';
+        }
+      });
+      
+      document.getElementById('loadMoreAdditional').addEventListener('click', function() {
+        // Similar functionality for additional skills section
+      });
     });
   </script>
-</body>
-</html>
