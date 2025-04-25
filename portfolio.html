@@ -3,21 +3,29 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Data Visualization Tool</title>
+  <meta name="description" content="Interactive data visualization and analysis platform by Farnaz Nasehi">
+  <meta name="keywords" content="Data Analytics, Data Visualization, Interactive Dashboard">
+  <title>Data Analytics Tool - Farnaz Nasehi</title>
+  <!-- Bootstrap CSS -->
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+  <!-- Google Fonts -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Roboto:wght@300;400;500;700&display=swap">
+  <!-- Custom CSS -->
   <link rel="stylesheet" href="styles.css" />
+  <!-- Libraries -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jstat/1.9.4/jstat.min.js"></script>
   <script src="https://www.lactame.com/lib/ml/4.0.0/ml.min.js"></script>
-  <!-- Added particles.js library -->
   <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
 </head>
 <body>
   <!-- Navbar -->
   <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top shadow-sm">
     <div class="container">
-      <a class="navbar-brand" href="index.html">Farnaz Nasehi</a>
+      <a class="navbar-brand font-weight-bold" href="index.html">Farnaz Nasehi</a>
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav">
         <span class="navbar-toggler-icon"></span>
       </button>
@@ -26,64 +34,109 @@
           <li class="nav-item"><a class="nav-link" href="about.html" aria-label="About">About</a></li>
           <li class="nav-item"><a class="nav-link" href="resume.html" aria-label="Work Experience">Work Experience</a></li>
           <li class="nav-item"><a class="nav-link" href="skills.html">Skills</a></li>
-          <li class="nav-item"><a class="nav-link" href="portfolio.html">Data Analytics Tool</a></li>
+          <li class="nav-item active"><a class="nav-link" href="portfolio.html">Data Analytics Tool <span class="sr-only">(current)</span></a></li>
           <li class="nav-item"><a class="nav-link" href="contact.html">Contact</a></li>
-
         </ul>
       </div>
     </div>
   </nav>
 
-  <!-- Added particles background container -->
+  <!-- Particles background container -->
   <div id="particles-js" class="particles-container"></div>
 
-  <section class="header-section text-light py-4 gradient-background">
+  <!-- Header Section -->
+  <section class="header-section text-light py-4">
     <div class="container mt-5">
-      <div class="card bg-dark text-white shadow border-0">
-        <div class="card-body text-center">
-          <h1 class="card-title">Data Analytics Tool</h1>
+      <div class="card bg-dark text-white shadow-lg border-0">
+        <div class="card-body text-center p-4">
+          <h1 class="card-title mb-3">Data Analytics Tool</h1>
           <p class="card-text">A full-featured data visualization and analysis platform showcasing my expertise in interactive web applications and data science</p>
         </div>
       </div>
-      <!-- Secondary Toolbar -->
-      <div class="bg-dark py-2 rounded shadow-sm mt-3">
-        <div class="d-flex flex-wrap justify-content-center gap-2">
-          <button class="btn btn-primary" id="toolbar-data" title="Access Data Options">Data</button>
-          <button class="btn btn-secondary" id="toolbar-plots" title="Access Plot Options">Plots</button>
-          <button class="btn btn-secondary" id="toolbar-statistics" title="Access Statistics Options">Statistics</button>
-          <button class="btn btn-secondary" id="toolbar-predictions" title="Access Prediction Options">Predictions</button>
-          <button class="btn btn-secondary" id="toolbar-correlations" title="Access Correlation Options">Correlations</button>
-          <button class="btn btn-secondary" id="toolbar-transformations" title="Access Data Transformation Options">Data Transformations</button>
+      
+      <!-- Interactive Toolbar -->
+      <div class="toolbar-container mt-4">
+        <div class="bg-dark py-3 px-4 rounded shadow-lg">
+          <div class="toolbar-buttons d-flex flex-wrap justify-content-center">
+            <button class="btn btn-tool active" id="toolbar-data">
+              <i class="fas fa-database mr-2"></i>Data
+            </button>
+            <button class="btn btn-tool" id="toolbar-plots">
+              <i class="fas fa-chart-bar mr-2"></i>Plots
+            </button>
+            <button class="btn btn-tool" id="toolbar-statistics">
+              <i class="fas fa-calculator mr-2"></i>Statistics
+            </button>
+            <button class="btn btn-tool" id="toolbar-predictions">
+              <i class="fas fa-brain mr-2"></i>Predictions
+            </button>
+            <button class="btn btn-tool" id="toolbar-correlations">
+              <i class="fas fa-project-diagram mr-2"></i>Correlations
+            </button>
+            <button class="btn btn-tool" id="toolbar-transformations">
+              <i class="fas fa-magic mr-2"></i>Transformations
+            </button>
+          </div>
         </div>
       </div>
     </div>
   </section>
 
   <!-- Dynamic Content Section -->
-  <section>
-    <div class="container py-4" id="dynamicMenuContent">
-      <h4 class="text-center text-light">Welcome to the Data Analytics Tool</h4>
-      <p class="text-center text-light">Choose from the toolbar above to start analyzing your data.</p>
-      <div class="text-center">
-        <div class="spinner-border text-light" role="status" id="loadingSpinner" style="display: none;">
-          <span class="sr-only">Loading...</span>
+  <section class="content-section py-4">
+    <div class="container">
+      <div class="content-container bg-dark text-light p-4 rounded shadow-lg" id="dynamicMenuContent">
+        <div class="welcome-screen text-center py-5">
+          <h4 class="mb-4">Welcome to the Data Analytics Tool</h4>
+          <p class="mb-5">Choose from the toolbar above to start analyzing your data.</p>
+          <div class="upload-zone p-5 mb-4 mx-auto">
+            <i class="fas fa-file-upload mb-3"></i>
+            <p>Drag and drop files here<br>or</p>
+            <button class="btn btn-primary btn-lg mt-2">
+              <i class="fas fa-folder-open mr-2"></i>Browse Files
+            </button>
+          </div>
+          <div class="supported-formats">
+            <p class="small text-muted">Supported formats: CSV, Excel (.xlsx, .xls)</p>
+          </div>
+          <div class="text-center mt-4">
+            <div class="spinner-border text-primary" role="status" id="loadingSpinner" style="display: none;">
+              <span class="sr-only">Loading...</span>
+            </div>
+          </div>
         </div>
       </div>
     </div>
   </section>
 
   <!-- Footer -->
-  <footer class="text-center text-light py-3 bg-dark">
-    <p>© 2025 Farnaz Nasehi. All rights reserved.</p>
-    <a href="https://linkedin.com/in/farnaz-nasehi" class="text-light mx-2" aria-label="LinkedIn Profile">LinkedIn</a>
-    <a href="https://github.com/FarnazNK" class="text-light mx-2" aria-label="GitHub Profile">GitHub</a>
+  <footer class="bg-dark text-center text-light py-3">
+    <div class="container">
+      <p class="mb-2">© 2025 Farnaz Nasehi. All rights reserved.</p>
+      <div class="social-links mt-2">
+        <a href="https://linkedin.com/in/farnaz-nasehi" class="social-link" target="_blank" rel="noopener" aria-label="LinkedIn Profile">
+          <i class="fab fa-linkedin-in"></i>
+        </a>
+        <a href="https://github.com/FarnazNK" class="social-link" target="_blank" rel="noopener" aria-label="GitHub Profile">
+          <i class="fab fa-github"></i>
+        </a>
+        <a href="mailto:fnasehikalajahi@gmail.com" class="social-link" aria-label="Email">
+          <i class="far fa-envelope"></i>
+        </a>
+      </div>
+    </div>
   </footer>
 
+  <!-- Scripts -->
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
   <script src="script.js"></script>
-  <!-- Added particles.js initialization script -->
+  
+  <!-- Particles.js Initialization -->
   <script>
-    // Initialize particles.js for background animation
     document.addEventListener('DOMContentLoaded', function() {
+      // Initialize particles.js
       particlesJS("particles-js", {
         "particles": {
           "number": {
@@ -94,10 +147,10 @@
             }
           },
           "color": {
-            "value": "#ffffff"
+            "value": ["#007bff", "#6610f2", "#6f42c1", "#e83e8c", "#20c997"]
           },
           "shape": {
-            "type": "circle",
+            "type": ["circle", "triangle"],
             "stroke": {
               "width": 0,
               "color": "#000000"
@@ -108,9 +161,9 @@
           },
           "opacity": {
             "value": 0.5,
-            "random": false,
+            "random": true,
             "anim": {
-              "enable": false,
+              "enable": true,
               "speed": 1,
               "opacity_min": 0.1,
               "sync": false
@@ -120,8 +173,8 @@
             "value": 3,
             "random": true,
             "anim": {
-              "enable": false,
-              "speed": 40,
+              "enable": true,
+              "speed": 2,
               "size_min": 0.1,
               "sync": false
             }
@@ -129,20 +182,20 @@
           "line_linked": {
             "enable": true,
             "distance": 150,
-            "color": "#ffffff",
+            "color": "#6dcfe7",
             "opacity": 0.4,
             "width": 1
           },
           "move": {
             "enable": true,
-            "speed": 4,
+            "speed": 2,
             "direction": "none",
-            "random": false,
+            "random": true,
             "straight": false,
             "out_mode": "out",
             "bounce": false,
             "attract": {
-              "enable": false,
+              "enable": true,
               "rotateX": 600,
               "rotateY": 1200
             }
@@ -189,7 +242,14 @@
         },
         "retina_detect": true
       });
+      
+      // Toolbar button handling
+      const toolbarButtons = document.querySelectorAll('.btn-tool');
+      toolbarButtons.forEach(button => {
+        button.addEventListener('click', function() {
+          toolbarButtons.forEach(btn => btn.classList.remove('active'));
+          this.classList.add('active');
+        });
+      });
     });
   </script>
-</body>
-</html>
