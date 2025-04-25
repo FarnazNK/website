@@ -703,9 +703,6 @@ footer a:hover {
     color: #ea868f;
 }
 
-
-/* Add these styles to your existing styles.css file */
-
 /* Particles background container */
 .particles-container {
     position: fixed;
@@ -816,26 +813,6 @@ footer a:hover {
     color: #ffffff; /* Ensure white text for visibility */
 }
 
-/* Make the site more responsive */
-@media (max-width: 768px) {
-    .profile-section {
-        padding: 100px 15px 80px;
-    }
-    
-    .skill-icon {
-        font-size: 2rem;
-        margin: 10px;
-    }
-    
-    .profile-section h1 {
-        font-size: 2.8rem;
-    }
-    
-    .profile-section h2 {
-        font-size: 1.5rem;
-    }
-}
-
 /* Add a smooth scrolling effect for the entire page */
 html {
     scroll-behavior: smooth;
@@ -858,327 +835,145 @@ html {
     animation: glow 2s ease-in-out infinite;
 }
 
-/* Additional professional refinements */
+/* Enhanced styling for the Data Analytics Tool toolbar */
+.toolbar-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+}
 
-/* Improved card hover transitions */
-.card-item {
-    transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  }
-  
-  .card-item:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
-  }
-  
-  /* Improved section headings */
-  .section-title::after {
-    content: '';
-    width: 70px;
-    height: 3px;
-    background: linear-gradient(to right, var(--primary-color), transparent);
-    border-radius: 3px;
-    transition: width 0.3s ease;
-  }
-  
-  .section-title:hover::after {
-    width: 100px;
-  }
-  
-  /* Professional profile image styling */
-  .profile-image-container {
-    position: relative;
-    display: inline-block;
-    border-radius: 50%;
-    padding: 5px;
-    background: linear-gradient(45deg, var(--primary-color), #6dcfe7);
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-  }
-  
-  /* Improved button styling */
-  .btn-primary {
-    background-image: linear-gradient(135deg, var(--primary-color), #0069d9);
-    border: none;
-    box-shadow: 0 4px 10px rgba(0, 123, 255, 0.3);
+.btn-tool {
+    padding: 10px 16px;
+    margin: 4px;
+    border-radius: 30px;
+    background-color: rgba(255, 255, 255, 0.1);
+    color: #fff;
     transition: all 0.3s ease;
-  }
-  
-  .btn-primary:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 6px 15px rgba(0, 123, 255, 0.4);
-  }
-  
-  /* Professional card styling for skills */
-  .skill-level-bar {
-    background: linear-gradient(to right, var(--primary-color), #6dcfe7);
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-    transition: width 1.2s cubic-bezier(0.19, 1, 0.22, 1);
-  }
-  
-  /* Improved particles interactions */
-  .particles-container {
-    background: linear-gradient(145deg, #0f0f0f, #1e1e1e);
-  }
-  
-  /* Professional scroll indicator */
-  .scroll-indicator {
-    position: absolute;
-    bottom: 30px;
-    left: 50%;
-    transform: translateX(-50%);
-    color: var(--text-light);
-    font-size: 2rem;
-    animation: bounce 2s infinite;
-    opacity: 0.8;
-    cursor: pointer;
-  }
-  
-  @keyframes bounce {
-    0%, 20%, 50%, 80%, 100% {transform: translateY(0) translateX(-50%);}
-    40% {transform: translateY(-20px) translateX(-50%);}
-    60% {transform: translateY(-10px) translateX(-50%);}
-  }
+    border: none;
+    font-weight: 500;
+}
 
-/* Timeline Component Styles */
-.timeline {
-    position: relative;
-    max-width: 1200px;
+.btn-tool:hover {
+    background-color: rgba(0, 123, 255, 0.2);
+    transform: translateY(-2px);
+}
+
+.btn-tool.active {
+    background-color: #007bff;
+    box-shadow: 0 4px 15px rgba(0, 123, 255, 0.3);
+}
+
+/* Enhanced upload zone styling */
+.upload-zone {
+    border: 2px dashed rgba(109, 207, 231, 0.4);
+    border-radius: 10px;
+    max-width: 400px;
     margin: 0 auto;
-    padding: 20px 0;
-  }
-  
-  .timeline::after {
-    content: '';
+    padding: 30px;
+    transition: all 0.3s ease;
+}
+
+.upload-zone:hover {
+    border-color: #6dcfe7;
+    background-color: rgba(109, 207, 231, 0.05);
+}
+
+.upload-zone i {
+    font-size: 3rem;
+    color: #6dcfe7;
+}
+
+/* Orbit animation styles */
+.tech-orbit {
     position: absolute;
-    width: 6px;
-    background: rgba(255, 255, 255, 0.1);
-    top: 0;
-    bottom: 0;
+    top: 50%;
     left: 50%;
-    margin-left: -3px;
-    border-radius: 3px;
-  }
-  
-  .timeline-item {
-    padding: 15px 30px;
-    position: relative;
-    width: 50%;
-    left: 0;
-  }
-  
-  .timeline-item.right {
-    left: 50%;
-  }
-  
-  .timeline-badge {
+    transform: translate(-50%, -50%);
+    width: 300px;
+    height: 300px;
+    border-radius: 50%;
+    pointer-events: none;
+}
+
+.tech-icon {
     position: absolute;
     width: 40px;
     height: 40px;
-    right: -20px;
-    background-color: var(--primary-color);
-    top: 25px;
     border-radius: 50%;
-    z-index: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #fff;
-    box-shadow: 0 0 0 4px rgba(0, 123, 255, 0.2);
-  }
-  
-  .timeline-item.right .timeline-badge {
-    left: -20px;
-  }
-  
-  .timeline-panel {
-    padding: 20px;
-    position: relative;
-    border-radius: 6px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    transition: all 0.3s ease;
-  }
-  
-  .timeline-panel:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-  }
-  
-  .timeline-heading h4 {
-    margin-top: 0;
-    color: #fff;
-  }
-  
-  .timeline-body p {
-    margin-bottom: 0;
-  }
-  
-  /* Skills Snapshot Section */
-  .skill-category {
-    background-color: rgba(30, 30, 30, 0.7);
-    border-radius: 8px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    height: 100%;
-  }
-  
-  .skill-category:hover {
-    transform: translateY(-10px);
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
-  }
-  
-  .progress {
-    height: 8px;
-    border-radius: 4px;
-    overflow: hidden;
-  }
-  
-  .progress-bar {
-    transition: width 1.5s ease-in-out;
-  }
-  
-  /* Featured Projects Section */
-  .project-icon {
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    background-color: rgba(0, 123, 255, 0.1);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--primary-color);
-    transition: all 0.3s ease;
-  }
-  
-  .card:hover .project-icon {
-    background-color: rgba(0, 123, 255, 0.2);
-    transform: scale(1.1);
-  }
-  
-  .tech-tags {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-  }
-  
-  .tech-tag {
-    background-color: rgba(0, 123, 255, 0.1);
-    color: var(--primary-color);
-    padding: 3px 10px;
-    border-radius: 15px;
-    font-size: 0.8rem;
-    transition: all 0.3s ease;
-  }
-  
-  .tech-tag:hover {
-    background-color: var(--primary-color);
+    background: rgba(0, 0, 0, 0.7);
     color: white;
-    transform: translateY(-2px);
-  }
-  
-  /* Call to Action Section */
-  #cta {
-    background: linear-gradient(145deg, #121212, #1e1e1e);
-    position: relative;
-    overflow: hidden;
-  }
-  
-  #cta::before {
-    content: '';
-    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    box-shadow: 0 0 10px rgba(0, 123, 255, 0.5);
+}
+
+.tech-icon.python {
     top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: radial-gradient(circle at center, rgba(109, 207, 231, 0.1) 0%, transparent 70%);
-    z-index: 0;
-  }
-  
-  #cta .container {
-    position: relative;
-    z-index: 1;
-  }
-  
-  /* Hero Section Improvements */
-  #hero {
-    min-height: 100vh;
-    position: relative;
-  }
-  
-  .scroll-indicator {
-    position: absolute;
-    bottom: 30px;
     left: 50%;
     transform: translateX(-50%);
-    color: var(--text-light);
-    font-size: 2rem;
-    animation: bounce 2s infinite;
-    opacity: 0.8;
-    cursor: pointer;
-    z-index: 2;
-  }
-  
-  @keyframes bounce {
-    0%, 20%, 50%, 80%, 100% {transform: translateY(0) translateX(-50%);}
-    40% {transform: translateY(-20px) translateX(-50%);}
-    60% {transform: translateY(-10px) translateX(-50%);}
-  }
-  
-  /* Responsive Adjustments */
-  @media (max-width: 768px) {
-    .timeline::after {
-      left: 31px;
+    animation: orbit 15s linear infinite;
+}
+
+.tech-icon.react {
+    top: 50%;
+    right: 0;
+    transform: translateY(-50%);
+    animation: orbit 15s linear infinite 3s;
+}
+
+.tech-icon.js {
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    animation: orbit 15s linear infinite 6s;
+}
+
+.tech-icon.database {
+    top: 50%;
+    left: 0;
+    transform: translateY(-50%);
+    animation: orbit 15s linear infinite 9s;
+}
+
+.tech-icon.blockchain {
+    top: 25%;
+    left: 25%;
+    animation: orbit 15s linear infinite 12s;
+}
+
+@keyframes orbit {
+    0% {
+        transform: rotate(0deg) translateX(130px) rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg) translateX(130px) rotate(-360deg);
+    }
+}
+
+/* Make the site more responsive */
+@media (max-width: 768px) {
+    .profile-section {
+        padding: 100px 15px 80px;
     }
     
-    .timeline-item {
-      width: 100%;
-      padding-left: 70px;
-      padding-right: 25px;
-      left: 0;
+    .skill-icon {
+        font-size: 2rem;
+        margin: 10px;
     }
     
-    .timeline-item.right {
-      left: 0;
+    .profile-section h1 {
+        font-size: 2.8rem;
     }
     
-    .timeline-badge {
-      left: 10px;
-      right: auto;
+    .profile-section h2 {
+        font-size: 1.5rem;
     }
     
-    .timeline-item.right .timeline-badge {
-      left: 10px;
+    .btn-tool {
+        padding: 8px 12px;
+        font-size: 0.9rem;
     }
-  }
-  
-  /* Enhanced Contact Form Styling */
-  .card .form-control {
-    background-color: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    color: #fff;
-    transition: all 0.3s ease;
-  }
-  
-  .card .form-control:focus {
-    background-color: rgba(255, 255, 255, 0.1);
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 0.2rem rgba(var(--primary-color-rgb), 0.25);
-  }
-  
-  .contact-card {
-    transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
-    cursor: pointer;
-    background-color: rgba(30, 30, 30, 0.7);
-  }
-  
-  .contact-card:hover {
-    transform: translateY(-10px);
-    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3) !important;
-  }
-  
-  .contact-card i {
-    transition: transform 0.3s ease;
-  }
-  
-  .contact-card:hover i {
-    transform: scale(1.2);
-  }  
+}
