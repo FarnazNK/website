@@ -3,33 +3,46 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Farnaz Nasehi - Full-Stack Developer</title>
     
-    <!-- SEO Meta Tags (Added) -->
-    <meta name="description" content="Farnaz Nasehi - Senior Full-Stack Developer specializing in hyperspectral imaging, financial analytics, and blockchain technologies. Expert in Python, React, and data visualization.">
-    <meta name="keywords" content="Farnaz Nasehi, Full-Stack Developer, Software Engineer, Python Developer, React Developer, Hyperspectral Imaging">
+    <!-- Enhanced SEO Meta Tags -->
+    <title>Farnaz Nasehi - Full-Stack Developer</title>
+    <meta name="description" content="Farnaz Nasehi - Full-Stack Developer specializing in hyperspectral imaging, financial analytics, and blockchain technologies. Expert in Python, React, and data visualization.">
+    <meta name="keywords" content="Farnaz Nasehi, Full-Stack Developer, Software Engineer, Python Developer, React Developer, Hyperspectral Imaging, Data Visualization, Blockchain">
     <meta name="author" content="Farnaz Nasehi">
     
-    <!-- Open Graph / Social Media Meta Tags (Added) -->
+    <!-- Open Graph / Social Media Meta Tags -->
     <meta property="og:title" content="Farnaz Nasehi - Full-Stack Developer">
     <meta property="og:description" content="Specializing in hyperspectral imaging, financial analytics, and building modern web applications with expertise in Python, React, and data visualization.">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://farnaznk.github.io/website/">
     <meta property="og:image" content="https://farnaznk.github.io/website/me.jpg">
     
-    <!-- Existing CSS -->
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Farnaz Nasehi - Full-Stack Developer">
+    <meta name="twitter:description" content="Specializing in hyperspectral imaging, financial analytics, and building modern web applications with expertise in Python, React, and data visualization.">
+    <meta name="twitter:image" content="https://farnaznk.github.io/website/me.jpg">
+    
+    <!-- CSS Libraries -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Roboto:wght@300;400;500;700&display=swap">
     <link rel="stylesheet" href="styles.css">
     
-    <!-- Adding animation libraries -->
+    <!-- Animation libraries -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
     <link rel="stylesheet" href="https://unpkg.com/aos@2.3.1/dist/aos.css">
     
     <!-- Particle.js for background animation -->
     <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
     
-    <!-- JSON-LD structured data for better SEO (Added) -->
+    <!-- Preload critical images -->
+    <link rel="preload" href="me.jpg" as="image">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="favicon.png">
+    
+    <!-- JSON-LD structured data for better SEO -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
@@ -50,14 +63,14 @@
     }
     </script>
     
-    <!-- Canonical URL to prevent duplicate content issues (Added) -->
+    <!-- Canonical URL to prevent duplicate content issues -->
     <link rel="canonical" href="https://farnaznk.github.io/website/">
 </head>
 <body>
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top shadow-sm">
         <div class="container">
-            <a class="navbar-brand" href="index.html">Farnaz Nasehi</a>
+            <a class="navbar-brand font-weight-bold" href="index.html">Farnaz Nasehi</a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -67,6 +80,7 @@
                     <li class="nav-item"><a class="nav-link" href="resume.html">Work Experience</a></li>
                     <li class="nav-item"><a class="nav-link" href="skills.html">Skills</a></li>
                     <li class="nav-item"><a class="nav-link" href="portfolio.html">Data Analytics Tool</a></li>
+                    <li class="nav-item"><a class="nav-link" href="contact.html">Contact</a></li>
                 </ul>
             </div>
         </div>
@@ -75,204 +89,465 @@
     <!-- Animated particles background -->
     <div id="particles-js" class="particles-container"></div>
 
-    <!-- Profile Section with animations -->
-    <section id="about" class="profile-section text-center text-light">
+    <!-- Profile Section with enhanced animations -->
+    <section id="hero" class="profile-section text-center text-light d-flex align-items-center justify-content-center">
         <div class="container">
-            <h1 class="mt-4 display-4 animate__animated animate__fadeInDown">
-                Hi, I'm <span style="color: #FFD700;" class="animate__animated animate__heartBeat animate__delay-1s">Farnaz</span>
-            </h1>
-            <h2 class="text-light mb-4 animate__animated animate__fadeInUp animate__delay-1s" id="typewriter">Full-Stack Software Developer</h2>
-            <p class="lead text-white-50 mb-4 animate__animated animate__fadeInUp animate__delay-2s">
-                Specializing in hyperspectral imaging, financial analytics, and building modern web applications
-                with expertise in Python, React, and data visualization.
-            </p>
-            <div class="row justify-content-center">
-                <div class="col-md-8">
-                    <div class="skill-icons mb-4 d-flex justify-content-center flex-wrap">
-                        <i class="fab fa-python mx-2 skill-icon" data-aos="zoom-in" data-aos-delay="200"></i>
-                        <i class="fab fa-react mx-2 skill-icon" data-aos="zoom-in" data-aos-delay="400"></i>
-                        <i class="fab fa-js-square mx-2 skill-icon" data-aos="zoom-in" data-aos-delay="600"></i>
-                        <i class="fas fa-database mx-2 skill-icon" data-aos="zoom-in" data-aos-delay="800"></i>
-                        <i class="fas fa-chart-line mx-2 skill-icon" data-aos="zoom-in" data-aos-delay="1000"></i>
+            <div class="row">
+                <div class="col-lg-8 mx-auto">
+                    <h1 class="mt-4 display-4 animate__animated animate__fadeInDown">
+                        Hi, I'm <span style="color: #6dcfe7;" class="animate__animated animate__heartBeat animate__delay-1s">Farnaz Nasehi</span>
+                    </h1>
+                    <h2 class="text-light mb-4 animate__animated animate__fadeInUp animate__delay-1s" id="typewriter">Full-Stack Software Developer</h2>
+                    <p class="lead text-white-50 mb-4 animate__animated animate__fadeInUp animate__delay-2s">
+                        Specializing in hyperspectral imaging, financial analytics, and building modern web applications
+                        with expertise in Python, React, and data visualization.
+                    </p>
+                    <div class="row justify-content-center">
+                        <div class="col-md-10">
+                            <div class="skill-icons mb-4 d-flex justify-content-center flex-wrap">
+                                <i class="fab fa-python mx-2 skill-icon" data-aos="zoom-in" data-aos-delay="200"></i>
+                                <i class="fab fa-react mx-2 skill-icon" data-aos="zoom-in" data-aos-delay="400"></i>
+                                <i class="fab fa-js-square mx-2 skill-icon" data-aos="zoom-in" data-aos-delay="600"></i>
+                                <i class="fas fa-database mx-2 skill-icon" data-aos="zoom-in" data-aos-delay="800"></i>
+                                <i class="fas fa-chart-line mx-2 skill-icon" data-aos="zoom-in" data-aos-delay="1000"></i>
+                                <i class="fas fa-cubes mx-2 skill-icon" data-aos="zoom-in" data-aos-delay="1200"></i>
+                            </div>
+                        </div>
+                    </div>
+                        
+                    <div class="mt-5 animate__animated animate__fadeInUp animate__delay-3s">
+                        <a href="about.html" class="btn btn-primary btn-lg mx-2 mb-2">
+                            <i class="fas fa-user mr-2"></i> About Me
+                        </a>
+                        <a href="portfolio.html" class="btn btn-outline-primary btn-lg mx-2 mb-2">
+                            <i class="fas fa-laptop-code mr-2"></i> See My Work
+                        </a>
+                    </div>
+                    
+                    <!-- Scroll indicator -->
+                    <div class="scroll-indicator mt-5 animate__animated animate__fadeIn animate__delay-4s">
+                        <i class="fas fa-chevron-down"></i>
                     </div>
                 </div>
             </div>
-                
-            <a href="resume.html" class="btn btn-primary btn-lg mt-3 animate__animated animate__fadeInUp animate__delay-3s">
-                <i class="fas fa-briefcase"></i> View My Work Experience
-            </a>
         </div>
     </section>
-
-    <!-- Footer -->
-    <footer class="text-center text-light py-3">
-        <p>© 2025 Farnaz Nasehi. All rights reserved.</p>
-        <div class="social-icons mt-2 animate__animated animate__fadeInUp">
-            <a href="https://www.linkedin.com/in/farnaz-nasehi" target="_blank"><i class="fab fa-linkedin"></i></a>
-            <a href="https://github.com/FarnazNK" target="_blank"><i class="fab fa-github"></i></a>
-            <a href="mailto:fnasehikalajahi@gmail.com"><i class="fas fa-envelope"></i></a>
-        </div>
-    </footer>
-
-    <!-- Scripts -->
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     
-    <script>
-        // Initialize AOS animation library
-        AOS.init();
-        
-        // Initialize particles.js for background animation
-        document.addEventListener('DOMContentLoaded', function() {
-            particlesJS("particles-js", {
-                "particles": {
-                    "number": {
-                        "value": 80,
-                        "density": {
-                            "enable": true,
-                            "value_area": 800
-                        }
-                    },
-                    "color": {
-                        "value": "#ffffff"
-                    },
-                    "shape": {
-                        "type": "circle",
-                        "stroke": {
-                            "width": 0,
-                            "color": "#000000"
-                        },
-                        "polygon": {
-                            "nb_sides": 5
-                        }
-                    },
-                    "opacity": {
-                        "value": 0.5,
-                        "random": false,
-                        "anim": {
-                            "enable": false,
-                            "speed": 1,
-                            "opacity_min": 0.1,
-                            "sync": false
-                        }
-                    },
-                    "size": {
-                        "value": 3,
-                        "random": true,
-                        "anim": {
-                            "enable": false,
-                            "speed": 40,
-                            "size_min": 0.1,
-                            "sync": false
-                        }
-                    },
-                    "line_linked": {
-                        "enable": true,
-                        "distance": 150,
-                        "color": "#ffffff",
-                        "opacity": 0.4,
-                        "width": 1
-                    },
-                    "move": {
-                        "enable": true,
-                        "speed": 4,
-                        "direction": "none",
-                        "random": false,
-                        "straight": false,
-                        "out_mode": "out",
-                        "bounce": false,
-                        "attract": {
-                            "enable": false,
-                            "rotateX": 600,
-                            "rotateY": 1200
-                        }
-                    }
-                },
-                "interactivity": {
-                    "detect_on": "canvas",
-                    "events": {
-                        "onhover": {
-                            "enable": true,
-                            "mode": "grab"
-                        },
-                        "onclick": {
-                            "enable": true,
-                            "mode": "push"
-                        },
-                        "resize": true
-                    },
-                    "modes": {
-                        "grab": {
-                            "distance": 140,
-                            "line_linked": {
-                                "opacity": 1
-                            }
-                        },
-                        "bubble": {
-                            "distance": 400,
-                            "size": 40,
-                            "duration": 2,
-                            "opacity": 8,
-                            "speed": 3
-                        },
-                        "repulse": {
-                            "distance": 200,
-                            "duration": 0.4
-                        },
-                        "push": {
-                            "particles_nb": 4
-                        },
-                        "remove": {
-                            "particles_nb": 2
-                        }
-                    }
-                },
-                "retina_detect": true
-            });
-        });
-        
-        // Typing effect for job titles
-        document.addEventListener('DOMContentLoaded', function() {
-            const titles = ['Full-Stack Developer', 'Software Engineer', 'UI/UX Designer', 'Problem Solver'];
-            let titleIndex = 0;
-            let charIndex = 0;
-            let isDeleting = false;
-            const typingSpeed = 200; // Slower typing speed
-            const erasingSpeed = 100; // Slower erasing speed
-            const newTextDelay = 2000; // Longer delay between words (2 seconds)
-        
-            function typeEffect() {
-                const typewriter = document.getElementById('typewriter');
+    <!-- Project highlights section (New) -->
+    <section id="highlights" class="py-5 bg-gradient">
+        <div class="container">
+            <h2 class="text-center mb-5">Featured Projects</h2>
+            <div class="row">
+                <!-- Project Card 1 -->
+                <div class="col-lg-4 mb-4" data-aos="fade-up" data-aos-delay="100">
+                    <div class="card h-100 bg-dark text-light border-0 shadow">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center mb-3">
+                                <div class="project-icon mr-3">
+                                    <i class="fas fa-chart-area fa-2x text-primary"></i>
+                                </div>
+                                <h3 class="h5 mb-0">Hyperspectral Data Analyzer</h3>
+                            </div>
+                            <p class="card-text">A Python desktop application for analyzing complex spectral data with 70-85% improved performance over traditional solutions.</p>
+                            <div class="tech-tags mt-3">
+                                <span class="tech-tag">Python</span>
+                                <span class="tech-tag">TKinter</span>
+                                <span class="tech-tag">NumPy</span>
+                                <span class="tech-tag">Matplotlib</span>
+                            </div>
+                        </div>
+                        <div class="card-footer bg-dark border-0 text-right">
+                            <a href="portfolio.html" class="btn btn-sm btn-outline-primary">Learn More <i class="fas fa-arrow-right ml-1"></i></a>
+                        </div>
+                    </div>
+                </div>
                 
-                if (typewriter) {
-                    const currentTitle = titles[titleIndex];
-        
-                    if (isDeleting) {
-                        typewriter.textContent = currentTitle.substring(0, charIndex - 1);
-                        charIndex--;
-                    } else {
-                        typewriter.textContent = currentTitle.substring(0, charIndex + 1);
-                        charIndex++;
-                    }
-        
-                    if (!isDeleting && charIndex === currentTitle.length) {
-                        isDeleting = true;
-                        setTimeout(typeEffect, newTextDelay);
-                    } else if (isDeleting && charIndex === 0) {
-                        isDeleting = false;
-                        titleIndex = (titleIndex + 1) % titles.length;
-                        setTimeout(typeEffect, 500);
-                    } else {
-                        setTimeout(typeEffect, isDeleting ? erasingSpeed : typingSpeed);
-                    }
-                }
+                <!-- Project Card 2 -->
+                <div class="col-lg-4 mb-4" data-aos="fade-up" data-aos-delay="300">
+                    <div class="card h-100 bg-dark text-light border-0 shadow">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center mb-3">
+                                <div class="project-icon mr-3">
+                                    <i class="fas fa-cubes fa-2x text-primary"></i>
+                                </div>
+                                <h3 class="h5 mb-0">Blockchain Analytics Dashboard</h3>
+                            </div>
+                            <p class="card-text">Real-time Ethereum blockchain data analyzer with wallet labeling and transaction pattern recognition capabilities.</p>
+                            <div class="tech-tags mt-3">
+                                <span class="tech-tag">Julia</span>
+                                <span class="tech-tag">SQL</span>
+                                <span class="tech-tag">Web Scraping</span>
+                                <span class="tech-tag">Data Pipelines</span>
+                            </div>
+                        </div>
+                        <div class="card-footer bg-dark border-0 text-right">
+                            <a href="portfolio.html" class="btn btn-sm btn-outline-primary">Learn More <i class="fas fa-arrow-right ml-1"></i></a>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Project Card 3 -->
+                <div class="col-lg-4 mb-4" data-aos="fade-up" data-aos-delay="500">
+                    <div class="card h-100 bg-dark text-light border-0 shadow">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center mb-3">
+                                <div class="project-icon mr-3">
+                                    <i class="fas fa-brain fa-2x text-primary"></i>
+                                </div>
+                                <h3 class="h5 mb-0">Interactive Data Analytics Tool</h3>
+                            </div>
+                            <p class="card-text">Web-based application for advanced data visualization and analysis featuring interactive dashboards and ML predictions.</p>
+                            <div class="tech-tags mt-3">
+                                <span class="tech-tag">JavaScript</span>
+                                <span class="tech-tag">Chart.js</span>
+                                <span class="tech-tag">TensorFlow.js</span>
+                                <span class="tech-tag">Bootstrap</span>
+                            </div>
+                        </div>
+                        <div class="card-footer bg-dark border-0 text-right">
+                            <a href="portfolio.html" class="btn btn-sm btn-outline-primary">Learn More <i class="fas fa-arrow-right ml-1"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Skills snapshot section (New) -->
+    <section id="skills-snapshot" class="py-5 bg-dark">
+        <div class="container">
+            <h2 class="text-center mb-5">Technical Expertise</h2>
+            <div class="row text-center">
+                <!-- Skill Category 1 -->
+                <div class="col-md-4 mb-4" data-aos="fade-up" data-aos-delay="100">
+                    <div class="skill-category p-4">
+                        <i class="fas fa-laptop-code fa-3x mb-3 text-primary"></i>
+                        <h3 class="h4 mb-3">Full-Stack Development</h3>
+                        <p class="text-muted">Developing end-to-end solutions with modern frontend frameworks and robust backend architectures.</p>
+                        <div class="progress-wrapper mt-4">
+                            <small class="text-uppercase">Python, React, Next.js</small>
+                            <div class="progress mt-2 bg-secondary">
+                                <div class="progress-bar bg-primary" style="width: 92%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+<!-- Skill Category 2 -->
+<div class="col-md-4 mb-4" data-aos="fade-up" data-aos-delay="300">
+    <div class="skill-category p-4">
+        <i class="fas fa-chart-bar fa-3x mb-3 text-primary"></i>
+        <h3 class="h4 mb-3">Data Visualization</h3>
+        <p class="text-muted">Creating interactive and insightful data visualizations for complex scientific and financial data.</p>
+        <div class="progress-wrapper mt-4">
+            <small class="text-uppercase">Matplotlib, Chart.js, TensorFlow.js</small>
+            <div class="progress mt-2 bg-secondary">
+                <div class="progress-bar bg-primary" style="width: 90%"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Skill Category 3 -->
+<div class="col-md-4 mb-4" data-aos="fade-up" data-aos-delay="500">
+    <div class="skill-category p-4">
+        <i class="fas fa-cogs fa-3x mb-3 text-primary"></i>
+        <h3 class="h4 mb-3">System Architecture</h3>
+        <p class="text-muted">Designing scalable, high-performance systems with optimized workflows and data pipelines.</p>
+        <div class="progress-wrapper mt-4">
+            <small class="text-uppercase">System Design, Data Pipelines, API Integration</small>
+            <div class="progress mt-2 bg-secondary">
+                <div class="progress-bar bg-primary" style="width: 88%"></div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+
+<div class="text-center mt-4">
+<a href="skills.html" class="btn btn-outline-primary btn-lg">
+    <i class="fas fa-list-check mr-2"></i> View All Skills
+</a>
+</div>
+</div>
+</section>
+
+<!-- Experience Snapshot (New) -->
+<section id="experience-snapshot" class="py-5 bg-gradient">
+<div class="container">
+<h2 class="text-center mb-5">Recent Experience</h2>
+<div class="timeline">
+<!-- Experience Item 1 -->
+<div class="timeline-item" data-aos="fade-right">
+    <div class="timeline-badge">
+        <i class="fas fa-code-branch"></i>
+    </div>
+    <div class="timeline-panel bg-dark text-light p-4 rounded shadow">
+        <div class="timeline-heading">
+            <h4 class="mb-2">Software Developer</h4>
+            <p class="mb-0 text-primary">Hyperspectral Intelligence Inc</p>
+            <p class="text-muted mb-3"><small>Aug 2024 – Present</small></p>
+        </div>
+        <div class="timeline-body">
+            <p>Developing full-stack Python applications for hyperspectral imaging with responsive GUIs and optimized backend pipelines, achieving 70-85% performance improvements.</p>
+        </div>
+    </div>
+</div>
+
+<!-- Experience Item 2 -->
+<div class="timeline-item right" data-aos="fade-left">
+    <div class="timeline-badge">
+        <i class="fas fa-chart-line"></i>
+    </div>
+    <div class="timeline-panel bg-dark text-light p-4 rounded shadow">
+        <div class="timeline-heading">
+            <h4 class="mb-2">Data Visualization Specialist</h4>
+            <p class="mb-0 text-primary">Hyperspectral Intelligence Inc</p>
+            <p class="text-muted mb-3"><small>Feb 2024 – July 2024</small></p>
+        </div>
+        <div class="timeline-body">
+            <p>Created interactive dashboards with real-time spectral data visualization, implementing performance optimizations for handling multi-gigabyte datasets.</p>
+        </div>
+    </div>
+</div>
+</div>
+
+<div class="text-center mt-4">
+<a href="resume.html" class="btn btn-outline-primary btn-lg">
+    <i class="fas fa-briefcase mr-2"></i> View Full Work History
+</a>
+</div>
+</div>
+</section>
+
+<!-- Call To Action Section (New) -->
+<section id="cta" class="py-5 text-center bg-dark">
+<div class="container">
+<div class="row justify-content-center">
+<div class="col-lg-8">
+    <h2 class="mb-4 animate__animated animate__pulse animate__infinite animate__slow">Let's Work Together</h2>
+    <p class="lead mb-4">Looking for a developer who can bridge frontend innovation with backend robustness?</p>
+    <a href="contact.html" class="btn btn-primary btn-lg px-5">
+        <i class="fas fa-paper-plane mr-2"></i> Get In Touch
+    </a>
+</div>
+</div>
+</div>
+</section>
+
+<!-- Footer -->
+<footer class="bg-dark text-center text-light py-4">
+<div class="container">
+<p class="m-0">© 2025 Farnaz Nasehi. All Rights Reserved.</p>
+<div class="mt-2">
+<a href="https://linkedin.com/in/farnaz-nasehi" target="_blank" rel="noopener noreferrer" class="text-light mx-3" aria-label="LinkedIn Profile">
+    <i class="fab fa-linkedin fa-lg"></i>
+</a>
+<a href="https://github.com/FarnazNK" target="_blank" rel="noopener noreferrer" class="text-light mx-3" aria-label="GitHub Profile">
+    <i class="fab fa-github fa-lg"></i>
+</a>
+<a href="mailto:fnasehikalajahi@gmail.com" class="text-light mx-3" aria-label="Email">
+    <i class="far fa-envelope fa-lg"></i>
+</a>
+</div>
+</div>
+</footer>
+
+<!-- Scripts -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+
+<script>
+// Initialize AOS animation library
+AOS.init({
+duration: 800,
+once: true
+});
+
+// Initialize particles.js for background animation
+document.addEventListener('DOMContentLoaded', function() {
+particlesJS("particles-js", {
+"particles": {
+    "number": {
+        "value": 80,
+        "density": {
+            "enable": true,
+            "value_area": 800
+        }
+    },
+    "color": {
+        "value": "#ffffff"
+    },
+    "shape": {
+        "type": "circle",
+        "stroke": {
+            "width": 0,
+            "color": "#000000"
+        },
+        "polygon": {
+            "nb_sides": 5
+        }
+    },
+    "opacity": {
+        "value": 0.5,
+        "random": false,
+        "anim": {
+            "enable": false,
+            "speed": 1,
+            "opacity_min": 0.1,
+            "sync": false
+        }
+    },
+    "size": {
+        "value": 3,
+        "random": true,
+        "anim": {
+            "enable": false,
+            "speed": 40,
+            "size_min": 0.1,
+            "sync": false
+        }
+    },
+    "line_linked": {
+        "enable": true,
+        "distance": 150,
+        "color": "#ffffff",
+        "opacity": 0.4,
+        "width": 1
+    },
+    "move": {
+        "enable": true,
+        "speed": 4,
+        "direction": "none",
+        "random": false,
+        "straight": false,
+        "out_mode": "out",
+        "bounce": false,
+        "attract": {
+            "enable": false,
+            "rotateX": 600,
+            "rotateY": 1200
+        }
+    }
+},
+"interactivity": {
+    "detect_on": "canvas",
+    "events": {
+        "onhover": {
+            "enable": true,
+            "mode": "grab"
+        },
+        "onclick": {
+            "enable": true,
+            "mode": "push"
+        },
+        "resize": true
+    },
+    "modes": {
+        "grab": {
+            "distance": 140,
+            "line_linked": {
+                "opacity": 1
             }
-        
-            // Start typing after 1 second
-            setTimeout(typeEffect, 1000);
-        });
-    </script>
+        },
+        "bubble": {
+            "distance": 400,
+            "size": 40,
+            "duration": 2,
+            "opacity": 8,
+            "speed": 3
+        },
+        "repulse": {
+            "distance": 200,
+            "duration": 0.4
+        },
+        "push": {
+            "particles_nb": 4
+        },
+        "remove": {
+            "particles_nb": 2
+        }
+    }
+},
+"retina_detect": true
+});
+
+// Add smooth scrolling
+document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+anchor.addEventListener('click', function (e) {
+    e.preventDefault();
+    document.querySelector(this.getAttribute('href')).scrollIntoView({
+        behavior: 'smooth'
+    });
+});
+});
+
+// Scroll indicator click
+document.querySelector('.scroll-indicator').addEventListener('click', function() {
+document.querySelector('#highlights').scrollIntoView({
+    behavior: 'smooth'
+});
+});
+});
+
+// Typing effect for job titles
+document.addEventListener('DOMContentLoaded', function() {
+const titles = [
+'Full-Stack Developer', 
+'Software Engineer', 
+'Data Visualization Specialist', 
+'Python Expert', 
+'React Developer'
+];
+let titleIndex = 0;
+let charIndex = 0;
+let isDeleting = false;
+const typingSpeed = 100; // Typing speed (ms)
+const erasingSpeed = 50; // Erasing speed (ms)
+const newTextDelay = 2000; // Delay between words (ms)
+
+function typeEffect() {
+const typewriter = document.getElementById('typewriter');
+
+if (typewriter) {
+    const currentTitle = titles[titleIndex];
+
+    if (isDeleting) {
+        typewriter.textContent = currentTitle.substring(0, charIndex - 1);
+        charIndex--;
+    } else {
+        typewriter.textContent = currentTitle.substring(0, charIndex + 1);
+        charIndex++;
+    }
+
+    if (!isDeleting && charIndex === currentTitle.length) {
+        isDeleting = true;
+        setTimeout(typeEffect, newTextDelay);
+    } else if (isDeleting && charIndex === 0) {
+        isDeleting = false;
+        titleIndex = (titleIndex + 1) % titles.length;
+        setTimeout(typeEffect, 500);
+    } else {
+        setTimeout(typeEffect, isDeleting ? erasingSpeed : typingSpeed);
+    }
+}
+}
+
+// Start typing after 1 second
+setTimeout(typeEffect, 1000);
+});
+
+// Add scrolled class to navbar on scroll
+window.addEventListener('scroll', function() {
+const navbar = document.querySelector('.navbar');
+if (window.scrollY > 50) {
+navbar.classList.add('scrolled');
+} else {
+navbar.classList.remove('scrolled');
+}
+});
+</script>
 </body>
 </html>
