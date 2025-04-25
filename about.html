@@ -36,7 +36,6 @@
           <li class="nav-item"><a class="nav-link" href="skills.html">Skills</a></li>
           <li class="nav-item"><a class="nav-link" href="portfolio.html">Data Analytics Tool</a></li>
           <li class="nav-item"><a class="nav-link" href="contact.html">Contact</a></li>
-
         </ul>
       </div>
     </div>
@@ -64,10 +63,14 @@
               <span class="tech-icon blockchain"><i class="fas fa-cubes"></i></span>
             </div>
           </div>
+          <div class="location-badge mt-4">
+            <i class="fas fa-map-marker-alt mr-2"></i>Calgary, AB, Canada
+          </div>
         </div>
+        
         <!-- About Text -->
         <div class="col-md-8 animate__animated animate__fadeInRight">
-          <h1 class="mb-4 text-center text-md-left">About Me</h1>
+          <h1 class="mb-4 text-center text-md-left section-title">About Me</h1>
           <p class="lead">
             I'm <span class="font-weight-bold text-primary">Farnaz Nasehi</span>, a full-stack software developer with over six years of experience architecting end-to-end, scalable solutions across <span class="text-info">hyperspectral imaging</span>, financial analytics, and blockchain ecosystems.
           </p>
@@ -82,7 +85,7 @@
           </p>
           <div class="row mt-5">
             <div class="col-md-6">
-              <h5 class="font-weight-bold border-bottom pb-2 mb-3">Core Strengths</h5>
+              <h5 class="font-weight-bold border-bottom pb-2 mb-3 section-subtitle">Core Strengths</h5>
               <ul class="strength-list">
                 <li><i class="fas fa-cogs text-primary mr-2"></i> Full-Stack System Architecture</li>
                 <li><i class="fas fa-chart-line text-success mr-2"></i> Real-Time Data Analytics & Visualization</li>
@@ -93,7 +96,7 @@
               </ul>
             </div>
             <div class="col-md-6">
-              <h5 class="font-weight-bold border-bottom pb-2 mb-3">Technologies</h5>
+              <h5 class="font-weight-bold border-bottom pb-2 mb-3 section-subtitle">Technologies</h5>
               <div class="tech-cloud">
                 <span class="tech-tag">Python</span>
                 <span class="tech-tag">React</span>
@@ -111,8 +114,8 @@
             </div>
           </div>
           <div class="mt-4 text-center text-md-left">
-            <a href="portfolio.html" class="btn btn-primary mr-2 animate__animated animate__pulse animate__infinite"><i class="fas fa-briefcase mr-2"></i>Explore My Projects</a>
-            <a href="resume.html" class="btn btn-outline-primary"><i class="fas fa-file-alt mr-2"></i>View My Resume</a>
+            <a href="portfolio.html" class="btn btn-primary btn-lg mr-2 animate__animated animate__pulse animate__infinite animate__slow"><i class="fas fa-briefcase mr-2"></i>Explore My Projects</a>
+            <a href="resume.html" class="btn btn-outline-primary btn-lg"><i class="fas fa-file-alt mr-2"></i>View My Resume</a>
           </div>
         </div>
       </div>
@@ -278,128 +281,3 @@
       });
     });
   </script>
-
-  <!-- Add this to your styles.css file -->
-  <style>
-    /* Additional styles for better animation and interaction */
-    .tech-tag {
-      display: inline-block;
-      background-color: rgba(0, 123, 255, 0.1);
-      color: #007bff;
-      padding: 5px 10px;
-      margin: 5px;
-      border-radius: 15px;
-      transition: all 0.3s ease;
-      cursor: default;
-    }
-    
-    .tech-tag:hover {
-      background-color: #007bff;
-      color: white;
-      transform: translateY(-5px);
-      box-shadow: 0 5px 15px rgba(0, 123, 255, 0.3);
-    }
-    
-    .strength-list {
-      list-style: none;
-      padding-left: 0;
-    }
-    
-    .strength-list li {
-      margin-bottom: 10px;
-      padding: 8px;
-      border-radius: 5px;
-      transition: all 0.3s ease;
-    }
-    
-    .strength-list li:hover {
-      background-color: rgba(255, 255, 255, 0.1);
-      transform: translateX(5px);
-    }
-    
-    /* Orbit animation for tech icons */
-    .tech-orbit {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: 300px;
-      height: 300px;
-      border-radius: 50%;
-      pointer-events: none;
-    }
-    
-    .tech-icon {
-      position: absolute;
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      background: rgba(0, 0, 0, 0.7);
-      color: white;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 20px;
-      box-shadow: 0 0 10px rgba(0, 123, 255, 0.5);
-    }
-    
-    .tech-icon.python {
-      top: 0;
-      left: 50%;
-      transform: translateX(-50%);
-      animation: orbit 15s linear infinite;
-    }
-    
-    .tech-icon.react {
-      top: 50%;
-      right: 0;
-      transform: translateY(-50%);
-      animation: orbit 15s linear infinite 3s;
-    }
-    
-    .tech-icon.js {
-      bottom: 0;
-      left: 50%;
-      transform: translateX(-50%);
-      animation: orbit 15s linear infinite 6s;
-    }
-    
-    .tech-icon.database {
-      top: 50%;
-      left: 0;
-      transform: translateY(-50%);
-      animation: orbit 15s linear infinite 9s;
-    }
-    
-    .tech-icon.blockchain {
-      top: 25%;
-      left: 25%;
-      animation: orbit 15s linear infinite 12s;
-    }
-    
-    @keyframes orbit {
-      0% {
-        transform: rotate(0deg) translateX(130px) rotate(0deg);
-      }
-      100% {
-        transform: rotate(360deg) translateX(130px) rotate(-360deg);
-      }
-    }
-    
-    /* Pulse effect for CTA button */
-    .btn-primary.animate__pulse {
-      animation-duration: 2s;
-    }
-    
-    /* Profile image hover effect */
-    .profile-img {
-      transition: all 0.5s ease;
-    }
-    
-    .profile-img:hover {
-      transform: scale(1.1);
-      box-shadow: 0 0 30px rgba(109, 207, 231, 0.6) !important;
-    }
-  </style>
-</body>
-</html>

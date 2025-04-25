@@ -3,18 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Contact Farnaz Nasehi - Full-Stack Developer specializing in hyperspectral imaging, financial analytics, and blockchain technologies.">
+    <meta name="keywords" content="Farnaz Nasehi, Contact, Full-Stack Developer, Software Engineer">
     <title>Contact - Farnaz Nasehi</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Roboto:wght@300;400;500;700&display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
     <link rel="stylesheet" href="styles.css">
-    <!-- Added particles.js library -->
     <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
 </head>
 <body>
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top shadow-sm">
         <div class="container">
-            <a class="navbar-brand" href="index.html">Farnaz Nasehi</a>
+            <a class="navbar-brand font-weight-bold" href="index.html">Farnaz Nasehi</a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -22,44 +25,98 @@
                 <ul class="navbar-nav ml-auto">
                     <li class="nav-item"><a class="nav-link" href="about.html">About</a></li>
                     <li class="nav-item"><a class="nav-link" href="resume.html">Work Experience</a></li>
-                    <li class="nav-item"><a class="nav-link" href="portfolio.html">Portfolio</a></li>
                     <li class="nav-item"><a class="nav-link" href="skills.html">Skills</a></li>
-                    <li class="nav-item"><a class="nav-link" href="contact.html">Contact</a></li>
+                    <li class="nav-item"><a class="nav-link" href="portfolio.html">Data Analytics Tool</a></li>
+                    <li class="nav-item active"><a class="nav-link" href="contact.html">Contact<span class="sr-only">(current)</span></a></li>
                 </ul>
             </div>
         </div>
     </nav>
 
-    <!-- Added particles background container -->
+    <!-- Particles background container -->
     <div id="particles-js" class="particles-container"></div>
 
     <!-- Spacer for fixed navbar -->
     <div style="padding-top: 80px;"></div>
 
     <!-- Contact Section -->
-    <section id="contact" class="contact-section text-light" style="background: linear-gradient(45deg, #6dcfe7, #333); padding: 80px 20px;">
+    <section id="contact" class="contact-section" style="position: relative; z-index: 2; padding: 80px 0;">
         <div class="container text-center">
-            <h1 class="mb-5">Get in Touch</h1>
+            <h1 class="mb-5 section-title animate__animated animate__fadeInDown">Get in Touch</h1>
+            <p class="lead text-light mb-5 animate__animated animate__fadeInUp">I'm always open to discussing new projects, creative ideas or opportunities to be part of your vision.</p>
+            
             <div class="row">
-                <div class="col-md-4">
-                    <div class="contact-card shadow-sm p-4 rounded" onclick="window.open('https://www.linkedin.com/in/farnaz-nasehi/', '_blank')">
+                <div class="col-md-4 mb-4 animate__animated animate__fadeInLeft" data-wow-delay="0.2s">
+                    <div class="contact-card shadow p-4 rounded" onclick="window.open('https://www.linkedin.com/in/farnaz-nasehi/', '_blank')">
                         <i class="fab fa-linkedin fa-3x mb-3" style="color: #0e76a8;"></i>
                         <h3>LinkedIn</h3>
-                        <p class="text-light">Connect with me on LinkedIn</p>
+                        <p class="text-light">Connect professionally</p>
+                        <small class="text-muted">View my experience and network</small>
                     </div>
                 </div>
-                <div class="col-md-4">
-                    <div class="contact-card shadow-sm p-4 rounded" onclick="window.open('https://github.com/FarnazNK', '_blank')">
+                <div class="col-md-4 mb-4 animate__animated animate__fadeInUp" data-wow-delay="0.4s">
+                    <div class="contact-card shadow p-4 rounded" onclick="window.open('https://github.com/FarnazNK', '_blank')">
                         <i class="fab fa-github fa-3x mb-3" style="color: #6e5494;"></i>
                         <h3>GitHub</h3>
-                        <p class="text-light">Check out my GitHub projects</p>
+                        <p class="text-light">View my projects</p>
+                        <small class="text-muted">See my code and contributions</small>
                     </div>
                 </div>
-                <div class="col-md-4">
-                    <div class="contact-card shadow-sm p-4 rounded">
+                <div class="col-md-4 mb-4 animate__animated animate__fadeInRight" data-wow-delay="0.6s">
+                    <div class="contact-card shadow p-4 rounded">
                         <i class="fas fa-envelope fa-3x mb-3" style="color: #ff4b5c;"></i>
-                        <h3>Email</h3>
+                        <h3>Email Me</h3>
                         <p class="text-light">fnasehikalajahi@gmail.com</p>
+                        <a href="mailto:fnasehikalajahi@gmail.com" class="btn btn-outline-light mt-2">Send Email</a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Contact Form -->
+            <div class="row mt-5">
+                <div class="col-lg-8 mx-auto animate__animated animate__fadeInUp" data-wow-delay="0.8s">
+                    <div class="card shadow bg-dark text-light">
+                        <div class="card-header bg-primary text-white">
+                            <h4 class="mb-0">Send Me a Message</h4>
+                        </div>
+                        <div class="card-body">
+                            <form id="contactForm">
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="name">Your Name</label>
+                                        <input type="text" class="form-control bg-dark text-light border-secondary" id="name" required>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="email">Your Email</label>
+                                        <input type="email" class="form-control bg-dark text-light border-secondary" id="email" required>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="subject">Subject</label>
+                                    <input type="text" class="form-control bg-dark text-light border-secondary" id="subject" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="message">Message</label>
+                                    <textarea class="form-control bg-dark text-light border-secondary" id="message" rows="5" required></textarea>
+                                </div>
+                                <button type="submit" class="btn btn-primary btn-lg w-100">
+                                    <i class="fas fa-paper-plane mr-2"></i> Send Message
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Location Section -->
+            <div class="row mt-5">
+                <div class="col-md-12 animate__animated animate__fadeIn" data-wow-delay="1s">
+                    <div class="card bg-dark text-light">
+                        <div class="card-body">
+                            <h3 class="mb-4"><i class="fas fa-map-marker-alt mr-2" style="color: #ff4b5c;"></i> Location</h3>
+                            <p class="lead">Calgary, Alberta, Canada</p>
+                            <p>Open to remote work opportunities worldwide</p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -67,17 +124,29 @@
     </section>
 
     <!-- Footer -->
-    <footer class="text-center text-light py-3" style="background-color: #333;">
-        <p>© 2024 Farnaz Nasehi. All rights reserved.</p>
+    <footer class="bg-dark text-center text-light py-4">
+        <div class="container">
+            <p class="m-0">© 2025 Farnaz Nasehi. All Rights Reserved.</p>
+            <div class="mt-2">
+                <a href="https://linkedin.com/in/farnaz-nasehi" target="_blank" rel="noopener noreferrer" class="text-light mx-3" aria-label="LinkedIn Profile">
+                    <i class="fab fa-linkedin fa-lg"></i>
+                </a>
+                <a href="https://github.com/FarnazNK" target="_blank" rel="noopener noreferrer" class="text-light mx-3" aria-label="GitHub Profile">
+                    <i class="fab fa-github fa-lg"></i>
+                </a>
+                <a href="mailto:fnasehikalajahi@gmail.com" class="text-light mx-3" aria-label="Email">
+                    <i class="far fa-envelope fa-lg"></i>
+                </a>
+            </div>
+        </div>
     </footer>
 
     <!-- Scripts -->
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-    <!-- Added particles.js initialization script -->
     <script>
-        // Initialize particles.js for background animation
+        // Initialize particles.js
         document.addEventListener('DOMContentLoaded', function() {
             particlesJS("particles-js", {
                 "particles": {
@@ -185,6 +254,132 @@
                 "retina_detect": true
             });
         });
+
+        // Handle form submission with feedback
+        document.getElementById('contactForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // In a real implementation, you would send form data to a server
+            // For demo purposes, we'll just show a success message
+            
+            const formElements = this.elements;
+            for (let i = 0; i < formElements.length; i++) {
+                formElements[i].disabled = true;
+            }
+            
+            this.innerHTML = `
+                <div class="text-center py-5">
+                    <i class="fas fa-check-circle fa-5x text-success mb-3"></i>
+                    <h3>Message Sent!</h3>
+                    <p class="lead">Thank you for reaching out. I'll respond to your message shortly.</p>
+                </div>
+            `;
+            
+            // Reset form after 5 seconds
+            setTimeout(() => {
+                this.reset();
+                for (let i = 0; i < formElements.length; i++) {
+                    formElements[i].disabled = false;
+                }
+                this.innerHTML = `
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="name">Your Name</label>
+                            <input type="text" class="form-control bg-dark text-light border-secondary" id="name" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="email">Your Email</label>
+                            <input type="email" class="form-control bg-dark text-light border-secondary" id="email" required>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="subject">Subject</label>
+                        <input type="text" class="form-control bg-dark text-light border-secondary" id="subject" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="message">Message</label>
+                        <textarea class="form-control bg-dark text-light border-secondary" id="message" rows="5" required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-lg w-100">
+                        <i class="fas fa-paper-plane mr-2"></i> Send Message
+                    </button>
+                `;
+            }, 5000);
+        });
     </script>
+    
+    <!-- Add these styles for the enhanced contact page -->
+    <style>
+        /* Enhanced contact card styling */
+        .contact-card {
+            transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+            cursor: pointer;
+            background-color: rgba(30, 30, 30, 0.7);
+        }
+        
+        .contact-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3) !important;
+        }
+        
+        .contact-card i {
+            transition: transform 0.3s ease;
+        }
+        
+        .contact-card:hover i {
+            transform: scale(1.2);
+        }
+        
+        /* Form styling */
+        .form-control {
+            background-color: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #fff;
+            transition: all 0.3s ease;
+        }
+        
+        .form-control:focus {
+            background-color: rgba(255, 255, 255, 0.1);
+            border-color: #007bff;
+            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+        }
+        
+        /* Background gradient for contact section */
+        .contact-section {
+            background: linear-gradient(135deg, #1a1a1a, #333);
+            position: relative;
+        }
+        
+        .contact-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at center, rgba(109, 207, 231, 0.2) 0%, transparent 70%);
+            z-index: -1;
+        }
+        
+        /* Better section title */
+        .section-title {
+            position: relative;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            color: #fff;
+        }
+        
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 3px;
+            background: linear-gradient(to right, #007bff, #6dcfe7);
+            border-radius: 3px;
+        }
+    </style>
 </body>
 </html>
