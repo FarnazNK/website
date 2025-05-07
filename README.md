@@ -3,7 +3,7 @@
 This repository contains the source code for my professional portfolio website showcasing my skills, experience, and projects as a Full-Stack Developer.
 
 ## Live Website
-The website is live at: https://farnaznk.github.io/website/
+The website is live at:https://farnaznasehi.com/
 
 ## Features
 - Responsive design that works on all devices
