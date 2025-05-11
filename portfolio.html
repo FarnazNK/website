@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="Interactive data visualization and analysis platform by Farnaz Nasehi">
-  <meta name="keywords" content="Data Analytics, Data Visualization, Interactive Dashboard">
-  <title>Data Analytics Tool - Farnaz Nasehi</title>
+  <meta name="description" content="Quantitative investment platform by Farnaz Nasehi">
+  <meta name="keywords" content="Quantitative Finance, Portfolio Optimization, Trading Strategies">
+  <title>Quantitative Investment Platform - Farnaz Nasehi</title>
   <!-- Bootstrap CSS -->
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
   <!-- Font Awesome Icons -->
@@ -16,9 +16,15 @@
   <link rel="stylesheet" href="styles.css" />
   <!-- Libraries -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jstat/1.9.4/jstat.min.js"></script>
-  <script src="https://www.lactame.com/lib/ml/4.0.0/ml.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-financial"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.3.2/papaparse.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/portfolio-allocation@1.1.0/dist/portfolio-allocation.min.js"></script>
+  <script>
+      if (typeof PortfolioAllocation === 'undefined') {
+          document.write('<script src="portfolio-allocation-library.js"><\/script>');
+      }
+  </script>
   <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
 </head>
 <body>
@@ -34,7 +40,7 @@
           <li class="nav-item"><a class="nav-link" href="about.html" aria-label="About">About</a></li>
           <li class="nav-item"><a class="nav-link" href="resume.html" aria-label="Work Experience">Work Experience</a></li>
           <li class="nav-item"><a class="nav-link" href="skills.html">Skills</a></li>
-          <li class="nav-item active"><a class="nav-link" href="portfolio.html">Data Analytics Tool <span class="sr-only">(current)</span></a></li>
+          <li class="nav-item active"><a class="nav-link" href="portfolio.html">Quantitative Investment Platform <span class="sr-only">(current)</span></a></li>
           <li class="nav-item"><a class="nav-link" href="contact.html">Contact</a></li>
         </ul>
       </div>
@@ -49,8 +55,8 @@
     <div class="container mt-5">
       <div class="card bg-dark text-white shadow-lg border-0">
         <div class="card-body text-center p-4">
-          <h1 class="card-title mb-3">Data Analytics Tool</h1>
-          <p class="card-text">A full-featured data visualization and analysis platform showcasing my expertise in interactive web applications and data science</p>
+          <h1 class="card-title mb-3">Quantitative Investment Platform</h1>
+          <p class="card-text">A full-featured platform for financial data analysis, portfolio optimization, and trading strategy backtesting</p>
         </div>
       </div>
       
@@ -65,16 +71,13 @@
               <i class="fas fa-chart-bar mr-2"></i>Plots
             </button>
             <button class="btn btn-tool" id="toolbar-statistics">
-              <i class="fas fa-calculator mr-2"></i>Statistics
+              <i class="fas fa-calculator mr-2"></i>Risk Metrics
             </button>
-            <button class="btn btn-tool" id="toolbar-predictions">
-              <i class="fas fa-brain mr-2"></i>Predictions
+            <button class="btn btn-tool" id="toolbar-portfolio">
+              <i class="fas fa-briefcase mr-2"></i>Portfolio
             </button>
-            <button class="btn btn-tool" id="toolbar-correlations">
-              <i class="fas fa-project-diagram mr-2"></i>Correlations
-            </button>
-            <button class="btn btn-tool" id="toolbar-transformations">
-              <i class="fas fa-magic mr-2"></i>Transformations
+            <button class="btn btn-tool" id="toolbar-strategies">
+              <i class="fas fa-chart-line mr-2"></i>Strategies
             </button>
           </div>
         </div>
@@ -87,12 +90,12 @@
     <div class="container">
       <div class="content-container bg-dark text-light p-4 rounded shadow-lg" id="dynamicMenuContent">
         <div class="welcome-screen text-center py-5">
-          <h4 class="mb-4">Welcome to the Data Analytics Tool</h4>
-          <p class="mb-5">Choose from the toolbar above to start analyzing your data.</p>
+          <h4 class="mb-4">Welcome to the Quantitative Investment Platform</h4>
+          <p class="mb-5">Choose from the toolbar above to start analyzing financial data.</p>
           <div class="upload-zone p-5 mb-4 mx-auto">
             <i class="fas fa-file-upload mb-3"></i>
             <p>Drag and drop files here<br>or</p>
-            <button class="btn btn-primary btn-lg mt-2">
+            <button class="btn btn-primary btn-lg mt-2" id="browseFiles">
               <i class="fas fa-folder-open mr-2"></i>Browse Files
             </button>
           </div>
@@ -131,12 +134,12 @@
   <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-  <script src="script.js"></script>
+  <script defer src="script.js"></script>
+  <script src="portfolio-allocation-library.js"></script>
   
   <!-- Particles.js Initialization -->
   <script>
     document.addEventListener('DOMContentLoaded', function() {
-      // Initialize particles.js
       particlesJS("particles-js", {
         "particles": {
           "number": {
@@ -253,3 +256,5 @@
       });
     });
   </script>
+</body>
+</html>
