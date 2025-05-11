@@ -1,30 +1,69 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // Core variables
     const dynamicContent = document.getElementById('dynamicMenuContent');
     let sharedDataset = { headers: [], rows: [] };
-    const rowsPerPage = 100; // For pagination
+    const rowsPerPage = 100;
+    const dependencies = {
+        Papa: typeof Papa !== 'undefined' ? Papa : null,
+        XLSX: typeof XLSX !== 'undefined' ? XLSX : null,
+        Chart: typeof Chart !== 'undefined' ? Chart : null,
+        PortfolioAllocation: typeof PortfolioAllocation !== 'undefined' ? PortfolioAllocation : null
+    };
 
-    // Dependency checks
-    if (typeof Papa === 'undefined') {
-        showErrorMessage('Papa Parse is required for CSV parsing.');
-        return;
-    }
-    if (typeof XLSX === 'undefined') {
-        showErrorMessage('XLSX.js is required for Excel file support.');
-        return;
-    }
-    if (typeof Chart === 'undefined') {
-        showErrorMessage('Chart.js is required for plotting.');
-        return;
-    }
-    if (typeof PortfolioAllocation === 'undefined') {
-        showErrorMessage('Portfolio Allocation library is required for portfolio optimization.');
-        return;
-    }
+    // Debug library loading
+    console.log('Dependencies:', {
+        Papa: !!dependencies.Papa,
+        XLSX: !!dependencies.XLSX,
+        Chart: !!dependencies.Chart,
+        PortfolioAllocation: !!dependencies.PortfolioAllocation
+    });
 
-    // UI components for toolbar sections
+    // Dependency check
+    if (!dependencies.Papa) return showErrorMessage('Papa Parse is required for CSV parsing.');
+    if (!dependencies.XLSX) return showErrorMessage('XLSX.js is required for Excel file support.');
+    if (!dependencies.Chart) return showErrorMessage('Chart.js is required for plotting.');
+    if (!dependencies.PortfolioAllocation) return showErrorMessage('Portfolio Allocation library is required for portfolio optimization.');
+
+    // Utility functions
+    const sanitizeInput = (input) => {
+        // Using a simple sanitization for now; consider DOMPurify for production
+        const div = document.createElement('div');
+        div.textContent = input;
+        return div.innerHTML;
+    };
+
+    const showMessage = (message, type = 'success', containerId = 'dynamicMenuContent') => {
+        const container = document.getElementById(containerId) || dynamicContent;
+        const alertDiv = document.createElement('div');
+        alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
+        alertDiv.innerHTML = `
+            <strong>${type.charAt(0).toUpperCase() + type.slice(1)}:</strong> ${sanitizeInput(message)}
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        `;
+        container.prepend(alertDiv);
+        setTimeout(() => $(alertDiv).alert('close'), 5000);
+    };
+
+    const showErrorMessage = (message, containerId) => showMessage(message, 'danger', containerId);
+    const showSuccessMessage = (message, containerId) => showMessage(message, 'success', containerId);
+
+    const getColumnIndex = (column) => {
+        const index = sharedDataset.headers.indexOf(column);
+        if (index === -1) throw new Error(`Invalid column name: ${column}`);
+        return index;
+    };
+
+    const getColumnData = (columnIndex) => {
+        return sharedDataset.rows
+            .map(row => parseFloat(row[columnIndex]))
+            .filter(val => !isNaN(val));
+    };
+
+    // Toolbar UI components
     const toolbarHandlers = {
-        'toolbar-data': function() {
-            return `
+        'toolbar-data': () => `
             <div class="row">
                 <div class="col-md-3 bg-dark p-3 rounded shadow-sm menu-section">
                     <h4 class="text-light">Menu</h4>
@@ -33,6 +72,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         <li class="list-group-item menu-item" id="menu-clean-data">Clean Data</li>
                         <li class="list-group-item menu-item" id="menu-filter-data">Filter Data</li>
                         <li class="list-group-item menu-item" id="menu-export-data">Export Data</li>
+                        <li class="list-group-item menu-item" id="menu-clear-data">Clear Data</li>
                     </ul>
                 </div>
                 <div class="col-md-9 bg-dark p-3 rounded shadow-lg" id="data-content">
@@ -56,10 +96,8 @@ document.addEventListener('DOMContentLoaded', () => {
                         </div>
                     </div>
                 </div>
-            </div>`;
-        },
-        'toolbar-plots': function() {
-            return `
+            </div>`,
+        'toolbar-plots': () => `
             <div class="container py-4">
                 <div class="row">
                     <div class="col-md-3 bg-dark text-light p-3 rounded shadow-sm">
@@ -84,10 +122,8 @@ document.addEventListener('DOMContentLoaded', () => {
                         <div id="chartsContainer" class="d-flex flex-wrap gap-3"></div>
                     </div>
                 </div>
-            </div>`;
-        },
-        'toolbar-statistics': function() {
-            return `
+            </div>`,
+        'toolbar-statistics': () => `
             <div class="container py-4">
                 <h4 class="text-light">Risk Metrics</h4>
                 <div class="row">
@@ -106,7 +142,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                     <label class="form-check-label" for="optionSharpe">Sharpe Ratio</label>
                                 </div>
                                 <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" id="optionVaR" checked>
+                                    <input сведений о портфелеclass="form-check-input" type="checkbox" id="optionVaR" checked>
                                     <label class="form-check-label" for="optionVaR">Value at Risk (95%)</label>
                                 </div>
                                 <div class="form-check">
@@ -119,10 +155,8 @@ document.addEventListener('DOMContentLoaded', () => {
                         <div id="statsResult" class="table-responsive text-light"></div>
                     </div>
                 </div>
-            </div>`;
-        },
-        'toolbar-portfolio': function() {
-            return `
+            </div>`,
+        'toolbar-portfolio': () => `
             <div class="container py-4">
                 <h4 class="text-light">Portfolio Optimization</h4>
                 <div class="row">
@@ -134,23 +168,23 @@ document.addEventListener('DOMContentLoaded', () => {
                                 `<option value="${header}">${header}</option>`).join('')}
                         </select>
                         <label>Risk-Free Rate (%):</label>
-                        <input type="number" id="riskFreeRate" class="form-control mb-3" value="2">
+                        <input type="number" id="riskFreeRate" class="form-control mb-3" value="2" min="0" step="0.1">
                         <label>Optimization Method:</label>
                         <select id="optimizationMethod" class="form-control mb-3">
                             <option value="mean-variance">Mean-Variance</option>
                             <option value="min-volatility">Minimum Volatility</option>
                         </select>
-                        <button class="btn btn-primary w-100" id="optimizePortfolio">Optimize Portfolio</button>
+                        <button class="btn btn-primary w-100 mb-2" id="optimizePortfolio">Optimize Portfolio</button>
+                        <button class="btn btn-secondary w-100" id="exportPortfolio">Export Results</button>
                     </div>
                     <div class="col-md-9">
                         <div id="portfolioResult" class="table-responsive text-light"></div>
                         <div id="portfolioChart" class="mt-3"></div>
+                        <div id="portfolioPerformanceChart" class="mt-3"></div>
                     </div>
                 </div>
-            </div>`;
-        },
-        'toolbar-strategies': function() {
-            return `
+            </div>`,
+        'toolbar-strategies': () => `
             <div class="container py-4">
                 <h4 class="text-light">Trading Strategies</h4>
                 <div class="row">
@@ -167,11 +201,11 @@ document.addEventListener('DOMContentLoaded', () => {
                             <option value="macd">MACD</option>
                         </select>
                         <label>Fast Period:</label>
-                        <input type="number" id="fastPeriod" class="form-control mb-3" value="12">
+                        <input type="number" id="fastPeriod" class="form-control mb-3" value="12" min="1">
                         <label>Slow Period:</label>
-                        <input type="number" id="slowPeriod" class="form-control mb-3" value="26">
+                        <input type="number" id="slowPeriod" class="form-control mb-3" value="26" min="1">
                         <label>Transaction Cost (%):</label>
-                        <input type="number" id="transactionCost" class="form-control mb-3" value="0.1">
+                        <input type="number" id="transactionCost" class="form-control mb-3" value="0.1" min="0" step="0.01">
                         <button class="btn btn-primary w-100" id="backtestStrategy">Backtest Strategy</button>
                     </div>
                     <div class="col-md-9">
@@ -179,39 +213,47 @@ document.addEventListener('DOMContentLoaded', () => {
                         <div id="strategyChart" class="mt-3"></div>
                     </div>
                 </div>
-            </div>`;
-        }
+            </div>`
     };
 
-    // Attach Toolbar Event Listeners
-    Object.keys(toolbarHandlers).forEach(toolbarId => {
+    // Attach toolbar event listeners
+    Object.entries(toolbarHandlers).forEach(([toolbarId, handler]) => {
         const button = document.getElementById(toolbarId);
         if (button) {
             button.addEventListener('click', () => {
                 if (['toolbar-plots', 'toolbar-statistics', 'toolbar-portfolio', 'toolbar-strategies'].includes(toolbarId) && !sharedDataset.headers.length) {
-                    showErrorMessage('No data available. Please load data first.');
+                    showErrorMessage('No data available. Please load data first.', 'data-content');
                     dynamicContent.innerHTML = toolbarHandlers['toolbar-data']();
                     attachDataMenuEventListeners();
                     return;
                 }
-                dynamicContent.innerHTML = toolbarHandlers[toolbarId]();
-                if (toolbarId === 'toolbar-data') attachDataMenuEventListeners();
-                if (toolbarId === 'toolbar-plots') implementPlotFunctionality();
-                if (toolbarId === 'toolbar-statistics') implementRiskFunctionality();
-                if (toolbarId === 'toolbar-portfolio') implementPortfolioFunctionality();
-                if (toolbarId === 'toolbar-strategies') implementStrategyFunctionality();
+                dynamicContent.innerHTML = handler();
+                switch (toolbarId) {
+                    case 'toolbar-data': attachDataMenuEventListeners(); break;
+                    case 'toolbar-plots': implementPlotFunctionality(); break;
+                    case 'toolbar-statistics': implementRiskFunctionality(); break;
+                    case 'toolbar-portfolio': implementPortfolioFunctionality(); break;
+                    case 'toolbar-strategies': implementStrategyFunctionality(); break;
+                }
             });
         }
     });
 
-    // Data Section Event Listeners
+    // Data section event listeners
     function attachDataMenuEventListeners() {
-        document.getElementById('menu-load-data')?.addEventListener('click', loadDataSection);
-        document.getElementById('menu-clean-data')?.addEventListener('click', cleanDataSection);
-        document.getElementById('menu-filter-data')?.addEventListener('click', filterDataSection);
-        document.getElementById('menu-export-data')?.addEventListener('click', exportDataSection);
+        const menuItems = {
+            'menu-load-data': loadDataSection,
+            'menu-clean-data': cleanDataSection,
+            'menu-filter-data': filterDataSection,
+            'menu-export-data': exportDataSection,
+            'menu-clear-data': clearDataSection
+        };
 
-        // Handle drag-and-drop and browse button
+        Object.entries(menuItems).forEach(([id, handler]) => {
+            const element = document.getElementById(id);
+            if (element) element.addEventListener('click', handler);
+        });
+
         const uploadZone = document.querySelector('.upload-zone');
         const browseButton = document.getElementById('browseFiles');
         const loadingSpinner = document.getElementById('loadingSpinner');
@@ -253,7 +295,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Load Data Section
+    // Load data section
     function loadDataSection() {
         document.getElementById('data-content').innerHTML = `
             <div class="p-3 text-center">
@@ -267,7 +309,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <p class="text-muted">Supported formats: CSV, Excel (.xlsx, .xls)</p>
                 <div class="input-group mb-3">
                     <input type="text" id="tickerInput" class="form-control" placeholder="Enter ticker (e.g., AAPL)">
-                    <input type="text" id="apiKeyInput" class="form-control" placeholder="Enter Alpha Vantage API Key">
+                    <input type="password" id="apiKeyInput" class="form-control" placeholder="Enter Alpha Vantage API Key">
                     <button class="btn btn-primary" id="fetch-data-button">Fetch Market Data</button>
                 </div>
                 <div class="text-center mt-4">
@@ -279,24 +321,25 @@ document.addEventListener('DOMContentLoaded', () => {
             <div id="data-preview"></div>
         `;
 
-        document.getElementById('fetch-data-button').addEventListener('click', () => {
+        document.getElementById('fetch-data-button').addEventListener('click', async () => {
             const ticker = sanitizeInput(document.getElementById('tickerInput').value.trim());
             const apiKey = document.getElementById('apiKeyInput').value.trim();
             if (!ticker || !apiKey) {
-                showErrorMessage('Please enter a valid ticker and API key.');
+                showErrorMessage('Please enter a valid ticker and API key.', 'data-content');
                 return;
             }
             document.getElementById('loadingSpinner').style.display = 'block';
-            fetchMarketData(ticker, apiKey);
+            await fetchMarketData(ticker, apiKey);
         });
 
         attachDataMenuEventListeners();
     }
 
-    // Fetch Market Data
+    // Fetch market data
     async function fetchMarketData(ticker, apiKey) {
         try {
             const response = await fetch(`https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=${ticker}&apikey=${apiKey}&outputsize=compact`);
+            if (!response.ok) throw new Error('Network error');
             const data = await response.json();
             if (data["Error Message"]) throw new Error(data["Error Message"]);
 
@@ -315,22 +358,22 @@ document.addEventListener('DOMContentLoaded', () => {
             validateHeaders(sharedDataset.headers);
             localStorage.setItem('savedDataset', JSON.stringify(sharedDataset));
             displayDataTable();
-            showSuccessMessage(`Loaded data for ${ticker}`);
+            showSuccessMessage(`Loaded data for ${ticker}`, 'data-content');
         } catch (error) {
-            showErrorMessage(`Error fetching data: ${error.message}`);
+            showErrorMessage(`Error fetching data: ${error.message}`, 'data-content');
         } finally {
             document.getElementById('loadingSpinner').style.display = 'none';
         }
     }
 
-    // Process File
+    // Process file
     function processFile(file) {
         const fileExtension = file.name.split('.').pop().toLowerCase();
         if (fileExtension === 'csv') {
-            Papa.parse(file, {
+            dependencies.Papa.parse(file, {
                 complete: (result) => {
                     if (result.errors.length) {
-                        showErrorMessage('Error parsing CSV: ' + result.errors[0].message);
+                        showErrorMessage('Error parsing CSV: ' + result.errors[0].message, 'data-content');
                         document.getElementById('loadingSpinner').style.display = 'none';
                         return;
                     }
@@ -344,70 +387,73 @@ document.addEventListener('DOMContentLoaded', () => {
             reader.onload = (event) => {
                 try {
                     const data = new Uint8Array(event.target.result);
-                    const workbook = XLSX.read(data, { type: 'array' });
+                    const workbook = dependencies.XLSX.read(data, { type: 'array' });
                     const sheetName = workbook.SheetNames[0];
                     const worksheet = workbook.Sheets[sheetName];
-                    const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+                    const jsonData = dependencies.XLSX.utils.sheet_to_json(worksheet, { header: 1 });
                     processExcel(jsonData);
                 } catch (error) {
-                    showErrorMessage(`Error processing Excel file: ${error.message}`);
+                    showErrorMessage(`Error processing Excel file: ${error.message}`, 'data-content');
                 } finally {
                     document.getElementById('loadingSpinner').style.display = 'none';
                 }
             };
             reader.readAsArrayBuffer(file);
         } else {
-            showErrorMessage('Invalid file type. Please upload a CSV or Excel file.');
+            showErrorMessage('Invalid file type. Please upload a CSV or Excel file.', 'data-content');
             document.getElementById('loadingSpinner').style.display = 'none';
         }
     }
 
-    // Process CSV Data
+    // Process CSV data
     function processCSV(data) {
         if (!data.length || !data[0].length) {
-            showErrorMessage('The CSV file is empty.');
+            showErrorMessage('The CSV file is empty.', 'data-content');
             document.getElementById('loadingSpinner').style.display = 'none';
             return;
         }
         updateSharedDataset(data);
     }
 
-    // Process Excel Data
+    // Process Excel data
     function processExcel(jsonData) {
         if (!jsonData.length) {
-            showErrorMessage('The Excel file is empty.');
+            showErrorMessage('The Excel file is empty.', 'data-content');
             document.getElementById('loadingSpinner').style.display = 'none';
             return;
         }
         updateSharedDataset(jsonData);
     }
 
-    // Update Shared Dataset
+    // Update shared dataset
     function updateSharedDataset(rows) {
-        sharedDataset.headers = rows[0].map(h => sanitizeInput(h.toString().trim()));
-        sharedDataset.rows = rows.slice(1).map(row => row.map(cell => cell ? sanitizeInput(cell.toString().trim()) : ''));
-        validateHeaders(sharedDataset.headers);
-        localStorage.setItem('savedDataset', JSON.stringify(sharedDataset));
-        displayDataTable();
-        document.getElementById('loadingSpinner').style.display = 'none';
+        try {
+            sharedDataset.headers = rows[0].map(h => sanitizeInput(h.toString().trim()));
+            sharedDataset.rows = rows.slice(1).map(row => row.map(cell => cell ? sanitizeInput(cell.toString().trim()) : ''));
+            validateHeaders(sharedDataset.headers);
+            localStorage.setItem('savedDataset', JSON.stringify(sharedDataset));
+            displayDataTable();
+            showSuccessMessage('Data loaded successfully!', 'data-content');
+        } catch (error) {
+            showErrorMessage(error.message, 'data-content');
+        } finally {
+            document.getElementById('loadingSpinner').style.display = 'none';
+        }
     }
 
-    // Validate Headers
+    // Validate headers
     function validateHeaders(headers) {
         const uniqueHeaders = new Set(headers);
-        if (uniqueHeaders.size !== headers.length) {
-            throw new Error('Duplicate column headers detected.');
-        }
-        if (headers.some(h => !h)) {
-            throw new Error('Empty column headers are not allowed.');
-        }
+        if (uniqueHeaders.size !== headers.length) throw new Error('Duplicate column headers detected.');
+        if (headers.some(h => !h)) throw new Error('Empty column headers are not allowed.');
     }
 
-    // Display Data Table with Pagination
+    // Display data table with pagination
     function displayDataTable(page = 1) {
         const start = (page - 1) * rowsPerPage;
         const end = start + rowsPerPage;
         const paginatedRows = sharedDataset.rows.slice(start, end);
+        const totalPages = Math.ceil(sharedDataset.rows.length / rowsPerPage);
 
         document.getElementById('data-content').innerHTML = `
             <div class="table-container bg-dark rounded p-3">
@@ -420,7 +466,12 @@ document.addEventListener('DOMContentLoaded', () => {
                         <li class="page-item ${page === 1 ? 'disabled' : ''}">
                             <a class="page-link" href="#" data-page="${page - 1}">Previous</a>
                         </li>
-                        <li class="page-item">
+                        ${Array.from({length: totalPages}, (_, i) => `
+                            <li class="page-item ${page === i + 1 ? 'active' : ''}">
+                                <a class="page-link" href="#" data-page="${i + 1}">${i + 1}</a>
+                            </li>
+                        `).join('')}
+                        <li class="page-item ${page === totalPages ? 'disabled' : ''}">
                             <a class="page-link" href="#" data-page="${page + 1}">Next</a>
                         </li>
                     </ul>
@@ -436,16 +487,26 @@ document.addEventListener('DOMContentLoaded', () => {
             link.addEventListener('click', (e) => {
                 e.preventDefault();
                 const newPage = parseInt(e.target.dataset.page);
-                if (newPage > 0 && newPage <= Math.ceil(sharedDataset.rows.length / rowsPerPage)) {
-                    displayDataTable(newPage);
-                }
+                if (newPage > 0 && newPage <= totalPages) displayDataTable(newPage);
             });
         });
-
-        showSuccessMessage('Data loaded successfully!');
     }
 
-    // Clean Data Section
+    // Clear data section
+    function clearDataSection() {
+        sharedDataset = { headers: [], rows: [] };
+        localStorage.removeItem('savedDataset');
+        document.getElementById('data-content').innerHTML = `
+            <div class="text-center py-5">
+                <h4>Data Cleared</h4>
+                <p>Dataset has been cleared. Load new data to continue.</p>
+                <button class="btn btn-primary" id="reloadData">Load Data</button>
+            </div>`;
+        document.getElementById('reloadData').addEventListener('click', loadDataSection);
+        showSuccessMessage('Dataset cleared successfully!', 'data-content');
+    }
+
+    // Clean data section
     function cleanDataSection() {
         document.getElementById('data-content').innerHTML = `
             <div class="card bg-dark text-light mb-3">
@@ -478,29 +539,29 @@ document.addEventListener('DOMContentLoaded', () => {
                         return cell;
                     });
                 });
-                showSuccessMessage(`Filled missing values in ${beforeCount - sharedDataset.rows.length} rows.`);
+                showSuccessMessage(`Filled missing values in ${beforeCount - sharedDataset.rows.length} rows.`, 'cleaning-result');
                 document.getElementById('cleaning-result').innerHTML = renderDataTable();
             } catch (error) {
-                showErrorMessage(error.message);
+                showErrorMessage(error.message, 'cleaning-result');
             }
         });
 
         document.getElementById('filter-low-volume').addEventListener('click', () => {
             showModal('Filter Low Volume Days', `
                 <label for="volumeThreshold">Minimum Volume:</label>
-                <input type="number" id="volumeThreshold" class="form-control" value="10000">
+                <input type="number" id="volumeThreshold" class="form-control" value="10000" min="0">
             `, (inputs) => {
                 try {
                     const volumeThreshold = parseFloat(inputs.volumeThreshold);
-                    if (isNaN(volumeThreshold)) throw new Error('Invalid volume threshold.');
+                    if (isNaN(volumeThreshold) || volumeThreshold < 0) throw new Error('Invalid volume threshold.');
                     const volumeIndex = sharedDataset.headers.indexOf('Volume');
                     if (volumeIndex === -1) throw new Error('Volume column not found.');
                     const beforeCount = sharedDataset.rows.length;
                     sharedDataset.rows = sharedDataset.rows.filter(row => parseFloat(row[volumeIndex]) >= volumeThreshold);
-                    showSuccessMessage(`Removed ${beforeCount - sharedDataset.rows.length} low-volume days.`);
+                    showSuccessMessage(`Removed ${beforeCount - sharedDataset.rows.length} low-volume days.`, 'cleaning-result');
                     document.getElementById('cleaning-result').innerHTML = renderDataTable();
                 } catch (error) {
-                    showErrorMessage(error.message);
+                    showErrorMessage(error.message, 'cleaning-result');
                 }
             });
         });
@@ -521,10 +582,10 @@ document.addEventListener('DOMContentLoaded', () => {
                         const value = parseFloat(row[columnIndex]);
                         return isNaN(value) || !outliers.includes(value);
                     });
-                    showSuccessMessage(`Removed ${beforeCount - sharedDataset.rows.length} outliers from "${column}".`);
+                    showSuccessMessage(`Removed ${beforeCount - sharedDataset.rows.length} outliers from "${column}".`, 'cleaning-result');
                     document.getElementById('cleaning-result').innerHTML = renderDataTable();
                 } catch (error) {
-                    showErrorMessage(error.message);
+                    showErrorMessage(error.message, 'cleaning-result');
                 }
             });
         });
@@ -535,15 +596,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 const uniqueRows = new Map();
                 sharedDataset.rows.forEach(row => uniqueRows.set(JSON.stringify(row), row));
                 sharedDataset.rows = Array.from(uniqueRows.values());
-                showSuccessMessage(`Removed ${beforeCount - sharedDataset.rows.length} duplicate rows.`);
+                showSuccessMessage(`Removed ${beforeCount - sharedDataset.rows.length} duplicate rows.`, 'cleaning-result');
                 document.getElementById('cleaning-result').innerHTML = renderDataTable();
             } catch (error) {
-                showErrorMessage(error.message);
+                showErrorMessage(error.message, 'cleaning-result');
             }
         });
     }
 
-    // Filter Data Section
+    // Filter data section
     function filterDataSection() {
         document.getElementById('data-content').innerHTML = `
             <div class="card bg-dark text-light mb-3">
@@ -592,10 +653,10 @@ document.addEventListener('DOMContentLoaded', () => {
                         }
                     });
 
-                    showSuccessMessage(`Filtered ${beforeCount - sharedDataset.rows.length} rows.`);
+                    showSuccessMessage(`Filtered ${beforeCount - sharedDataset.rows.length} rows.`, 'filtering-result');
                     document.getElementById('filtering-result').innerHTML = renderDataTable();
                 } catch (error) {
-                    showErrorMessage(error.message);
+                    showErrorMessage(error.message, 'filtering-result');
                 }
             });
         });
@@ -622,10 +683,10 @@ document.addEventListener('DOMContentLoaded', () => {
                         const value = parseFloat(row[columnIndex]);
                         return !isNaN(value) && value >= minValue && value <= maxValue;
                     });
-                    showSuccessMessage(`Filtered to ${sharedDataset.rows.length} rows in range [${minValue}, ${maxValue}].`);
+                    showSuccessMessage(`Filtered to ${sharedDataset.rows.length} rows in range [${minValue}, ${maxValue}].`, 'filtering-result');
                     document.getElementById('filtering-result').innerHTML = renderDataTable();
                 } catch (error) {
-                    showErrorMessage(error.message);
+                    showErrorMessage(error.message, 'filtering-result');
                 }
             });
         });
@@ -633,17 +694,17 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('filter-top-n').addEventListener('click', () => {
             showModal('Filter Top N Rows', `
                 <label for="nRows">Number of Rows:</label>
-                <input type="number" id="nRows" class="form-control" value="100">
+                <input type="number" id="nRows" class="form-control" value="100" min="1">
             `, (inputs) => {
                 try {
                     const n = parseInt(inputs.nRows, 10);
                     if (isNaN(n) || n <= 0) throw new Error('Invalid value for N.');
                     const beforeCount = sharedDataset.rows.length;
                     sharedDataset.rows = sharedDataset.rows.slice(0, n);
-                    showSuccessMessage(`Kept top ${n} rows (removed ${beforeCount - n} rows).`);
+                    showSuccessMessage(`Kept top ${n} rows (removed ${beforeCount - n} rows).`, 'filtering-result');
                     document.getElementById('filtering-result').innerHTML = renderDataTable();
                 } catch (error) {
-                    showErrorMessage(error.message);
+                    showErrorMessage(error.message, 'filtering-result');
                 }
             });
         });
@@ -658,19 +719,19 @@ document.addEventListener('DOMContentLoaded', () => {
                     const columnIndex = getColumnIndex(column);
                     const beforeCount = sharedDataset.rows.length;
                     sharedDataset.rows = sharedDataset.rows.filter(row => row[columnIndex] !== '' && row[columnIndex] !== null);
-                    showSuccessMessage(`Kept ${sharedDataset.rows.length} non-null rows in "${column}".`);
+                    showSuccessMessage(`Kept ${sharedDataset.rows.length} non-null rows in "${column}".`, 'filtering-result');
                     document.getElementById('filtering-result').innerHTML = renderDataTable();
                 } catch (error) {
-                    showErrorMessage(error.message);
+                    showErrorMessage(error.message, 'filtering-result');
                 }
             });
         });
     }
 
-    // Export Data Section
+    // Export data section
     function exportDataSection() {
         if (!sharedDataset.headers.length) {
-            showErrorMessage('No data available to export.');
+            showErrorMessage('No data available to export.', 'data-content');
             return;
         }
 
@@ -684,10 +745,10 @@ document.addEventListener('DOMContentLoaded', () => {
         a.download = 'exported_dataset.csv';
         a.click();
         URL.revokeObjectURL(url);
-        showSuccessMessage('Data exported successfully!');
+        showSuccessMessage('Data exported successfully!', 'data-content');
     }
 
-    // Plot Functionality
+    // Plot functionality
     function implementPlotFunctionality() {
         document.getElementById('generateChart').addEventListener('click', () => {
             try {
@@ -714,12 +775,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     createChart(chartType, closes, chartLabel, chartColor, dates);
                 }
             } catch (error) {
-                showErrorMessage(error.message);
+                showErrorMessage(error.message, 'chartsContainer');
             }
         });
     }
 
-    // Create Chart
+    // Create chart
     function createChart(type, data, label, color, labels) {
         const chartWrapper = document.createElement('div');
         chartWrapper.className = 'chart-wrapper card m-2 p-2';
@@ -761,11 +822,11 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         };
 
-        const chartInstance = new Chart(ctx, config);
+        const chartInstance = new dependencies.Chart(ctx, config);
         canvas.chartInstance = chartInstance;
     }
 
-    // Risk Metrics Functionality
+    // Risk metrics functionality
     function implementRiskFunctionality() {
         document.getElementById('generateStats').addEventListener('click', () => {
             try {
@@ -841,13 +902,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 tableHTML += '</tbody></table></div>';
                 document.getElementById('statsResult').innerHTML = tableHTML;
             } catch (error) {
-                showErrorMessage(error.message);
+                showErrorMessage(error.message, 'statsResult');
             }
         });
     }
 
-    // Portfolio Optimization Functionality
+    // Portfolio optimization functionality
     function implementPortfolioFunctionality() {
+        let latestPortfolio = null; // Store latest optimization results for export
+
         document.getElementById('optimizePortfolio').addEventListener('click', () => {
             try {
                 const tickers = Array.from(document.getElementById('portfolioTickers').selectedOptions).map(opt => opt.value);
@@ -855,6 +918,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const method = document.getElementById('optimizationMethod').value;
 
                 if (tickers.length < 2) throw new Error('Select at least two tickers.');
+                if (isNaN(riskFreeRate) || riskFreeRate < 0) throw new Error('Invalid risk-free rate.');
 
                 const returns = tickers.map(ticker => {
                     const closeIndex = sharedDataset.headers.indexOf(ticker);
@@ -865,10 +929,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 const meanReturns = returns.map(r => calculateMean(r) * 252);
                 const covMatrix = calculateCovarianceMatrix(returns).map(row => row.map(v => v * 252));
 
-                const pa = PortfolioAllocation;
+                const pa = dependencies.PortfolioAllocation;
                 const weights = method === 'mean-variance'
                     ? pa.meanVarianceOptimizationWeights(meanReturns, covMatrix, { riskFreeRate })
                     : pa.minimumVarianceWeights(covMatrix);
+
+                // Store results for export
+                latestPortfolio = { tickers, weights };
 
                 let tableHTML = `
                     <div class="table-responsive">
@@ -896,7 +963,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 document.getElementById('portfolioChart').innerHTML = '';
                 document.getElementById('portfolioChart').appendChild(chartWrapper);
 
-                new Chart(canvas.getContext('2d'), {
+                new dependencies.Chart(canvas.getContext('2d'), {
                     type: 'pie',
                     data: {
                         labels: tickers,
@@ -911,14 +978,82 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 });
 
-                showSuccessMessage('Portfolio optimized successfully!');
+                // Plot portfolio performance
+                const portfolioReturns = sharedDataset.rows.map((row, i) => {
+                    if (i === 0) return null;
+                    let dailyReturn = 0;
+                    tickers.forEach((ticker, j) => {
+                        const closeIndex = sharedDataset.headers.indexOf(ticker);
+                        const close = parseFloat(row[closeIndex]);
+                        const prevClose = parseFloat(sharedDataset.rows[i - 1][closeIndex]);
+                        dailyReturn += weights[j] * (close - prevClose) / prevClose;
+                    });
+                    return dailyReturn;
+                }).filter(r => r !== null);
+
+                const equity = [10000];
+                portfolioReturns.forEach(r => {
+                    equity.push(equity[equity.length - 1] * (1 + r));
+                });
+
+                const perfChartWrapper = document.createElement('div');
+                perfChartWrapper.style.cssText = 'width: 100%; height: 400px;';
+                const perfCanvas = document.createElement('canvas');
+                perfChartWrapper.appendChild(perfCanvas);
+                document.getElementById('portfolioPerformanceChart').innerHTML = '';
+                document.getElementById('portfolioPerformanceChart').appendChild(perfChartWrapper);
+
+                new dependencies.Chart(perfCanvas.getContext('2d'), {
+                    type: 'line',
+                    data: {
+                        labels: sharedDataset.rows.map(row => row[0]).slice(1),
+                        datasets: [{
+                            label: 'Portfolio Equity',
+                            data: equity.slice(1),
+                            borderColor: '#007bff',
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            x: { title: { display: true, text: 'Date' } },
+                            y: { title: { display: true, text: 'Equity' } }
+                        }
+                    }
+                });
+
+                showSuccessMessage('Portfolio optimized successfully!', 'portfolioResult');
             } catch (error) {
-                showErrorMessage(error.message);
+                showErrorMessage(error.message, 'portfolioResult');
             }
+        });
+
+        // Export portfolio results
+        document.getElementById('exportPortfolio').addEventListener('click', () => {
+            if (!latestPortfolio) {
+                showErrorMessage('No portfolio results to export.', 'portfolioResult');
+                return;
+            }
+
+            const csv = [
+                ['Ticker', 'Weight (%)'],
+                ...latestPortfolio.tickers.map((ticker, i) => [ticker, (latestPortfolio.weights[i] * 100).toFixed(2)])
+            ].map(row => row.map(cell => `"${cell}"`).join(',')).join('\n');
+
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'portfolio_weights.csv';
+            a.click();
+            URL.revokeObjectURL(url);
+            showSuccessMessage('Portfolio results exported successfully!', 'portfolioResult');
         });
     }
 
-    // Trading Strategy Functionality
+    // Trading strategy functionality
     function implementStrategyFunctionality() {
         document.getElementById('backtestStrategy').addEventListener('click', () => {
             try {
@@ -927,6 +1062,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 const fastPeriod = parseInt(document.getElementById('fastPeriod').value);
                 const slowPeriod = parseInt(document.getElementById('slowPeriod').value);
                 const transactionCost = parseFloat(document.getElementById('transactionCost').value) / 100;
+
+                if (fastPeriod <= 0 || slowPeriod <= 0 || slowPeriod <= fastPeriod) {
+                    throw new Error('Invalid periods: Fast period must be positive and less than slow period.');
+                }
+                if (transactionCost < 0) throw new Error('Transaction cost cannot be negative.');
 
                 const closeIndex = sharedDataset.headers.indexOf(ticker);
                 const closes = sharedDataset.rows.map(row => parseFloat(row[closeIndex])).filter(v => !isNaN(v)).reverse();
@@ -972,7 +1112,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 document.getElementById('strategyChart').innerHTML = '';
                 document.getElementById('strategyChart').appendChild(chartWrapper);
 
-                new Chart(canvas.getContext('2d'), {
+                new dependencies.Chart(canvas.getContext('2d'), {
                     type: 'line',
                     data: {
                         labels: dates.slice(slowPeriod),
@@ -993,23 +1133,143 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 });
 
-                showSuccessMessage('Strategy backtested successfully!');
+                showSuccessMessage('Strategy backtested successfully!', 'strategyResult');
             } catch (error) {
-                showErrorMessage(error.message);
+                showErrorMessage(error.message, 'strategyResult');
             }
         });
     }
 
-    // Helper Functions
-
-    // Sanitize Input
-    function sanitizeInput(input) {
-        const div = document.createElement('div');
-        div.textContent = input;
-        return div.innerHTML;
+    // Helper functions
+    function calculateMean(values) {
+        if (!values.length) return 0;
+        return values.reduce((sum, val) => sum + val, 0) / values.length;
     }
 
-    // Show Bootstrap Modal
+    function calculateStdDev(values, mean) {
+        if (!values.length) return 0;
+        return Math.sqrt(
+            values.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) / values.length
+        );
+    }
+
+    function detectOutliers(values) {
+        const sorted = [...values].sort((a, b) => a - b);
+        const q1Index = Math.floor(sorted.length / 4);
+        const q3Index = Math.floor(sorted.length * 3 / 4);
+        const q1 = sorted[q1Index];
+        const q3 = sorted[q3Index];
+        const iqr = q3 - q1;
+        const lowerBound = q1 - 1.5 * iqr;
+        const upperBound = q3 + 1.5 * iqr;
+        return values.filter(val => val < lowerBound || val > upperBound);
+    }
+
+    function calculateMaxDrawdown(equity) {
+        let maxDrawdown = 0;
+        let peak = equity[0];
+        for (let i = 1; i < equity.length; i++) {
+            if (equity[i] > peak) peak = equity[i];
+            const drawdown = (peak - equity[i]) / peak;
+            if (drawdown > maxDrawdown) maxDrawdown = drawdown;
+        }
+        return maxDrawdown;
+    }
+
+    function calculateSMA(prices, period) {
+        const sma = [];
+        for (let i = 0; i < prices.length; i++) {
+            if (i < period - 1) {
+                sma.push(null);
+            } else {
+                const slice = prices.slice(i - period + 1, i + 1);
+                sma.push(calculateMean(slice));
+            }
+        }
+        return sma;
+    }
+
+    function calculateMACD(prices, fastPeriod, slowPeriod, signalPeriod = 9) {
+        const fastEMA = calculateEMA(prices, fastPeriod);
+        const slowEMA = calculateEMA(prices, slowPeriod);
+        const macd = fastEMA.map((f, i) => i < slowPeriod ? null : f - slowEMA[i]);
+        const signal = calculateEMA(macd.filter(v => v !== null), signalPeriod);
+        return macd.map((m, i) => {
+            if (i < slowPeriod + signalPeriod - 1) return null;
+            return m - signal[i - (slowPeriod + signalPeriod - 1)];
+        });
+    }
+
+    function calculateEMA(prices, period) {
+        const k = 2 / (period + 1);
+        const ema = [prices[0]];
+        for (let i = 1; i < prices.length; i++) {
+            ema.push(prices[i] * k + ema[i - 1] * (1 - k));
+        }
+        return ema;
+    }
+
+    function calculateCovarianceMatrix(returns) {
+        const n = returns[0].length;
+        const means = returns.map(r => calculateMean(r));
+        const covMatrix = returns.map((r1, i) =>
+            returns.map((r2, j) => {
+                let sum = 0;
+                for (let k = 0; k < n; k++) {
+                    sum += (r1[k] - means[i]) * (r2[k] - means[j]);
+                }
+                return sum / (n - 1);
+            })
+        );
+        return covMatrix;
+    }
+
+    function backtestStrategy(prices, signals, transactionCost) {
+        let equity = [10000];
+        let position = 0;
+        let returns = [];
+
+        for (let i = 1; i < prices.length; i++) {
+            if (signals[i] === 1 && position !== 1) {
+                position = 1;
+                equity.push(equity[equity.length - 1] * (1 - transactionCost));
+            } else if (signals[i] === -1 && position !== -1) {
+                position = -1;
+                equity.push(equity[equity.length - 1] * (1 - transactionCost));
+            } else if (signals[i] === 0 && position !== 0) {
+                position = 0;
+                equity.push(equity[equity.length - 1] * (1 - transactionCost));
+            } else {
+                equity.push(equity[equity.length - 1]);
+            }
+
+            const dailyReturn = position * (prices[i] - prices[i - 1]) / prices[i - 1];
+            equity[equity.length - 1] *= (1 + dailyReturn);
+            returns.push(dailyReturn);
+        }
+
+        const sharpeRatio = calculateMean(returns) / calculateStdDev(returns, calculateMean(returns)) * Math.sqrt(252);
+        const maxDrawdown = calculateMaxDrawdown(equity);
+
+        return { equity, returns, sharpeRatio, maxDrawdown };
+    }
+
+    function renderDataTable() {
+        return `
+            <div class="table-container bg-dark rounded p-3">
+                <table class="table table-dark table-striped">
+                    <thead>
+                        <tr>${sharedDataset.headers.map(header => `<th>${header}</th>`).join('')}</tr>
+                    </thead>
+                    <tbody>
+                        ${sharedDataset.rows.map(row => {
+                            return `<tr>${row.map(cell => `<td>${cell}</td>`).join('')}</tr>`;
+                        }).join('')}
+                    </tbody>
+                </table>
+            </div>`;
+    }
+
     function showModal(title, bodyHTML, callback) {
         const modal = document.createElement('div');
         modal.innerHTML = `
@@ -1045,202 +1305,7 @@ document.addEventListener('DOMContentLoaded', () => {
         $(modal.querySelector('.modal')).on('hidden.bs.modal', () => modal.remove());
     }
 
-    // Get Column Index
-    function getColumnIndex(column) {
-        const index = sharedDataset.headers.indexOf(column);
-        if (index === -1) throw new Error(`Invalid column name: ${column}`);
-        return index;
-    }
-
-    // Get Column Data
-    function getColumnData(columnIndex) {
-        return sharedDataset.rows
-            .map(row => parseFloat(row[columnIndex]))
-            .filter(val => !isNaN(val));
-    }
-
-    // Calculate Mean
-    function calculateMean(values) {
-        if (!values.length) return 0;
-        return values.reduce((sum, val) => sum + val, 0) / values.length;
-    }
-
-    // Calculate Standard Deviation
-    function calculateStdDev(values, mean) {
-        if (!values.length) return 0;
-        return Math.sqrt(
-            values.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) / values.length
-        );
-    }
-
-    // Detect Outliers
-    function detectOutliers(values) {
-        const sorted = [...values].sort((a, b) => a - b);
-        const q1Index = Math.floor(sorted.length / 4);
-        const q3Index = Math.floor(sorted.length * 3 / 4);
-        const q1 = sorted[q1Index];
-        const q3 = sorted[q3Index];
-        const iqr = q3 - q1;
-        const lowerBound = q1 - 1.5 * iqr;
-        const upperBound = q3 + 1.5 * iqr;
-        return values.filter(val => val < lowerBound || val > upperBound);
-    }
-
-    // Calculate Max Drawdown
-    function calculateMaxDrawdown(equity) {
-        let maxDrawdown = 0;
-        let peak = equity[0];
-        for (let i = 1; i < equity.length; i++) {
-            if (equity[i] > peak) peak = equity[i];
-            const drawdown = (peak - equity[i]) / peak;
-            if (drawdown > maxDrawdown) maxDrawdown = drawdown;
-        }
-        return maxDrawdown;
-    }
-
-    // Calculate Simple Moving Average
-    function calculateSMA(prices, period) {
-        const sma = [];
-        for (let i = 0; i < prices.length; i++) {
-            if (i < period - 1) {
-                sma.push(null);
-            } else {
-                const slice = prices.slice(i - period + 1, i + 1);
-                sma.push(calculateMean(slice));
-            }
-        }
-        return sma;
-    }
-
-    // Calculate MACD
-    function calculateMACD(prices, fastPeriod, slowPeriod, signalPeriod = 9) {
-        const fastEMA = calculateEMA(prices, fastPeriod);
-        const slowEMA = calculateEMA(prices, slowPeriod);
-        const macd = fastEMA.map((f, i) => i < slowPeriod ? null : f - slowEMA[i]);
-        const signal = calculateEMA(macd.filter(v => v !== null), signalPeriod);
-        return macd.map((m, i) => {
-            if (i < slowPeriod + signalPeriod - 1) return null;
-            return m - signal[i - (slowPeriod + signalPeriod - 1)];
-        });
-    }
-
-    // Calculate Exponential Moving Average
-    function calculateEMA(prices, period) {
-        const k = 2 / (period + 1);
-        const ema = [prices[0]];
-        for (let i = 1; i < prices.length; i++) {
-            ema.push(prices[i] * k + ema[i - 1] * (1 - k));
-        }
-        return ema;
-    }
-
-    // Calculate Covariance Matrix
-    function calculateCovarianceMatrix(returns) {
-        const n = returns[0].length;
-        const means = returns.map(r => calculateMean(r));
-        const covMatrix = returns.map((r1, i) =>
-            returns.map((r2, j) => {
-                let sum = 0;
-                for (let k = 0; k < n; k++) {
-                    sum += (r1[k] - means[i]) * (r2[k] - means[j]);
-                }
-                return sum / (n - 1);
-            })
-        );
-        return covMatrix;
-    }
-
-    // Backtest Strategy
-    function backtestStrategy(prices, signals, transactionCost) {
-        let equity = [10000];
-        let position = 0;
-        let returns = [];
-
-        for (let i = 1; i < prices.length; i++) {
-            if (signals[i] === 1 && position !== 1) {
-                position = 1;
-                equity.push(equity[equity.length - 1] * (1 - transactionCost));
-            } else if (signals[i] === -1 && position !== -1) {
-                position = -1;
-                equity.push(equity[equity.length - 1] * (1 - transactionCost));
-            } else if (signals[i] === 0 && position !== 0) {
-                position = 0;
-                equity.push(equity[equity.length - 1] * (1 - transactionCost));
-            } else {
-                equity.push(equity[equity.length - 1]);
-            }
-
-            const dailyReturn = position * (prices[i] - prices[i - 1]) / prices[i - 1];
-            equity[equity.length - 1] *= (1 + dailyReturn);
-            returns.push(dailyReturn);
-        }
-
-        const sharpeRatio = calculateMean(returns) / calculateStdDev(returns, calculateMean(returns)) * Math.sqrt(252);
-        const maxDrawdown = calculateMaxDrawdown(equity);
-
-        return { equity, returns, sharpeRatio, maxDrawdown };
-    }
-
-    // Render Data Table
-    function renderDataTable() {
-        return `
-            <div class="table-container bg-dark rounded p-3">
-                <table class="table table-dark table-striped">
-                    <thead>
-                        <tr>${sharedDataset.headers.map(header => `<th>${header}</th>`).join('')}</tr>
-                    </thead>
-                    <tbody>
-                        ${sharedDataset.rows.map(row => {
-                            return `<tr>${row.map(cell => `<td>${cell}</td>`).join('')}</tr>`;
-                        }).join('')}
-                    </tbody>
-                </table>
-            </div>`;
-    }
-
-    // Show Error Message
-    function showErrorMessage(message) {
-        const alertDiv = document.createElement('div');
-        alertDiv.className = 'alert alert-danger alert-dismissible fade show';
-        alertDiv.innerHTML = `
-            <strong>Error:</strong> ${sanitizeInput(message)}
-            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-            </button>
-        `;
-        const container = document.querySelector('#data-content, #filtering-result, #cleaning-result, #portfolioResult, #strategyResult, #statsResult');
-        if (container) {
-            container.prepend(alertDiv);
-            setTimeout(() => {
-                $(alertDiv).alert('close');
-            }, 5000);
-        } else {
-            alert(message);
-        }
-    }
-
-    // Show Success Message
-    function showSuccessMessage(message) {
-        const alertDiv = document.createElement('div');
-        alertDiv.className = 'alert alert-success alert-dismissible fade show';
-        alertDiv.innerHTML = `
-            <strong>Success:</strong> ${sanitizeInput(message)}
-            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-            </button>
-        `;
-        const container = document.querySelector('#data-content, #filtering-result, #cleaning-result, #portfolioResult, #strategyResult, #statsResult');
-        if (container) {
-            container.prepend(alertDiv);
-            setTimeout(() => {
-                $(alertDiv).alert('close');
-            }, 5000);
-        } else {
-            alert(message);
-        }
-    }
-
-    // Initialize Application
+    // Initialize application
     const savedData = localStorage.getItem('savedDataset');
     if (savedData) {
         try {
