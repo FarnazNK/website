@@ -1,3 +1,20 @@
+/**
+ * quantitative-investment-platform.js
+ * 
+ * A quantitative investment platform for data loading, cleaning, visualization,
+ * risk analysis, portfolio optimization, and trading strategy backtesting.
+ * 
+ * Dependencies:
+ * - Papa Parse (CSV parsing)
+ * - XLSX.js (Excel file support)
+ * - Chart.js (charting)
+ * - PortfolioAllocation (portfolio optimization)
+ * 
+ * Usage:
+ * Include this script after loading dependencies and portfolio-allocation.js.
+ * The platform initializes on DOMContentLoaded and provides a UI for financial analysis.
+ */
+
 document.addEventListener('DOMContentLoaded', () => {
     // Core variables
     const dynamicContent = document.getElementById('dynamicMenuContent');
@@ -39,7 +56,7 @@ document.addEventListener('DOMContentLoaded', () => {
         alertDiv.innerHTML = `
             <strong>${type.charAt(0).toUpperCase() + type.slice(1)}:</strong> ${sanitizeInput(message)}
             <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
+                <span aria-hidden="true">×</span>
             </button>
         `;
         container.prepend(alertDiv);
@@ -142,7 +159,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                     <label class="form-check-label" for="optionSharpe">Sharpe Ratio</label>
                                 </div>
                                 <div class="form-check">
-                                    <input сведений о портфелеclass="form-check-input" type="checkbox" id="optionVaR" checked>
+                                    <input class="form-check-input" type="checkbox" id="optionVaR" checked>
                                     <label class="form-check-label" for="optionVaR">Value at Risk (95%)</label>
                                 </div>
                                 <div class="form-check">
@@ -169,10 +186,17 @@ document.addEventListener('DOMContentLoaded', () => {
                         </select>
                         <label>Risk-Free Rate (%):</label>
                         <input type="number" id="riskFreeRate" class="form-control mb-3" value="2" min="0" step="0.1">
+                        <label>Transaction Cost (%):</label>
+                        <input type="number" id="transactionCost" class="form-control mb-3" value="0.1" min="0" step="0.01">
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" id="allowNegativeWeights" checked>
+                            <label class="form-check-label" for="allowNegativeWeights">Allow Negative Weights</label>
+                        </div>
                         <label>Optimization Method:</label>
                         <select id="optimizationMethod" class="form-control mb-3">
                             <option value="mean-variance">Mean-Variance</option>
                             <option value="min-volatility">Minimum Volatility</option>
+                            <option value="risk-parity">Risk Parity</option>
                         </select>
                         <button class="btn btn-primary w-100 mb-2" id="optimizePortfolio">Optimize Portfolio</button>
                         <button class="btn btn-secondary w-100" id="exportPortfolio">Export Results</button>
@@ -889,7 +913,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                 equity.push(equity[equity.length - 1] * (1 + (closes[i] - closes[i - 1]) / closes[i - 1]));
                             }
                             const maxDrawdown = calculateMaxDrawdown(equity);
-                            rowHTML += `<td>${(maxDrawdown * 100).toFixed(2)}%</td>`;
+                            rowHTML += `<td>${(maxDrawdown * 100).toFixed(2)} हु%</td>`;
                         }
 
                         rowHTML += `</tr>`;
@@ -910,38 +934,79 @@ document.addEventListener('DOMContentLoaded', () => {
     // Portfolio optimization functionality
     function implementPortfolioFunctionality() {
         let latestPortfolio = null; // Store latest optimization results for export
+        let portfolioChartInstance = null; // Store chart instances for destruction
+        let performanceChartInstance = null;
 
         document.getElementById('optimizePortfolio').addEventListener('click', () => {
             try {
                 const tickers = Array.from(document.getElementById('portfolioTickers').selectedOptions).map(opt => opt.value);
                 const riskFreeRate = parseFloat(document.getElementById('riskFreeRate').value) / 100;
+                const transactionCost = parseFloat(document.getElementById('transactionCost').value) / 100;
+                const allowNegativeWeights = document.getElementById('allowNegativeWeights').checked;
                 const method = document.getElementById('optimizationMethod').value;
 
+                // Input validation
                 if (tickers.length < 2) throw new Error('Select at least two tickers.');
                 if (isNaN(riskFreeRate) || riskFreeRate < 0) throw new Error('Invalid risk-free rate.');
+                if (isNaN(transactionCost) || transactionCost < 0) throw new Error('Invalid transaction cost.');
 
+                // Calculate returns for each ticker
                 const returns = tickers.map(ticker => {
                     const closeIndex = sharedDataset.headers.indexOf(ticker);
                     const closes = sharedDataset.rows.map(row => parseFloat(row[closeIndex])).filter(v => !isNaN(v));
+                    if (closes.length < 2) throw new Error(`Insufficient data for ticker ${ticker}.`);
                     return closes.slice(1).map((close, i) => (close - closes[i]) / closes[i]);
                 });
 
-                const meanReturns = returns.map(r => calculateMean(r) * 252);
-                const covMatrix = calculateCovarianceMatrix(returns).map(row => row.map(v => v * 252));
+                // Ensure all return series have the same length
+                const minLength = Math.min(...returns.map(r => r.length));
+                if (minLength < 10) throw new Error('Insufficient data points for optimization.');
+                const alignedReturns = returns.map(r => r.slice(-minLength));
 
+                // Calculate mean returns and covariance matrix (annualized)
+                const meanReturns = alignedReturns.map(r => calculateMean(r) * 252);
+                const covMatrix = calculateCovarianceMatrix(alignedReturns).map(row => row.map(v => v * 252));
+
+                // Prepare transaction costs
+                const transactionCosts = Array(tickers.length).fill(transactionCost);
+
+                // Perform portfolio optimization
                 const pa = dependencies.PortfolioAllocation;
-                const weights = method === 'mean-variance'
-                    ? pa.meanVarianceOptimizationWeights(meanReturns, covMatrix, { riskFreeRate })
-                    : pa.minimumVarianceWeights(covMatrix);
+                let weights;
+                const options = { 
+                    riskFreeRate, 
+                    allowNegativeWeights, 
+                    transactionCosts 
+                };
+                switch (method) {
+                    case 'mean-variance':
+                        weights = pa.meanVarianceOptimizationWeights(meanReturns, covMatrix, options);
+                        break;
+                    case 'min-volatility':
+                        weights = pa.minimumVarianceWeights(covMatrix, options);
+                        break;
+                    case 'risk-parity':
+                        weights = pa.riskParityWeights(covMatrix, options);
+                        break;
+                    default:
+                        throw new Error('Invalid optimization method.');
+                }
+
+                // Calculate portfolio statistics
+                const stats = pa.calculatePortfolioStats(weights, meanReturns, covMatrix, { riskFreeRate });
 
                 // Store results for export
-                latestPortfolio = { tickers, weights };
+                latestPortfolio = { tickers, weights, stats };
 
+                // Display weights table
                 let tableHTML = `
                     <div class="table-responsive">
                         <table class="table table-dark table-striped">
                             <thead>
-                                <tr><th>Ticker</th><th>Weight (%)</th></tr>
+                                <tr>
+                                    <th>Ticker</th>
+                                    <th>Weight (%)</th>
+                                </tr>
                             </thead>
                             <tbody>
                                 ${tickers.map((ticker, i) => `
@@ -952,8 +1017,25 @@ document.addEventListener('DOMContentLoaded', () => {
                                 `).join('')}
                             </tbody>
                         </table>
+                        <table class="table table-dark table-striped mt-3">
+                            <thead>
+                                <tr>
+                                    <th>Metric</th>
+                                    <th>Value</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td>Expected Return (%)</td><td>${(stats.return * 100).toFixed(2)}</td></tr>
+                                <tr><td>Volatility (%)</td><td>${(stats.volatility * 100).toFixed(2)}</td></tr>
+                                <tr><td>Sharpe Ratio</td><td>${stats.sharpeRatio.toFixed(2)}</td></tr>
+                            </tbody>
+                        </table>
                     </div>`;
                 document.getElementById('portfolioResult').innerHTML = tableHTML;
+
+                // Destroy existing charts
+                if (portfolioChartInstance) portfolioChartInstance.destroy();
+                if (performanceChartInstance) performanceChartInstance.destroy();
 
                 // Plot portfolio weights
                 const chartWrapper = document.createElement('div');
@@ -963,7 +1045,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 document.getElementById('portfolioChart').innerHTML = '';
                 document.getElementById('portfolioChart').appendChild(chartWrapper);
 
-                new dependencies.Chart(canvas.getContext('2d'), {
+                portfolioChartInstance = new dependencies.Chart(canvas.getContext('2d'), {
                     type: 'pie',
                     data: {
                         labels: tickers,
@@ -974,11 +1056,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     },
                     options: {
                         responsive: true,
-                        maintainAspectRatio: false
+                        maintainAspectRatio: false,
+                        title: { display: true, text: 'Portfolio Weights' }
                     }
                 });
 
-                // Plot portfolio performance
+                // Calculate portfolio performance
                 const portfolioReturns = sharedDataset.rows.map((row, i) => {
                     if (i === 0) return null;
                     let dailyReturn = 0;
@@ -986,7 +1069,9 @@ document.addEventListener('DOMContentLoaded', () => {
                         const closeIndex = sharedDataset.headers.indexOf(ticker);
                         const close = parseFloat(row[closeIndex]);
                         const prevClose = parseFloat(sharedDataset.rows[i - 1][closeIndex]);
-                        dailyReturn += weights[j] * (close - prevClose) / prevClose;
+                        if (!isNaN(close) && !isNaN(prevClose)) {
+                            dailyReturn += weights[j] * (close - prevClose) / prevClose;
+                        }
                     });
                     return dailyReturn;
                 }).filter(r => r !== null);
@@ -996,6 +1081,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     equity.push(equity[equity.length - 1] * (1 + r));
                 });
 
+                // Calculate volatility bands (1 standard deviation)
+                const volatility = stats.volatility / Math.sqrt(252); // Daily volatility
+                const upperBand = equity.slice(1).map(e => e * (1 + volatility));
+                const lowerBand = equity.slice(1).map(e => e * (1 - volatility));
+
+                // Plot portfolio performance with volatility bands
                 const perfChartWrapper = document.createElement('div');
                 perfChartWrapper.style.cssText = 'width: 100%; height: 400px;';
                 const perfCanvas = document.createElement('canvas');
@@ -1003,16 +1094,32 @@ document.addEventListener('DOMContentLoaded', () => {
                 document.getElementById('portfolioPerformanceChart').innerHTML = '';
                 document.getElementById('portfolioPerformanceChart').appendChild(perfChartWrapper);
 
-                new dependencies.Chart(perfCanvas.getContext('2d'), {
+                performanceChartInstance = new dependencies.Chart(perfCanvas.getContext('2d'), {
                     type: 'line',
                     data: {
                         labels: sharedDataset.rows.map(row => row[0]).slice(1),
-                        datasets: [{
-                            label: 'Portfolio Equity',
-                            data: equity.slice(1),
-                            borderColor: '#007bff',
-                            fill: false
-                        }]
+                        datasets: [
+                            {
+                                label: 'Portfolio Equity',
+                                data: equity.slice(1),
+                                borderColor: '#007bff',
+                                fill: false
+                            },
+                            {
+                                label: 'Upper Volatility Band',
+                                data: upperBand,
+                                borderColor: '#28a745',
+                                borderDash: [5, 5],
+                                fill: false
+                            },
+                            {
+                                label: 'Lower Volatility Band',
+                                data: lowerBand,
+                                borderColor: '#dc3545',
+                                borderDash: [5, 5],
+                                fill: false
+                            }
+                        ]
                     },
                     options: {
                         responsive: true,
@@ -1020,7 +1127,8 @@ document.addEventListener('DOMContentLoaded', () => {
                         scales: {
                             x: { title: { display: true, text: 'Date' } },
                             y: { title: { display: true, text: 'Equity' } }
-                        }
+                        },
+                        title: { display: true, text: 'Portfolio Performance' }
                     }
                 });
 
@@ -1039,7 +1147,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const csv = [
                 ['Ticker', 'Weight (%)'],
-                ...latestPortfolio.tickers.map((ticker, i) => [ticker, (latestPortfolio.weights[i] * 100).toFixed(2)])
+                ...latestPortfolio.tickers.map((ticker, i) => [ticker, (latestPortfolio.weights[i] * 100).toFixed(2)]),
+                [],
+                ['Metric', 'Value'],
+                ['Expected Return (%)', (latestPortfolio.stats.return * 100).toFixed(2)],
+                ['Volatility (%)', (latestPortfolio.stats.volatility * 100).toFixed(2)],
+                ['Sharpe Ratio', latestPortfolio.stats.sharpeRatio.toFixed(2)]
             ].map(row => row.map(cell => `"${cell}"`).join(',')).join('\n');
 
             const blob = new Blob([csv], { type: 'text/csv' });
@@ -1279,7 +1392,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         <div class="modal-header">
                             <h5 class="modal-title">${title}</h5>
                             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
+                                <span aria-hidden="true">×</span>
                             </button>
                         </div>
                         <div class="modal-body">
