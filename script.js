@@ -75,7 +75,7 @@ document.addEventListener('DOMContentLoaded', () => {
         alertDiv.innerHTML = `
             <strong>${type.charAt(0).toUpperCase() + type.slice(1)}:</strong> ${sanitizeInput(message)}
             <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
+                <span aria-hidden="true">×</span>
             </button>
         `;
         container.prepend(alertDiv);
@@ -94,7 +94,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         <div class="modal-header">
                             <h5 class="modal-title" id="${modalId}Label">${sanitizeInput(title)}</h5>
                             <button type="button" class="close text-light" data-dismiss="modal" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
+                                <span aria-hidden="true">×</span>
                             </button>
                         </div>
                         <div class="modal-body">
@@ -284,9 +284,8 @@ document.addEventListener('DOMContentLoaded', () => {
         'toolbar-data': () => `
             <div class="row">
                 <div class="col-md-3 bg-dark p-3 rounded shadow-sm menu-section">
-                    <h4 class="text-light">Menu</h4>
+                    <h4 class="text-light">Data Operations</h4>
                     <ul class="list-group">
-                        <li class="list-group-item menu-item" id="menu-load-data">Load Data</li>
                         <li class="list-group-item menu-item" id="menu-clean-data">Clean Data</li>
                         <li class="list-group-item menu-item" id="menu-filter-data">Filter Data</li>
                         <li class="list-group-item menu-item" id="menu-export-data">Export Data</li>
@@ -296,22 +295,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="col-md-9 bg-dark p-3 rounded shadow-lg" id="data-content">
                     <div class="welcome-screen text-center py-5">
                         <h4 class="mb-4">Welcome to the Quantitative Investment Platform</h4>
-                        <p class="mb-5">Choose a menu item to start analyzing financial data.</p>
-                        <div class="upload-zone p-5 mb-4 mx-auto">
-                            <i class="fas fa-file-upload mb-3"></i>
-                            <p>Drag and drop files here<br>or</p>
-                            <button class="btn btn-primary btn-lg mt-2" id="browseFiles">
-                                <i class="fas fa-folder-open mr-2"></i>Browse Files
-                            </button>
-                        </div>
-                        <div class="supported-formats">
-                            <p class="small text-muted">Supported formats: CSV, Excel (.xlsx, .xls)</p>
-                        </div>
-                        <div class="text-center mt-4">
-                            <div class="spinner-border text-primary" role="status" id="loadingSpinner" style="display: none;">
-                                <span class="sr-only">Loading...</span>
-                            </div>
-                        </div>
+                        <p class="mb-5">Select a data operation from the menu to start analyzing financial data.</p>
+                        <div id="data-operation-content"></div>
                     </div>
                 </div>
             </div>`,
@@ -595,7 +580,47 @@ document.addEventListener('DOMContentLoaded', () => {
     // Data section event listeners
     function attachDataMenuEventListeners() {
         const menuItems = {
-            'menu-load-data': loadDataSection,
+            'menu-load-data': () => {
+                document.getElementById('data-operation-content').innerHTML = `
+                    <div class="p-3 text-center">
+                        <div class="upload-zone p-5 mb-4 mx-auto">
+                            <i class="fas fa-file-upload mb-3"></i>
+                            <p>Drag and drop files here<br>or</p>
+                            <button class="btn btn-primary btn-lg mt-2" id="browseFiles">
+                                <i class="fas fa-folder-open mr-2"></i>Browse Files
+                            </button>
+                        </div>
+                        <p class="text-muted">Supported formats: CSV, Excel (.xlsx, .xls)</p>
+                        <div class="input-group mb-3">
+                            <input type="text" id="tickerInput" class="form-control" placeholder="Enter ticker (e.g., AAPL)">
+                            <input type="password" id="apiKeyInput" class="form-control" placeholder="Enter Alpha Vantage API Key">
+                            <button class="btn btn-primary" id="fetch-data-button">Fetch Market Data</button>
+                        </div>
+                        <div class="text-center mt-4">
+                            <div class="spinner-border text-primary" role="status" id="loadingSpinner" style="display: none;">
+                                <span class="sr-only">Loading...</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="data-preview"></div>
+                `;
+
+                const fetchButton = document.getElementById('fetch-data-button');
+                if (fetchButton) {
+                    fetchButton.addEventListener('click', async () => {
+                        const ticker = sanitizeInput(document.getElementById('tickerInput').value.trim());
+                        const apiKey = document.getElementById('apiKeyInput').value.trim();
+                        if (!ticker || !apiKey) {
+                            showErrorMessage('Please enter a valid ticker and API key.', 'data-content');
+                            return;
+                        }
+                        document.getElementById('loadingSpinner').style.display = 'block';
+                        await fetchMarketData(ticker, apiKey);
+                    });
+                }
+
+                attachFileUploadListeners();
+            },
             'menu-clean-data': cleanDataSection,
             'menu-filter-data': filterDataSection,
             'menu-export-data': exportDataSection,
@@ -604,9 +629,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
         Object.entries(menuItems).forEach(([id, handler]) => {
             const element = document.getElementById(id);
-            if (element) element.addEventListener('click', handler);
+            if (element) {
+                element.addEventListener('click', () => {
+                    document.getElementById('data-operation-content').innerHTML = '';
+                    handler();
+                });
+            }
         });
 
+        // Initialize with load data view
+        menuItems['menu-load-data']();
+    }
+
+    // Attach file upload listeners
+    function attachFileUploadListeners() {
         const uploadZone = document.querySelector('.upload-zone');
         const browseButton = document.getElementById('browseFiles');
         const loadingSpinner = document.getElementById('loadingSpinner');
@@ -650,49 +686,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 fileInput.click();
             });
         }
-    }
-
-    // Load data section
-    function loadDataSection() {
-        document.getElementById('data-content').innerHTML = `
-            <div class="p-3 text-center">
-                <div class="upload-zone p-5 mb-4 mx-auto">
-                    <i class="fas fa-file-upload mb-3"></i>
-                    <p>Drag and drop files here<br>or</p>
-                    <button class="btn btn-primary btn-lg mt-2" id="browseFiles">
-                        <i class="fas fa-folder-open mr-2"></i>Browse Files
-                    </button>
-                </div>
-                <p class="text-muted">Supported formats: CSV, Excel (.xlsx, .xls)</p>
-                <div class="input-group mb-3">
-                    <input type="text" id="tickerInput" class="form-control" placeholder="Enter ticker (e.g., AAPL)">
-                    <input type="password" id="apiKeyInput" class="form-control" placeholder="Enter Alpha Vantage API Key">
-                    <button class="btn btn-primary" id="fetch-data-button">Fetch Market Data</button>
-                </div>
-                <div class="text-center mt-4">
-                    <div class="spinner-border text-primary" role="status" id="loadingSpinner" style="display: none;">
-                        <span class="sr-only">Loading...</span>
-                    </div>
-                </div>
-            </div>
-            <div id="data-preview"></div>
-        `;
-
-        const fetchButton = document.getElementById('fetch-data-button');
-        if (fetchButton) {
-            fetchButton.addEventListener('click', async () => {
-                const ticker = sanitizeInput(document.getElementById('tickerInput').value.trim());
-                const apiKey = document.getElementById('apiKeyInput').value.trim();
-                if (!ticker || !apiKey) {
-                    showErrorMessage('Please enter a valid ticker and API key.', 'data-content');
-                    return;
-                }
-                document.getElementById('loadingSpinner').style.display = 'block';
-                await fetchMarketData(ticker, apiKey);
-            });
-        }
-
-        attachDataMenuEventListeners();
     }
 
     // Fetch market data
@@ -815,7 +808,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const paginatedRows = sharedDataset.rows.slice(start, end);
         const totalPages = Math.ceil(sharedDataset.rows.length / rowsPerPage);
 
-        document.getElementById('data-content').innerHTML = `
+        document.getElementById('data-operation-content').innerHTML = `
             <div class="table-container bg-dark rounded p-3">
                 <table class="table table-dark table-striped">
                     <thead id="tableHead"></thead>
@@ -856,19 +849,17 @@ document.addEventListener('DOMContentLoaded', () => {
     function clearDataSection() {
         sharedDataset = { headers: [], rows: [] };
         localStorage.removeItem('savedDataset');
-        document.getElementById('data-content').innerHTML = `
+        document.getElementById('data-operation-content').innerHTML = `
             <div class="text-center py-5">
                 <h4>Data Cleared</h4>
                 <p>Dataset has been cleared. Load new data to continue.</p>
-                <button class="btn btn-primary" id="reloadData">Load Data</button>
             </div>`;
-        document.getElementById('reloadData').addEventListener('click', loadDataSection);
         showSuccessMessage('Dataset cleared successfully!', 'data-content');
     }
 
     // Clean data section
     function cleanDataSection() {
-        document.getElementById('data-content').innerHTML = `
+        document.getElementById('data-operation-content').innerHTML = `
             <div class="card bg-dark text-light mb-3">
                 <div class="card-header">Financial Data Cleaning Options</div>
                 <div class="card-body">
@@ -966,7 +957,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Filter data section
     function filterDataSection() {
-        document.getElementById('data-content').innerHTML = `
+        document.getElementById('data-operation-content').innerHTML = `
             <div class="card bg-dark text-light mb-3">
                 <div class="card-header">Data Filtering Options</div>
                 <div class="card-body">
@@ -1614,7 +1605,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     tableHTML += '</tbody></table></div>';
 
                     if (selectedStats.var || selectedStats.cvar) {
-                        tableHTML += `
+                        const newLocal = `
                         <div class="card bg-dark text-light mt-4">
                             <div class="card-header">
                                 <h5>Stress Test Analysis</h5>
@@ -1623,39 +1614,46 @@ document.addEventListener('DOMContentLoaded', () => {
                                 <div class="row">
                                     <div class="col-md-6">
                                         <label>Market Movement:</label>
-                                        <select id="stressScenario" class="form-control mb-3">
- <option value="crash">Market Crash (-20%)</option>
-                                    <option value="rally">Market Rally (+20%)</option>
-                                    <option value="volatility">High Volatility (2x)</option>
-                                        </select>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <button class="btn btn-primary w-100 mt-4" id="runStressTest">Run Stress Test</button>
-                                    </div>
+                                        <select id="stressScenario" class="form-control">
+                                        <option value="crash">Market Crash (-20%)</option>
+                                        <option value="rally">Market Rally (+20%)</option>
+                                        <option value="volatility">High Volatility (σ x 2)</option>
+                                    </select>
                                 </div>
-                                <div id="stressTestResult" class="mt-3"></div>
+                                <div class="col-md-6">
+                                    <button class="btn btn-primary w-100" id="runStressTest">Run Stress Test</button>
+                                </div>
                             </div>
-                        </div>`;
+                            <div id="stressTestResult" class="mt-3"></div>
+                        </div>
+                    </div>
+                `;
+                        tableHTML += newLocal;
                     }
 
-                    // Correlation heatmap
                     if (correlationData && correlationData.length > 1) {
                         tableHTML += `
-                        <div class="card bg-dark text-light mt-4">
-                            <div class="card-header">
-                                <h5>Correlation Heatmap</h5>
-                            </div>
-                            <div class="card-body">
-                                <div style="height: 400px;">
-                                    <canvas id="correlationHeatmap"></canvas>
+                            <div class="card bg-dark text-light mt-4">
+                                <div class="card-header">
+                                    <h5>Correlation Matrix</h5>
                                 </div>
-                            </div>
-                        </div>`;
+                                <div class="card-body">
+                                    ${generateCorrelationMatrix(correlationData)}
+                                </div>
+                            </div>`;
                     }
 
                     document.getElementById('statsResult').innerHTML = tableHTML;
 
-                    // Enable/disable Beta and Correlation based on benchmark selection
+                    const stressTestButton = document.getElementById('runStressTest');
+                    if (stressTestButton) {
+                        stressTestButton.addEventListener('click', () => {
+                            const scenario = document.getElementById('stressScenario').value;
+                            const selectedTickers = Array.from(statsColumn.selectedOptions).map(option => option.value);
+                            runStressTest(selectedTickers, scenario);
+                        });
+                    }
+
                     if (benchmarkTicker.value) {
                         document.getElementById('optionBeta').disabled = false;
                         document.getElementById('optionCorrelation').disabled = false;
@@ -1664,127 +1662,108 @@ document.addEventListener('DOMContentLoaded', () => {
                         document.getElementById('optionCorrelation').disabled = true;
                     }
 
-                    // Generate correlation heatmap
-                    if (correlationData && correlationData.length > 1) {
-                        const labels = correlationData.map(d => d.ticker);
-                        const matrix = labels.map((_, i) =>
-                            labels.map((_, j) => {
-                                if (i === j) return 1;
-                                return calculateCorrelation(correlationData[i].returns, correlationData[j].returns);
-                            })
-                        );
-
-                        const canvas = document.getElementById('correlationHeatmap');
-                        if (canvas) {
-                            const ctx = canvas.getContext('2d');
-                            const chartInstance = new dependencies.Chart(ctx, {
-                                type: 'matrix',
-                                data: {
-                                    labels,
-                                    datasets: [{
-                                        label: 'Correlation',
-                                        data: matrix.flatMap((row, i) =>
-                                            row.map((value, j) => ({
-                                                x: j,
-                                                y: i,
-                                                v: value
-                                            }))
-                                        ),
-                                        backgroundColor: (ctx) => {
-                                            const value = ctx.dataset.data[ctx.dataIndex].v;
-                                            const r = Math.floor(255 * (1 - Math.abs(value)));
-                                            const g = Math.floor(255 * (1 - Math.abs(value)));
-                                            const b = 255;
-                                            return `rgb(${r}, ${g}, ${b})`;
-                                        },
-                                        borderColor: '#343a40',
-                                        borderWidth: 1,
-                                        width: ({ chart }) => (chart.chartArea.width / labels.length - 1),
-                                        height: ({ chart }) => (chart.chartArea.height / labels.length - 1)
-                                    }]
-                                },
-                                options: {
-                                    responsive: true,
-                                    maintainAspectRatio: false,
-                                    plugins: {
-                                        title: { display: true, text: 'Correlation Heatmap' },
-                                        tooltip: {
-                                            callbacks: {
-                                                label: (context) => {
-                                                    const v = context.raw.v;
-                                                    const xLabel = labels[context.raw.x];
-                                                    const yLabel = labels[context.raw.y];
-                                                    return `${xLabel} vs ${yLabel}: ${v.toFixed(2)}`;
-                                                }
-                                            }
-                                        }
-                                    },
-                                    scales: {
-                                        x: {
-                                            type: 'category',
-                                            labels,
-                                            title: { display: true, text: 'Tickers' },
-                                            grid: { display: false }
-                                        },
-                                        y: {
-                                            type: 'category',
-                                            labels: labels.slice().reverse(),
-                                            title: { display: true, text: 'Tickers' },
-                                            grid: { display: false }
-                                        }
-                                    }
-                                }
-                            });
-                            canvas.chartInstance = chartInstance;
-                        }
-                    }
-
-                    // Stress test handler
-                    const stressTestButton = document.getElementById('runStressTest');
-                    if (stressTestButton) {
-                        stressTestButton.addEventListener('click', () => {
-                            try {
-                                const scenario = document.getElementById('stressScenario').value;
-                                let stressResults = '<h5>Stress Test Results</h5><table class="table table-dark"><thead><tr><th>Ticker</th><th>Impact</th></tr></thead><tbody>';
-
-                                for (const ticker of selectedOptions) {
-                                    const columnIndex = getColumnIndex(ticker);
-                                    const closes = getColumnData(columnIndex);
-                                    const returns = closes.slice(1).map((close, i) => (close - closes[i]) / closes[i]);
-
-                                    let impact = 0;
-                                    if (scenario === 'crash') {
-                                        impact = -0.2; // -20% return
-                                    } else if (scenario === 'rally') {
-                                        impact = 0.2; // +20% return
-                                    } else if (scenario === 'volatility') {
-                                        const stdDev = calculateStdDev(returns, calculateMean(returns));
-                                        impact = stdDev * 2; // 2x standard deviation
-                                    }
-
-                                    stressResults += `<tr><td>${ticker}</td><td>${(impact * 100).toFixed(2)}%</td></tr>`;
-                                }
-
-                                stressResults += '</tbody></table>';
-                                document.getElementById('stressTestResult').innerHTML = stressResults;
-                                showSuccessMessage('Stress test completed.', 'statsResult');
-                            } catch (error) {
-                                showErrorMessage(`Stress test error: ${error.message}`, 'statsResult');
-                            }
-                        });
-                    }
+                    showSuccessMessage('Risk metrics calculated successfully!', 'statsResult');
                 } catch (error) {
                     showErrorMessage(error.message, 'statsResult');
                 }
             });
         }
 
-        // Update Beta/Correlation checkbox availability
-        benchmarkTicker.addEventListener('change', () => {
-            const hasBenchmark = !!benchmarkTicker.value;
-            document.getElementById('optionBeta').disabled = !hasBenchmark;
-            document.getElementById('optionCorrelation').disabled = !hasBenchmark;
-        });
+        if (benchmarkTicker) {
+            benchmarkTicker.addEventListener('change', () => {
+                if (benchmarkTicker.value) {
+                    document.getElementById('optionBeta').disabled = false;
+                    document.getElementById('optionCorrelation').disabled = false;
+                } else {
+                    document.getElementById('optionBeta').disabled = true;
+                    document.getElementById('optionCorrelation').disabled = true;
+                }
+            });
+        }
+    }
+
+    // Generate Correlation Matrix
+    function generateCorrelationMatrix(correlationData) {
+        const tickers = correlationData.map(data => data.ticker);
+        const matrix = tickers.map((_, i) => 
+            tickers.map((_, j) => {
+                if (i === j) return 1;
+                return calculateCorrelation(correlationData[i].returns, correlationData[j].returns).toFixed(2);
+            })
+        );
+
+        let tableHTML = `
+            <div class="table-responsive">
+                <table class="table table-dark table-bordered">
+                    <thead>
+                        <tr><th></th>${tickers.map(t => `<th>${t}</th>`).join('')}</tr>
+                    </thead>
+                    <tbody>
+                        ${tickers.map((ticker, i) => `
+                            <tr>
+                                <th>${ticker}</th>
+                                ${matrix[i].map(val => `<td>${val}</td>`).join('')}
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            </div>`;
+        return tableHTML;
+    }
+
+    // Run Stress Test
+    function runStressTest(tickers, scenario) {
+        try {
+            let tableHTML = `
+                <div class="table-responsive">
+                    <table class="table table-dark table-striped">
+                        <thead>
+                            <tr>
+                                <th>Ticker</th>
+                                <th>Projected Loss/Gain (%)</th>
+                            </tr>
+                        </thead>
+                        <tbody>`;
+
+            for (const ticker of tickers) {
+                const columnIndex = getColumnIndex(ticker);
+                const closes = getColumnData(columnIndex);
+                const returns = closes.slice(1).map((close, i) => (close - closes[i]) / closes[i]);
+                let impact = 0;
+
+                if (scenario === 'crash') {
+                    impact = -0.2 * calculateBeta(returns, returns); // Simplified beta-based impact
+                } else if (scenario === 'rally') {
+                    impact = 0.2 * calculateBeta(returns, returns);
+                } else if (scenario === 'volatility') {
+                    const stdDev = calculateStdDev(returns, calculateMean(returns)) * Math.sqrt(252);
+                    impact = stdDev * 2; // Double volatility impact
+                }
+
+                tableHTML += `
+                    <tr>
+                        <td>${ticker}</td>
+                        <td>${(impact * 100).toFixed(2)}%</td>
+                    </tr>`;
+            }
+
+            tableHTML += '</tbody></table></div>';
+            document.getElementById('stressTestResult').innerHTML = tableHTML;
+            showSuccessMessage(`Stress test for ${scenario} completed.`, 'stressTestResult');
+        } catch (error) {
+            showErrorMessage(error.message, 'stressTestResult');
+        }
+    }
+
+    // Detect Outliers (IQR Method)
+    function detectOutliers(values) {
+        const sorted = [...values].sort((a, b) => a - b);
+        const q1 = sorted[Math.floor(sorted.length * 0.25)];
+        const q3 = sorted[Math.floor(sorted.length * 0.75)];
+        const iqr = q3 - q1;
+        const lowerBound = q1 - 1.5 * iqr;
+        const upperBound = q3 + 1.5 * iqr;
+        return values.filter(v => v < lowerBound || v > upperBound);
     }
 
     // Portfolio Optimization Implementation
@@ -1796,75 +1775,63 @@ document.addEventListener('DOMContentLoaded', () => {
             optimizeButton.addEventListener('click', () => {
                 try {
                     const tickers = Array.from(document.getElementById('portfolioTickers').selectedOptions).map(o => o.value);
-                    if (tickers.length < 2) throw new Error('Select at least two tickers for optimization.');
+                    if (tickers.length < 2) throw new Error('Please select at least two tickers.');
 
                     const riskFreeRate = parseFloat(document.getElementById('riskFreeRate').value) / 100;
                     const transactionCost = parseFloat(document.getElementById('transactionCost').value) / 100;
-                    const allowNegativeWeights = document.getElementById('allowNegativeWeights').checked;
+                    const allowNegative = document.getElementById('allowNegativeWeights').checked;
                     const method = document.getElementById('optimizationMethod').value;
 
-                    // Collect returns data
                     const returnsData = tickers.map(ticker => {
                         const columnIndex = getColumnIndex(ticker);
-                        const prices = getColumnData(columnIndex);
-                        return prices.slice(1).map((p, i) => (p - prices[i]) / prices[i]);
+                        const closes = getColumnData(columnIndex);
+                        return closes.slice(1).map((close, i) => (close - closes[i]) / closes[i]);
                     });
 
-                    // Ensure all return series have the same length
                     const minLength = Math.min(...returnsData.map(r => r.length));
-                    const alignedReturns = returnsData.map(returns => returns.slice(0, minLength));
-
-                    // Calculate mean returns and covariance matrix
-                    const meanReturns = alignedReturns.map(returns => calculateMean(returns) * 252);
-                    const covMatrix = calculateCovarianceMatrix(alignedReturns);
+                    const alignedReturns = returnsData.map(r => r.slice(0, minLength));
 
                     let weights;
                     if (method === 'mean-variance') {
                         weights = dependencies.PortfolioAllocation.meanVarianceOptimization({
-                            returns: meanReturns,
-                            covMatrix,
+                            returns: alignedReturns,
                             riskFreeRate,
-                            constraints: {
-                                minWeights: allowNegativeWeights ? null : Array(tickers.length).fill(0),
-                                maxWeights: Array(tickers.length).fill(1)
-                            }
+                            allowShort: allowNegative
                         });
                     } else if (method === 'min-volatility') {
                         weights = dependencies.PortfolioAllocation.minimumVariance({
-                            covMatrix,
-                            constraints: {
-                                minWeights: allowNegativeWeights ? null : Array(tickers.length).fill(0),
-                                maxWeights: Array(tickers.length).fill(1)
-                            }
+                            returns: alignedReturns,
+                            allowShort: allowNegative
                         });
                     } else if (method === 'risk-parity') {
-                        weights = dependencies.PortfolioAllocation.riskParityWeights({
-                            covMatrix
+                        weights = dependencies.PortfolioAllocation.riskParity({
+                            returns: alignedReturns
                         });
-                    } else {
-                        throw new Error('Unsupported optimization method.');
                     }
 
-                    // Adjust for transaction costs
+                    if (!weights || weights.some(w => isNaN(w))) {
+                        throw new Error('Optimization failed. Check input data.');
+                    }
+
+                    // Adjust for transaction costs (simplified)
                     const adjustedWeights = weights.map(w => w * (1 - transactionCost));
 
                     // Calculate portfolio metrics
-                    const portfolioReturn = meanReturns.reduce((sum, r, i) => sum + r * adjustedWeights[i], 0);
-                    const portfolioVolatility = Math.sqrt(
-                        adjustedWeights.reduce((sum, w_i, i) =>
-                            sum + adjustedWeights.reduce((innerSum, w_j, j) =>
-                                innerSum + w_i * w_j * covMatrix[i][j], 0), 0) * 252
+                    const portfolioReturns = Array(minLength).fill(0).map((_, i) => 
+                        adjustedWeights.reduce((sum, w, j) => sum + w * alignedReturns[j][i], 0)
                     );
-                    const sharpeRatio = (portfolioReturn - riskFreeRate) / portfolioVolatility;
+                    const annualizedReturn = calculateMean(portfolioReturns) * 252;
+                    const volatility = calculateStdDev(portfolioReturns, calculateMean(portfolioReturns)) * Math.sqrt(252);
+                    const sharpeRatio = volatility > 0 ? (annualizedReturn - riskFreeRate) / volatility : 0;
 
-                    // Display results
+                    // Generate results table
                     let resultHTML = `
                         <div class="table-responsive">
-                            <table class="table table-dark">
+                            <table class="table table-dark table-striped">
                                 <thead>
                                     <tr>
                                         <th>Ticker</th>
-                                        <th>Weight</th>
+                                        <th>Weight (%)</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -1878,17 +1845,19 @@ document.addEventListener('DOMContentLoaded', () => {
                             </table>
                         </div>
                         <div class="mt-3">
-                            <p><strong>Expected Annual Return:</strong> ${(portfolioReturn * 100).toFixed(2)}%</p>
-                            <p><strong>Annual Volatility:</strong> ${(portfolioVolatility * 100).toFixed(2)}%</p>
+                            <p><strong>Annualized Return:</strong> ${(annualizedReturn * 100).toFixed(2)}%</p>
+                            <p><strong>Volatility:</strong> ${(volatility * 100).toFixed(2)}%</p>
                             <p><strong>Sharpe Ratio:</strong> ${sharpeRatio.toFixed(2)}</p>
                         </div>`;
 
-                    // Generate portfolio weights chart
-                    const chartCanvas = document.createElement('canvas');
+                    // Create portfolio weights chart
+                    const chartWrapper = document.createElement('div');
+                    chartWrapper.style.cssText = 'height: 300px;';
+                    chartWrapper.innerHTML = '<canvas></canvas>';
                     document.getElementById('portfolioChart').innerHTML = '';
-                    document.getElementById('portfolioChart').appendChild(chartCanvas);
-                    const ctx = chartCanvas.getContext('2d');
+                    document.getElementById('portfolioChart').appendChild(chartWrapper);
 
+                    const ctx = chartWrapper.querySelector('canvas').getContext('2d');
                     new dependencies.Chart(ctx, {
                         type: 'pie',
                         data: {
@@ -1900,6 +1869,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         },
                         options: {
                             responsive: true,
+                            maintainAspectRatio: false,
                             plugins: {
                                 title: { display: true, text: 'Portfolio Weights' },
                                 tooltip: {
@@ -1911,88 +1881,46 @@ document.addEventListener('DOMContentLoaded', () => {
                         }
                     });
 
-                    // Generate efficient frontier
-                    const frontierReturns = [];
-                    const frontierVolatilities = [];
-                    const numPoints = 50;
-                    const minReturn = Math.min(...meanReturns);
-                    const maxReturn = Math.max(...meanReturns);
-
-                    for (let i = 0; i < numPoints; i++) {
-                        const targetReturn = minReturn + (maxReturn - minReturn) * i / (numPoints - 1);
-                        try {
-                            const frontierWeights = dependencies.PortfolioAllocation.meanVarianceOptimization({
-                                returns: meanReturns,
-                                covMatrix,
-                                riskFreeRate,
-                                targetReturn,
-                                constraints: {
-                                    minWeights: allowNegativeWeights ? null : Array(tickers.length).fill(0),
-                                    maxWeights: Array(tickers.length).fill(1)
-                                }
-                            });
-                            const vol = Math.sqrt(
-                                frontierWeights.reduce((sum, w_i, i) =>
-                                    sum + frontierWeights.reduce((innerSum, w_j, j) =>
-                                        innerSum + w_i * w_j * covMatrix[i][j], 0), 0) * 252
-                            );
-                            frontierReturns.push(targetReturn * 100);
-                            frontierVolatilities.push(vol * 100);
-                        } catch (error) {
-                            console.warn(`Failed to compute frontier point: ${error.message}`);
-                        }
-                    }
-
-                    const frontierCanvas = document.createElement('canvas');
+                    // Create performance chart
+                    const performanceWrapper = document.createElement('div');
+                    performanceWrapper.style.cssText = 'height: 300px;';
+                    performanceWrapper.innerHTML = '<canvas></canvas>';
                     document.getElementById('portfolioPerformanceChart').innerHTML = '';
-                    document.getElementById('portfolioPerformanceChart').appendChild(frontierCanvas);
-                    const frontierCtx = frontierCanvas.getContext('2d');
+                    document.getElementById('portfolioPerformanceChart').appendChild(performanceWrapper);
 
-                    new dependencies.Chart(frontierCtx, {
-                        type: 'scatter',
+                    const perfCtx = performanceWrapper.querySelector('canvas').getContext('2d');
+                    const equity = [10000];
+                    portfolioReturns.forEach(r => {
+                        equity.push(equity[equity.length - 1] * (1 + r));
+                    });
+
+                    new dependencies.Chart(perfCtx, {
+                        type: 'line',
                         data: {
-                            datasets: [
-                                {
-                                    label: 'Efficient Frontier',
-                                    data: frontierVolatilities.map((vol, i) => ({
-                                        x: vol,
-                                        y: frontierReturns[i]
-                                    })),
-                                    backgroundColor: '#007bff',
-                                    pointRadius: 3
-                                },
-                                {
-                                    label: 'Portfolio',
-                                    data: [{
-                                        x: portfolioVolatility * 100,
-                                        y: portfolioReturn * 100
-                                    }],
-                                    backgroundColor: '#dc3545',
-                                    pointRadius: 8
-                                }
-                            ]
+                            labels: Array(equity.length).fill('').map((_, i) => `Day ${i}`),
+                            datasets: [{
+                                label: 'Portfolio Equity',
+                                data: equity,
+                                borderColor: '#28a745',
+                                fill: false
+                            }]
                         },
                         options: {
                             responsive: true,
+                            maintainAspectRatio: false,
                             plugins: {
-                                title: { display: true, text: 'Efficient Frontier' },
-                                tooltip: {
-                                    callbacks: {
-                                        label: (context) => `Return: ${context.parsed.y.toFixed(2)}%, Volatility: ${context.parsed.x.toFixed(2)}%`
-                                    }
-                                }
+                                title: { display: true, text: 'Portfolio Performance' }
                             },
                             scales: {
-                                x: { title: { display: true, text: 'Volatility (%)' } },
-                                y: { title: { display: true, text: 'Return (%)' } }
+                                y: { title: { display: true, text: 'Equity ($)' } }
                             }
                         }
                     });
 
                     document.getElementById('portfolioResult').innerHTML = resultHTML;
-                    showSuccessMessage('Portfolio optimization completed.', 'portfolioResult');
+                    showSuccessMessage('Portfolio optimization completed!', 'portfolioResult');
                 } catch (error) {
-                    showErrorMessage(`Optimization error: ${error.message}`, 'portfolioResult');
+                    showErrorMessage(error.message, 'portfolioResult');
                 }
             });
         }
@@ -2001,14 +1929,18 @@ document.addEventListener('DOMContentLoaded', () => {
             exportButton.addEventListener('click', () => {
                 const table = document.querySelector('#portfolioResult table');
                 if (!table) {
-                    showErrorMessage('No portfolio data to export.', 'portfolioResult');
+                    showErrorMessage('No portfolio results to export.', 'portfolioResult');
                     return;
                 }
 
-                const rows = Array.from(table.querySelectorAll('tr')).map(row =>
-                    Array.from(row.querySelectorAll('th, td')).map(cell => cell.textContent)
-                );
-                const csv = rows.map(row => row.map(cell => `"${cell}"`).join(',')).join('\n');
+                const csv = [
+                    ['Ticker', 'Weight (%)'],
+                    ...Array.from(table.querySelectorAll('tbody tr')).map(row => {
+                        const cells = row.querySelectorAll('td');
+                        return [cells[0].textContent, cells[1].textContent];
+                    })
+                ].map(row => row.map(cell => `"${cell}"`).join(',')).join('\n');
+
                 const blob = new Blob([csv], { type: 'text/csv' });
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
@@ -2016,7 +1948,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 a.download = 'portfolio_weights.csv';
                 a.click();
                 URL.revokeObjectURL(url);
-                showSuccessMessage('Portfolio exported successfully!', 'portfolioResult');
+                showSuccessMessage('Portfolio results exported!', 'portfolioResult');
             });
         }
     }
@@ -2035,18 +1967,20 @@ document.addEventListener('DOMContentLoaded', () => {
                     const transactionCost = parseFloat(document.getElementById('transactionCost').value) / 100;
 
                     if (!ticker) throw new Error('Please select a ticker.');
-                    if (fastPeriod >= slowPeriod) throw new Error('Fast period must be less than slow period.');
+                    if (isNaN(fastPeriod) || isNaN(slowPeriod) || fastPeriod >= slowPeriod || fastPeriod < 1) {
+                        throw new Error('Invalid period settings.');
+                    }
 
                     const closeIndex = getColumnIndex(ticker);
-                    const prices = getColumnData(closeIndex);
-                    if (prices.length < slowPeriod) throw new Error('Insufficient data for the selected periods.');
+                    const closes = getColumnData(closeIndex);
+                    if (closes.length < slowPeriod) throw new Error('Insufficient data for the selected periods.');
 
                     let signals;
                     if (strategyType === 'sma-crossover') {
-                        signals = calculateSMACrossover(prices, fastPeriod, slowPeriod);
+                        signals = calculateSMACrossover(closes, fastPeriod, slowPeriod);
                     } else if (strategyType === 'macd') {
-                        const { macd, signal } = calculateMACD(prices, fastPeriod, slowPeriod, 9);
-                        signals = Array(prices.length).fill(0);
+                        const { macd, signal } = calculateMACD(closes, fastPeriod, slowPeriod, 9);
+                        signals = Array(closes.length).fill(0);
                         for (let i = 1; i < macd.length; i++) {
                             if (!isNaN(macd[i]) && !isNaN(signal[i]) && !isNaN(macd[i - 1]) && !isNaN(signal[i - 1])) {
                                 if (macd[i - 1] < signal[i - 1] && macd[i] > signal[i]) {
@@ -2056,115 +1990,123 @@ document.addEventListener('DOMContentLoaded', () => {
                                 }
                             }
                         }
-                    } else {
-                        throw new Error('Unsupported strategy type.');
                     }
 
                     // Backtest
-                    const initialCapital = 10000;
-                    let cash = initialCapital;
                     let position = 0;
-                    const equityCurve = [initialCapital];
+                    const equity = [10000];
                     const trades = [];
+                    let peakEquity = equity[0];
+                    let maxDrawdown = 0;
 
-                    for (let i = 1; i < prices.length; i++) {
+                    for (let i = 1; i < closes.length; i++) {
                         if (signals[i] === 1 && position === 0) {
-                            // Buy
-                            const shares = Math.floor(cash / prices[i]);
-                            if (shares > 0) {
-                                const cost = shares * prices[i] * (1 + transactionCost);
-                                cash -= cost;
-                                position = shares;
-                                trades.push({ date: sharedDataset.rows[i][0], type: 'Buy', price: prices[i], shares });
-                            }
-                        } else if (signals[i] === -1 && position > 0) {
-                            // Sell
-                            const proceeds = position * prices[i] * (1 - transactionCost);
-                            cash += proceeds;
-                            trades.push({ date: sharedDataset.rows[i][0], type: 'Sell', price: prices[i], shares: position });
+                            position = 1;
+                            trades.push({ type: 'buy', price: closes[i], date: sharedDataset.rows[i][0] });
+                            equity.push(equity[equity.length - 1] * (1 - transactionCost));
+                        } else if (signals[i] === -1 && position === 1) {
                             position = 0;
+                            trades.push({ type: 'sell', price: closes[i], date: sharedDataset.rows[i][0] });
+                            equity.push(equity[equity.length - 1] * (closes[i] / closes[i - 1]) * (1 - transactionCost));
+                        } else if (position === 1) {
+                            equity.push(equity[equity.length - 1] * (closes[i] / closes[i - 1]));
+                        } else {
+                            equity.push(equity[equity.length - 1]);
                         }
-                        equityCurve.push(cash + position * prices[i]);
+
+                        peakEquity = Math.max(peakEquity, equity[equity.length - 1]);
+                        const drawdown = (peakEquity - equity[equity.length - 1]) / peakEquity;
+                        maxDrawdown = Math.max(maxDrawdown, drawdown);
                     }
 
-                    // Calculate performance metrics
-                    const returns = equityCurve.slice(1).map((eq, i) => (eq - equityCurve[i]) / equityCurve[i]);
+                    const returns = equity.slice(1).map((e, i) => (e - equity[i]) / equity[i]);
                     const annualizedReturn = calculateMean(returns) * 252;
                     const volatility = calculateStdDev(returns, calculateMean(returns)) * Math.sqrt(252);
                     const sharpeRatio = volatility > 0 ? (annualizedReturn - 0.02) / volatility : 0;
-                    const maxDrawdown = calculateMaxDrawdown(equityCurve);
 
-                    // Display results
+                    // Generate results
                     let resultHTML = `
                         <div class="table-responsive">
-                            <table class="table table-dark">
+                            <table class="table table-dark table-striped">
                                 <thead>
                                     <tr>
                                         <th>Date</th>
                                         <th>Type</th>
                                         <th>Price</th>
-                                        <th>Shares</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     ${trades.map(trade => `
                                         <tr>
                                             <td>${trade.date}</td>
-                                            <td>${trade.type}</td>
+                                            <td>${trade.type.toUpperCase()}</td>
                                             <td>$${trade.price.toFixed(2)}</td>
-                                            <td>${trade.shares}</td>
                                         </tr>
                                     `).join('')}
                                 </tbody>
                             </table>
                         </div>
                         <div class="mt-3">
-                            <p><strong>Final Equity:</strong> $${equityCurve[equityCurve.length - 1].toFixed(2)}</p>
+                            <p><strong>Total Trades:</strong> ${trades.length}</p>
+                            <p><strong>Final Equity:</strong> $${equity[equity.length - 1].toFixed(2)}</p>
                             <p><strong>Annualized Return:</strong> ${(annualizedReturn * 100).toFixed(2)}%</p>
                             <p><strong>Volatility:</strong> ${(volatility * 100).toFixed(2)}%</p>
                             <p><strong>Sharpe Ratio:</strong> ${sharpeRatio.toFixed(2)}</p>
                             <p><strong>Max Drawdown:</strong> ${(maxDrawdown * 100).toFixed(2)}%</p>
                         </div>`;
 
-                    document.getElementById('strategyResult').innerHTML = resultHTML;
-
-                    // Plot equity curve
-                    const chartCanvas = document.createElement('canvas');
+                    // Create strategy chart
+                    const chartWrapper = document.createElement('div');
+                    chartWrapper.style.cssText = 'height: 400px;';
+                    chartWrapper.innerHTML = '<canvas></canvas>';
                     document.getElementById('strategyChart').innerHTML = '';
-                    document.getElementById('strategyChart').appendChild(chartCanvas);
-                    const ctx = chartCanvas.getContext('2d');
+                    document.getElementById('strategyChart').appendChild(chartWrapper);
 
+                    const ctx = chartWrapper.querySelector('canvas').getContext('2d');
                     new dependencies.Chart(ctx, {
                         type: 'line',
                         data: {
-                            labels: sharedDataset.rows.slice(0, equityCurve.length).map(row => row[0]),
-                            datasets: [{
-                                label: 'Equity Curve',
-                                data: equityCurve,
-                                borderColor: '#28a745',
-                                fill: false
-                            }]
+                            labels: sharedDataset.rows.slice(0, equity.length).map(row => row[0]),
+                            datasets: [
+                                {
+                                    label: 'Equity Curve',
+                                    data: equity,
+                                    borderColor: '#28a745',
+                                    fill: false
+                                },
+                                {
+                                    label: ticker,
+                                    data: closes,
+                                    borderColor: '#007bff',
+                                    fill: false,
+                                    yAxisID: 'y2'
+                                }
+                            ]
                         },
                         options: {
                             responsive: true,
+                            maintainAspectRatio: false,
                             plugins: {
-                                title: { display: true, text: `${strategyType.toUpperCase()} Strategy Equity Curve` },
-                                tooltip: {
-                                    callbacks: {
-                                        label: (context) => `Equity: $${context.parsed.y.toFixed(2)}`
-                                    }
-                                }
+                                title: { display: true, text: `${strategyType.toUpperCase()} Strategy - ${ticker}` }
                             },
                             scales: {
-                                x: { title: { display: true, text: 'Date' } },
-                                y: { title: { display: true, text: 'Equity ($)' }, beginAtZero: false }
+                                y: {
+                                    title: { display: true, text: 'Equity ($)' },
+                                    position: 'left'
+                                },
+                                y2: {
+                                    title: { display: true, text: 'Price ($)' },
+                                    position: 'right',
+                                    grid: { drawOnChartArea: false }
+                                }
                             }
                         }
                     });
 
-                    showSuccessMessage('Backtest completed successfully.', 'strategyResult');
+                    document.getElementById('strategyResult').innerHTML = resultHTML;
+                    showSuccessMessage('Strategy backtest completed!', 'strategyResult');
                 } catch (error) {
-                    showErrorMessage(`Backtest error: ${error.message}`, 'strategyResult');
+                    showErrorMessage(error.message, 'strategyResult');
                 }
             });
         }
@@ -2182,83 +2124,310 @@ document.addEventListener('DOMContentLoaded', () => {
         const loadButton = document.getElementById('loadSavedBasket');
         const analyzeButton = document.getElementById('analyzeBasket');
 
-        // Load saved baskets
-        const savedBaskets = JSON.parse(localStorage.getItem('savedBaskets') || '{}');
-        const savedBasketsDropdown = document.getElementById('savedBasketsDropdown');
-        Object.keys(savedBaskets).forEach(name => {
-            const option = document.createElement('option');
-            option.value = name;
-            option.textContent = name;
-            savedBasketsDropdown.appendChild(option);
-        });
+        let basketTickers = [];
 
-        // Add tickers to basket
-        addButton.addEventListener('click', () => {
-            Array.from(availableTickers.selectedOptions).forEach(option => {
-                const newOption = document.createElement('option');
-                newOption.value = option.value;
-                newOption.textContent = option.textContent;
-                selectedTickers.appendChild(newOption);
-                option.remove();
+        if (addButton) {
+            addButton.addEventListener('click', () => {
+                Array.from(availableTickers.selectedOptions).forEach(option => {
+                    const opt = document.createElement('option');
+                    opt.value = option.value;
+                    opt.text = option.text;
+                    selectedTickers.appendChild(opt);
+                    option.remove();
+                    basketTickers.push(opt.value);
+                });
+                updateBasketDisplay();
             });
-        });
+        }
 
-        // Remove tickers from basket
-        removeButton.addEventListener('click', () => {
-            Array.from(selectedTickers.selectedOptions).forEach(option => {
-                const newOption = document.createElement('option');
-                newOption.value = option.value;
-                newOption.textContent = option.textContent;
-                availableTickers.appendChild(newOption);
-                option.remove();
+        if (removeButton) {
+            removeButton.addEventListener('click', () => {
+                Array.from(selectedTickers.selectedOptions).forEach(option => {
+                    const opt = document.createElement('option');
+                    opt.value = option.value;
+                    opt.text = option.text;
+                    availableTickers.appendChild(opt);
+                    option.remove();
+                    basketTickers = basketTickers.filter(t => t !== opt.value);
+                });
+                updateBasketDisplay();
             });
-        });
+        }
 
-        // Create basket
-        createButton.addEventListener('click', () => {
-            try {
-                const basketName = sanitizeInput(document.getElementById('basketName').value.trim());
-                const tickers = Array.from(selectedTickers.options).map(o => o.value);
-                const weightingMethod = document.getElementById('weightingMethod').value;
+        if (createButton) {
+            createButton.addEventListener('click', () => {
+                try {
+                    if (basketTickers.length === 0) throw new Error('No tickers selected for the basket.');
 
-                if (!basketName) throw new Error('Please enter a basket name.');
-                if (tickers.length === 0) throw new Error('Please select at least one ticker.');
+                    const weightingMethod = document.getElementById('weightingMethod').value;
+                    let weights;
 
-                let weights;
-                if (weightingMethod === 'equal') {
-                    weights = Array(tickers.length).fill(1 / tickers.length);
-                } else if (weightingMethod === 'market-cap') {
-                    weights = calculateMarketCapWeights(tickers);
-                } else if (weightingMethod === 'inverse-volatility') {
-                    weights = calculateInverseVolatilityWeights(tickers);
-                } else if (weightingMethod === 'custom') {
-                    showWeightInputModal(tickers, (customWeights) => {
-                        weights = customWeights;
-                        displayBasket(basketName, tickers, weights);
-                    });
+                    if (weightingMethod === 'custom') {
+                        showWeightInputModal(basketTickers, (customWeights) => {
+                            weights = customWeights;
+                            generateBasketResults(weights);
+                        });
+                    } else {
+                        weights = calculateBasketWeights(weightingMethod);
+                        generateBasketResults(weights);
+                    }
+                } catch (error) {
+                    showErrorMessage(error.message, 'basketWeightsTable');
+                }
+            });
+        }
+
+        if (exportButton) {
+            exportButton.addEventListener('click', () => {
+                const table = document.querySelector('#basketWeightsTable table');
+                if (!table) {
+                    showErrorMessage('No basket to export.', 'basketWeightsTable');
                     return;
                 }
 
-                displayBasket(basketName, tickers, weights);
-            } catch (error) {
-                showErrorMessage(error.message, 'basketWeightsTable');
-            }
-        });
+                const csv = [
+                    ['Ticker', 'Weight (%)'],
+                    ...Array.from(table.querySelectorAll('tbody tr')).map(row => {
+                        const cells = row.querySelectorAll('td');
+                        return [cells[0].textContent, cells[1].textContent];
+                    })
+                ].map(row => row.map(cell => `"${cell}"`).join(',')).join('\n');
 
-        // Display basket
-        function displayBasket(basketName, tickers, weights) {
-            // Display weights table
+                const blob = new Blob([csv], { type: 'text/csv' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'basket_composition.csv';
+                a.click();
+                URL.revokeObjectURL(url);
+                showSuccessMessage('Basket exported successfully!', 'basketWeightsTable');
+            });
+        }
+
+        if (saveButton) {
+            saveButton.addEventListener('click', () => {
+                try {
+                    const basketName = document.getElementById('basketName').value.trim();
+                    if (!basketName) throw new Error('Please enter a basket name.');
+                    if (basketTickers.length === 0) throw new Error('No tickers in the basket.');
+
+                    const savedBaskets = JSON.parse(localStorage.getItem('savedBaskets') || '{}');
+                    savedBaskets[basketName] = basketTickers;
+                    localStorage.setItem('savedBaskets', JSON.stringify(savedBaskets));
+
+                    const dropdown = document.getElementById('savedBasketsDropdown');
+                    dropdown.innerHTML = '<option value="">Select a saved basket...</option>' +
+                        Object.keys(savedBaskets).map(name => `<option value="${name}">${name}</option>`).join('');
+                    showSuccessMessage(`Basket "${basketName}" saved!`, 'basketWeightsTable');
+                } catch (error) {
+                    showErrorMessage(error.message, 'basketWeightsTable');
+                }
+            });
+        }
+
+        if (loadButton) {
+            loadButton.addEventListener('click', () => {
+                try {
+                    const basketName = document.getElementById('savedBasketsDropdown').value;
+                    if (!basketName) throw new Error('Please select a saved basket.');
+
+                    const savedBaskets = JSON.parse(localStorage.getItem('savedBaskets') || '{}');
+                    const tickers = savedBaskets[basketName];
+                    if (!tickers) throw new Error('Basket not found.');
+
+                    // Reset selections
+                    selectedTickers.innerHTML = '';
+                    availableTickers.innerHTML = sharedDataset.headers
+                        .filter(h => h !== 'Date')
+                        .map(h => `<option value="${h}">${h}</option>`).join('');
+
+                    // Move selected tickers
+                    basketTickers = tickers;
+                    tickers.forEach(ticker => {
+                        const option = availableTickers.querySelector(`option[value="${ticker}"]`);
+                        if (option) {
+                            const opt = document.createElement('option');
+                            opt.value = ticker;
+                            opt.text = ticker;
+                            selectedTickers.appendChild(opt);
+                            option.remove();
+                        }
+                    });
+
+                    updateBasketDisplay();
+                    showSuccessMessage(`Basket "${basketName}" loaded!`, 'basketWeightsTable');
+                } catch (error) {
+                    showErrorMessage(error.message, 'basketWeightsTable');
+                }
+            });
+        }
+
+        if (analyzeButton) {
+            analyzeButton.addEventListener('click', () => {
+                try {
+                    if (basketTickers.length === 0) throw new Error('No tickers in the basket.');
+
+                    const benchmark = document.getElementById('basketBenchmark').value;
+                    const period = document.getElementById('basketPeriod').value;
+                    let periodRows = sharedDataset.rows.length;
+                    switch (period) {
+                        case '1y': periodRows = 252; break;
+                        case '6m': periodRows = 126; break;
+                        case '3m': periodRows = 63; break;
+                        case '1m': periodRows = 21; break;
+                    }
+                    periodRows = Math.min(periodRows, sharedDataset.rows.length);
+                    const dataRows = sharedDataset.rows.slice(0, periodRows);
+
+                    const weights = calculateBasketWeights('equal'); // Default to equal weights for analysis
+                    const basketReturns = dataRows.slice(1).map((row, i) => {
+                        return basketTickers.reduce((sum, ticker, j) => {
+                            const index = getColumnIndex(ticker);
+                            const price = parseFloat(row[index]);
+                            const prevPrice = parseFloat(dataRows[i][index]);
+                            return sum + weights[j] * ((price - prevPrice) / prevPrice);
+                        }, 0);
+                    });
+
+                    const annualizedReturn = calculateMean(basketReturns) * 252;
+                    const volatility = calculateStdDev(basketReturns, calculateMean(basketReturns)) * Math.sqrt(252);
+                    const sharpeRatio = volatility > 0 ? (annualizedReturn - 0.02) / volatility : 0;
+
+                    let metricsHTML = `
+                        <div class="table-responsive">
+                            <table class="table table-dark table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Metric</th>
+                                        <th>Value</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr><td>Annualized Return</td><td>${(annualizedReturn * 100).toFixed(2)}%</td></tr>
+                                    <tr><td>Volatility</td><td>${(volatility * 100).toFixed(2)}%</td></tr>
+                                    <tr><td>Sharpe Ratio</td><td>${sharpeRatio.toFixed(2)}</td></tr>
+                    `;
+
+                    if (benchmark) {
+                        const benchIndex = getColumnIndex(benchmark);
+                        const benchPrices = dataRows.map(row => parseFloat(row[benchIndex])).filter(v => !isNaN(v));
+                        const benchReturns = benchPrices.slice(1).map((p, i) => (p - benchPrices[i]) / benchPrices[i]);
+                        const beta = calculateBeta(basketReturns, benchReturns);
+                        const correlation = calculateCorrelation(basketReturns, benchReturns);
+                        metricsHTML += `
+                            <tr><td>Beta</td><td>${beta.toFixed(2)}</td></tr>
+                            <tr><td>Correlation</td><td>${correlation.toFixed(2)}</td></tr>
+                        `;
+                    }
+
+                    metricsHTML += '</tbody></table></div>';
+
+                    // Create performance chart
+                    const equity = [10000];
+                    basketReturns.forEach(r => {
+                        equity.push(equity[equity.length - 1] * (1 + r));
+                    });
+
+                    const chartWrapper = document.createElement('div');
+                    chartWrapper.style.cssText = 'height: 300px;';
+                    chartWrapper.innerHTML = '<canvas></canvas>';
+                    document.getElementById('basketPerformanceChart').innerHTML = '';
+                    document.getElementById('basketPerformanceChart').appendChild(chartWrapper);
+
+                    const ctx = chartWrapper.querySelector('canvas').getContext('2d');
+                    const datasets = [
+                        {
+                            label: 'Basket Equity',
+                            data: equity,
+                            borderColor: '#28a745',
+                            fill: false
+                        }
+                    ];
+
+                    if (benchmark) {
+                        const benchEquity = [10000];
+                        benchReturns.forEach(r => {
+                            benchEquity.push(benchEquity[benchEquity.length - 1] * (1 + r));
+                        });
+                        datasets.push({
+                            label: benchmark,
+                            data: benchEquity,
+                            borderColor: '#007bff',
+                            fill: false
+                        });
+                    }
+
+                    new dependencies.Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: dataRows.slice(0, equity.length).map(row => row[0]),
+                            datasets
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                title: { display: true, text: 'Basket Performance' }
+                            },
+                            scales: {
+                                y: { title: { display: true, text: 'Equity ($)' } }
+                            }
+                        }
+                    });
+
+                    document.getElementById('basketMetrics').innerHTML = metricsHTML;
+                    showSuccessMessage('Basket performance analysis completed!', 'basketMetrics');
+                } catch (error) {
+                    showErrorMessage(error.message, 'basketMetrics');
+                }
+            });
+        }
+
+        // Load saved baskets
+        const savedBaskets = JSON.parse(localStorage.getItem('savedBaskets') || '{}');
+        const dropdown = document.getElementById('savedBasketsDropdown');
+        dropdown.innerHTML = '<option value="">Select a saved basket...</option>' +
+            Object.keys(savedBaskets).map(name => `<option value="${name}">${name}</option>`).join('');
+
+        function calculateBasketWeights(method) {
+            const weights = Array(basketTickers.length).fill(0);
+            if (method === 'equal') {
+                weights.fill(1 / basketTickers.length);
+            } else if (method === 'market-cap') {
+                // Simplified: Use latest price as proxy for market cap
+                const prices = basketTickers.map(ticker => {
+                    const index = getColumnIndex(ticker);
+                    const price = parseFloat(sharedDataset.rows[0][index]);
+                    return isNaN(price) ? 0 : price;
+                });
+                const total = prices.reduce((sum, p) => sum + p, 0);
+                weights.forEach((_, i) => weights[i] = total > 0 ? prices[i] / total : 1 / basketTickers.length);
+            } else if (method === 'inverse-volatility') {
+                const volatilities = basketTickers.map(ticker => {
+                    const index = getColumnIndex(ticker);
+                    const prices = getColumnData(index);
+                    const returns = prices.slice(1).map((p, i) => (p - prices[i]) / prices[i]);
+                    return calculateStdDev(returns, calculateMean(returns)) * Math.sqrt(252);
+                });
+                const inverseVols = volatilities.map(v => v > 0 ? 1 / v : 0);
+                const totalInverse = inverseVols.reduce((sum, v) => sum + v, 0);
+                weights.forEach((_, i) => weights[i] = totalInverse > 0 ? inverseVols[i] / totalInverse : 1 / basketTickers.length);
+            }
+            return weights;
+        }
+
+        function generateBasketResults(weights) {
             let tableHTML = `
                 <div class="table-responsive">
-                    <table class="table table-dark">
+                    <table class="table table-dark table-striped">
                         <thead>
                             <tr>
                                 <th>Ticker</th>
-                                <th>Weight</th>
+                                <th>Weight (%)</th>
                             </tr>
                         </thead>
                         <tbody>
-                            ${tickers.map((ticker, i) => `
+                            ${basketTickers.map((ticker, i) => `
                                 <tr>
                                     <td>${ticker}</td>
                                     <td>${(weights[i] * 100).toFixed(2)}%</td>
@@ -2268,27 +2437,27 @@ document.addEventListener('DOMContentLoaded', () => {
                     </table>
                 </div>`;
 
-            document.getElementById('basketWeightsTable').innerHTML = tableHTML;
-
-            // Display pie chart
-            const chartCanvas = document.createElement('canvas');
+            const chartWrapper = document.createElement('div');
+            chartWrapper.style.cssText = 'height: 300px;';
+            chartWrapper.innerHTML = '<canvas></canvas>';
             document.getElementById('basketPieChart').innerHTML = '';
-            document.getElementById('basketPieChart').appendChild(chartCanvas);
-            const ctx = chartCanvas.getContext('2d');
+            document.getElementById('basketPieChart').appendChild(chartWrapper);
 
+            const ctx = chartWrapper.querySelector('canvas').getContext('2d');
             new dependencies.Chart(ctx, {
                 type: 'pie',
                 data: {
-                    labels: tickers,
+                    labels: basketTickers,
                     datasets: [{
                         data: weights.map(w => w * 100),
-                        backgroundColor: tickers.map((_, i) => `hsl(${i * 360 / tickers.length}, 70%, 50%)`)
+                        backgroundColor: basketTickers.map((_, i) => `hsl(${i * 360 / basketTickers.length}, 70%, 50%)`)
                     }]
                 },
                 options: {
                     responsive: true,
+                    maintainAspectRatio: false,
                     plugins: {
-                        title: { display: true, text: `${basketName} Weights` },
+                        title: { display: true, text: 'Basket Composition' },
                         tooltip: {
                             callbacks: {
                                 label: (context) => `${context.label}: ${context.parsed.toFixed(2)}%`
@@ -2298,295 +2467,37 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             });
 
-            showSuccessMessage('Basket created successfully.', 'basketWeightsTable');
+            document.getElementById('basketWeightsTable').innerHTML = tableHTML;
+            showSuccessMessage('Basket created successfully!', 'basketWeightsTable');
         }
 
-        // Save basket
-        saveButton.addEventListener('click', () => {
-            try {
-                const basketName = sanitizeInput(document.getElementById('basketName').value.trim());
-                const tickers = Array.from(selectedTickers.options).map(o => o.value);
-                if (!basketName) throw new Error('Please enter a basket name.');
-                if (tickers.length === 0) throw new Error('No tickers selected.');
-
-                savedBaskets[basketName] = { tickers, weightingMethod: document.getElementById('weightingMethod').value };
-                localStorage.setItem('savedBaskets', JSON.stringify(savedBaskets));
-
-                const option = document.createElement('option');
-                option.value = basketName;
-                option.textContent = basketName;
-                savedBasketsDropdown.appendChild(option);
-
-                showSuccessMessage('Basket saved successfully.', 'basketWeightsTable');
-            } catch (error) {
-                showErrorMessage(error.message, 'basketWeightsTable');
-            }
-        });
-
-        // Load saved basket
-        loadButton.addEventListener('click', () => {
-            try {
-                const basketName = savedBasketsDropdown.value;
-                if (!basketName) throw new Error('Please select a saved basket.');
-
-                const basket = savedBaskets[basketName];
-                document.getElementById('basketName').value = basketName;
-                document.getElementById('weightingMethod').value = basket.weightingMethod;
-
-                // Clear current selections
-                Array.from(selectedTickers.options).forEach(o => {
-                    const newOption = document.createElement('option');
-                    newOption.value = o.value;
-                    newOption.textContent = o.textContent;
-                    availableTickers.appendChild(newOption);
-                    o.remove();
-                });
-
-                // Add saved tickers
-                basket.tickers.forEach(ticker => {
-                    const option = Array.from(availableTickers.options).find(o => o.value === ticker);
-                    if (option) {
-                        const newOption = document.createElement('option');
-                        newOption.value = option.value;
-                        newOption.textContent = option.textContent;
-                        selectedTickers.appendChild(newOption);
-                        option.remove();
-                    }
-                });
-
-                showSuccessMessage(`Loaded basket: ${basketName}`, 'basketWeightsTable');
-            } catch (error) {
-                showErrorMessage(error.message, 'basketWeightsTable');
-            }
-        });
-
-        // Export basket
-        exportButton.addEventListener('click', () => {
-            const table = document.querySelector('#basketWeightsTable table');
-            if (!table) {
-                showErrorMessage('No basket data to export.', 'basketWeightsTable');
+        function updateBasketDisplay() {
+            if (basketTickers.length === 0) {
+                document.getElementById('basketWeightsTable').innerHTML = '';
+                document.getElementById('basketPieChart').innerHTML = '';
                 return;
             }
-
-            const rows = Array.from(table.querySelectorAll('tr')).map(row =>
-                Array.from(row.querySelectorAll('th, td')).map(cell => cell.textContent)
-            );
-            const csv = rows.map(row => row.map(cell => `"${cell}"`).join(',')).join('\n');
-            const blob = new Blob([csv], { type: 'text/csv' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'basket_weights.csv';
-            a.click();
-            URL.revokeObjectURL(url);
-            showSuccessMessage('Basket exported successfully!', 'basketWeightsTable');
-        });
-
-        // Analyze basket performance
-        analyzeButton.addEventListener('click', () => {
-            try {
-                const tickers = Array.from(selectedTickers.options).map(o => o.value);
-                const benchmark = document.getElementById('basketBenchmark').value;
-                const period = document.getElementById('basketPeriod').value;
-
-                if (tickers.length === 0) throw new Error('No tickers in the basket.');
-
-                // Determine data range
-                let periodRows = sharedDataset.rows.length;
-                switch (period) {
-                    case '1y': periodRows = 252; break;
-                    case '6m': periodRows = 126; break;
-                    case '3m': periodRows = 63; break;
-                    case '1m': periodRows = 21; break;
-                }
-                periodRows = Math.min(periodRows, sharedDataset.rows.length);
-                const dataRows = sharedDataset.rows.slice(0, periodRows);
-
-                // Calculate equal weights for simplicity
-                const weights = Array(tickers.length).fill(1 / tickers.length);
-
-                // Calculate basket returns
-                const basketReturns = dataRows.slice(1).map((row, i) => {
-                    let dailyReturn = 0;
-                    tickers.forEach((ticker, j) => {
-                        const columnIndex = getColumnIndex(ticker);
-                        const price = parseFloat(row[columnIndex]);
-                        const prevPrice = parseFloat(dataRows[i][columnIndex]);
-                        if (!isNaN(price) && !isNaN(prevPrice) && prevPrice !== 0) {
-                            dailyReturn += weights[j] * (price - prevPrice) / prevPrice;
-                        }
-                    });
-                    return dailyReturn;
-                });
-
-                // Calculate benchmark returns if provided
-                let benchmarkReturns = null;
-                if (benchmark) {
-                    const benchIndex = getColumnIndex(benchmark);
-                    benchmarkReturns = dataRows.slice(1).map((row, i) => {
-                        const price = parseFloat(row[benchIndex]);
-                        const prevPrice = parseFloat(dataRows[i][benchIndex]);
-                        return (!isNaN(price) && !isNaN(prevPrice) && prevPrice !== 0)
-                            ? (price - prevPrice) / prevPrice
-                            : 0;
-                    });
-                }
-
-                // Calculate performance metrics
-                const annualizedReturn = calculateMean(basketReturns) * 252;
-                const volatility = calculateStdDev(basketReturns, calculateMean(basketReturns)) * Math.sqrt(252);
-                const sharpeRatio = volatility > 0 ? (annualizedReturn - 0.02) / volatility : 0;
-                const sortedReturns = [...basketReturns].sort((a, b) => a - b);
-                const var95 = sortedReturns[Math.floor(sortedReturns.length * 0.05)] * Math.sqrt(252);
-
-                // Equity curve
-                const equityCurve = [10000];
-                basketReturns.forEach(r => {
-                    equityCurve.push(equityCurve[equityCurve.length - 1] * (1 + r));
-                });
-                const maxDrawdown = calculateMaxDrawdown(equityCurve);
-
-                let metricsHTML = `
-                    <div class="table-responsive">
-                        <table class="table table-dark">
-                            <thead>
-                                <tr>
-                                    <th>Metric</th>
-                                    <th>Basket</th>
-                                    ${benchmark ? '<th>Benchmark</th>' : ''}
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr><td>Annualized Return</td><td>${(annualizedReturn * 100).toFixed(2)}%</td>
-                                    ${benchmark ? `<td>${(calculateMean(benchmarkReturns) * 252 * 100).toFixed(2)}%</td>` : ''}
-                                </tr>
-                                <tr><td>Volatility</td><td>${(volatility * 100).toFixed(2)}%</td>
-                                    ${benchmark ? `<td>${(calculateStdDev(benchmarkReturns, calculateMean(benchmarkReturns)) * Math.sqrt(252) * 100).toFixed(2)}%</td>` : ''}
-                                </tr>
-                                <tr><td>Sharpe Ratio</td><td>${sharpeRatio.toFixed(2)}</td>
-                                    ${benchmark ? `<td>${((calculateMean(benchmarkReturns) * 252 - 0.02) / (calculateStdDev(benchmarkReturns, calculateMean(benchmarkReturns)) * Math.sqrt(252))).toFixed(2)}</td>` : ''}
-                                </tr>
-                                <tr><td>Max Drawdown</td><td>${(maxDrawdown * 100).toFixed(2)}%</td>
-                                    ${benchmark ? `<td>${(calculateMaxDrawdown(benchmarkReturns.reduce((eq, r, i) => [...eq, (eq[i] || 10000) * (1 + r)], [10000])) * 100).toFixed(2)}%</td>` : ''}
-                                </tr>
-                                <tr><td>VaR (95%)</td><td>${(var95 * 100).toFixed(2)}%</td>
-                                    ${benchmark ? `<td>${(([...benchmarkReturns].sort((a, b) => a - b)[Math.floor(benchmarkReturns.length * 0.05)] * Math.sqrt(252) * 100).toFixed(2))}%</td>` : ''}
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>`;
-
-                document.getElementById('basketMetrics').innerHTML = metricsHTML;
-
-                // Plot performance chart
-                const chartCanvas = document.createElement('canvas');
-                document.getElementById('basketPerformanceChart').innerHTML = '';
-                document.getElementById('basketPerformanceChart').appendChild(chartCanvas);
-                const ctx = chartCanvas.getContext('2d');
-
-                const datasets = [
-                    {
-                        label: 'Basket Equity',
-                        data: equityCurve,
-                        borderColor: '#28a745',
-                        fill: false
-                    }
-                ];
-
-                if (benchmark) {
-                    const benchEquity = [10000];
-                    benchmarkReturns.forEach(r => {
-                        benchEquity.push(benchEquity[benchEquity.length - 1] * (1 + r));
-                    });
-                    datasets.push({
-                        label: 'Benchmark Equity',
-                        data: benchEquity,
-                        borderColor: '#007bff',
-                        fill: false
-                    });
-                }
-
-                new dependencies.Chart(ctx, {
-                    type: 'line',
-                    data: {
-                        labels: dataRows.slice(0, equityCurve.length).map(row => row[0]),
-                        datasets
-                    },
-                    options: {
-                        responsive: true,
-                        plugins: {
-                            title: { display: true, text: 'Basket vs Benchmark Performance' },
-                            tooltip: {
-                                callbacks: {
-                                    label: (context) => `${context.dataset.label}: $${context.parsed.y.toFixed(2)}`
-                                }
-                            }
-                        },
-                        scales: {
-                            x: { title: { display: true, text: 'Date' } },
-                            y: { title: { display: true, text: 'Equity ($)' }, beginAtZero: false }
-                        }
-                    }
-                });
-
-                showSuccessMessage('Basket performance analysis completed.', 'basketMetrics');
-            } catch (error) {
-                showErrorMessage(error.message, 'basketMetrics');
-            }
-        });
-    }
-
-    // Utility Functions
-    function detectOutliers(values) {
-        const mean = calculateMean(values);
-        const stdDev = calculateStdDev(values, mean);
-        if (stdDev === 0) return [];
-        return values.filter(v => Math.abs(v - mean) > 3 * stdDev);
-    }
-
-    function calculateCovarianceMatrix(returnsData) {
-        const n = returnsData[0].length;
-        const means = returnsData.map(returns => calculateMean(returns));
-        const covMatrix = returnsData.map(() => Array(returnsData.length).fill(0));
-
-        for (let i = 0; i < returnsData.length; i++) {
-            for (let j = i; j < returnsData.length; j++) {
-                let cov = 0;
-                for (let k = 0; k < n; k++) {
-                    cov += (returnsData[i][k] - means[i]) * (returnsData[j][k] - means[j]);
-                }
-                cov /= n;
-                covMatrix[i][j] = cov;
-                covMatrix[j][i] = cov;
-            }
+            const weights = calculateBasketWeights('equal');
+            generateBasketResults(weights);
         }
-        return covMatrix.map(row => row.map(v => v * 252)); // Annualize
-    }
-
-    function calculateMarketCapWeights(tickers) {
-        // Placeholder: Assume equal weights as market cap data is not available
-        console.warn('Market cap data not available; using equal weights.');
-        return Array(tickers.length).fill(1 / tickers.length);
-    }
-
-    function calculateInverseVolatilityWeights(tickers) {
-        const volatilities = tickers.map(ticker => {
-            const columnIndex = getColumnIndex(ticker);
-            const prices = getColumnData(columnIndex);
-            const returns = prices.slice(1).map((p, i) => (p - prices[i]) / prices[i]);
-            return calculateStdDev(returns, calculateMean(returns)) * Math.sqrt(252);
-        });
-
-        const inverseVols = volatilities.map(v => v > 0 ? 1 / v : 0);
-        const sumInverseVols = inverseVols.reduce((sum, v) => sum + v, 0);
-        if (sumInverseVols === 0) {
-            console.warn('All volatilities are zero; using equal weights.');
-            return Array(tickers.length).fill(1 / tickers.length);
-        }
-        return inverseVols.map(v => v / sumInverseVols);
     }
 
     // Initialize the platform
-    dynamicContent.innerHTML = toolbarHandlers['toolbar-data']();
-    attachDataMenuEventListeners();
+    const savedDataset = localStorage.getItem('savedDataset');
+    if (savedDataset) {
+        try {
+            sharedDataset = JSON.parse(savedDataset);
+            validateHeaders(sharedDataset.headers);
+        } catch (error) {
+            console.error('Error loading saved dataset:', error);
+            localStorage.removeItem('savedDataset');
+            sharedDataset = { headers: [], rows: [] };
+        }
+    }
+
+    // Trigger data tab by default
+    const dataButton = document.getElementById('toolbar-data');
+    if (dataButton) {
+        dataButton.click();
+    }
 });
