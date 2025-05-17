@@ -1,395 +1,424 @@
 /**
  * portfolio-allocation.js
- * 
- * This library provides implementation for the following optimization methods:
+ *
+ * A robust library for portfolio optimization, providing:
  * - Mean-Variance Optimization (Markowitz Portfolio Theory)
  * - Minimum Variance Portfolio
  * - Risk Parity Portfolio
- * 
+ * - Portfolio statistics and risk contributions
+ *
  * Usage:
- * 1. Add this script to your website
- * 2. Access methods through the global PortfolioAllocation object
+ * 1. Include this script in your HTML after dependencies.
+ * 2. Access methods via the global PortfolioAllocation object.
+ *
+ * Dependencies: None (self-contained matrix operations)
  */
 
-// Define the PortfolioAllocation namespace
-window.PortfolioAllocation = (function() {
-    /**
-     * Find the optimal portfolio weights using mean-variance optimization
-     * (Markowitz Portfolio Theory)
-     * 
-     * @param {Array} meanReturns - Array of expected returns for each asset
-     * @param {Array} covMatrix - Covariance matrix (2D array)
-     * @param {Object} options - Optional parameters
-     * @param {number} options.riskFreeRate - Risk-free rate (default: 0)
-     * @param {number} options.targetReturn - Target return (optional)
-     * @param {boolean} options.allowNegativeWeights - Allow negative weights (default: true)
-     * @param {Array} options.transactionCosts - Transaction costs for each asset (optional)
-     * @returns {Array} Optimal weights for each asset
-     */
-    function meanVarianceOptimizationWeights(meanReturns, covMatrix, options = {}) {
-        const n = meanReturns.length;
-        const riskFreeRate = options.riskFreeRate || 0;
-        const allowNegativeWeights = options.allowNegativeWeights !== false;
-        const transactionCosts = options.transactionCosts || Array(n).fill(0);
-        
-        // Validate inputs
-        if (n === 0) {
-            throw new Error("Mean returns array cannot be empty");
+/* eslint-disable no-param-reassign */
+window.PortfolioAllocation = (() => {
+  /**
+   * Compute mean returns from historical return series
+   * @param {number[][]} returnsData - Array of return series for each asset
+   * @returns {number[]} Mean returns
+   */
+  const computeMeanReturns = (returnsData) => {
+    return returnsData.map((returns) => {
+      const validReturns = returns.filter((r) => !Number.isNaN(r) && Number.isFinite(r));
+      return validReturns.length > 0 ? validReturns.reduce((sum, r) => sum + r, 0) / validReturns.length : 0;
+    });
+  };
+
+  /**
+   * Compute covariance matrix from historical return series
+   * @param {number[][]} returnsData - Array of return series for each asset
+   * @returns {number[][]} Covariance matrix
+   */
+  const computeCovMatrix = (returnsData) => {
+    const n = returnsData.length;
+    const length = Math.min(...returnsData.map((r) => r.length));
+    if (length < 2) throw new Error('Insufficient data points for covariance calculation');
+
+    const means = computeMeanReturns(returnsData);
+    const covMatrix = Array(n)
+      .fill()
+      .map(() => Array(n).fill(0));
+
+    for (let i = 0; i < n; i++) {
+      for (let j = i; j < n; j++) {
+        let cov = 0;
+        let count = 0;
+        for (let t = 0; t < length; t++) {
+          if (
+            Number.isFinite(returnsData[i][t]) &&
+            Number.isFinite(returnsData[j][t]) &&
+            !Number.isNaN(returnsData[i][t]) &&
+            !Number.isNaN(returnsData[j][t])
+          ) {
+            cov += (returnsData[i][t] - means[i]) * (returnsData[j][t] - means[j]);
+            count++;
+          }
         }
-        if (covMatrix.length !== n || covMatrix[0].length !== n) {
-            throw new Error("Covariance matrix dimensions must match the number of assets");
-        }
-        if (transactionCosts.length !== n) {
-            throw new Error("Transaction costs array must match the number of assets");
-        }
-        
-        // Calculate inverse of covariance matrix
-        const invCov = matrixInverse(covMatrix);
-        if (!invCov) {
-            // If matrix inversion fails, return equal weights
-            return Array(n).fill(1/n);
-        }
-        
-        // Adjust returns for transaction costs
-        const adjustedReturns = meanReturns.map((r, i) => r - transactionCosts[i]);
-        
-        // Calculate excess returns (asset returns - risk-free rate)
-        const excessReturns = adjustedReturns.map(r => r - riskFreeRate);
-        
-        // Calculate weights that maximize Sharpe ratio
-        const ones = Array(n).fill(1);
-        
-        // Calculate components for the formula
-        const A = matrixVectorMultiply(invCov, excessReturns);
-        const B = matrixVectorMultiply(invCov, ones);
-        const C = matrixVectorMultiply(excessReturns, A);
-        const D = matrixVectorMultiply(ones, B);
-        const E = matrixVectorMultiply(ones, A);
-        
-        let weights;
-        if (options.targetReturn) {
-            // If target return is specified, find weights that minimize variance for that return
-            const targetExcessReturn = options.targetReturn - riskFreeRate;
-            const lambda1 = (D * targetExcessReturn - E) / (C * D - E * E);
-            const lambda2 = (C - E * targetExcessReturn) / (C * D - E * E);
-            
-            // Calculate weights
-            weights = [];
-            for (let i = 0; i < n; i++) {
-                let weight = 0;
-                for (let j = 0; j < n; j++) {
-                    weight += invCov[i][j] * (lambda1 * excessReturns[j] + lambda2);
-                }
-                weights.push(weight);
-            }
-        } else {
-            // Otherwise maximize Sharpe ratio
-            weights = A.map(a_i => a_i / vectorSum(A));
-        }
-        
-        // Normalize weights and apply negative weights constraint
-        const weightSum = vectorSum(weights);
-        weights = weights.map(w => w / weightSum);
-        
-        if (!allowNegativeWeights) {
-            weights = weights.map(w => Math.max(0, w));
-            const newSum = vectorSum(weights);
-            weights = weights.map(w => w / newSum);
-        }
-        
-        return weights;
+        covMatrix[i][j] = covMatrix[j][i] = count > 1 ? cov / (count - 1) : 0;
+      }
     }
-    
-    /**
-     * Calculate the minimum variance portfolio
-     * 
-     * @param {Array} covMatrix - Covariance matrix (2D array)
-     * @param {Object} options - Optional parameters
-     * @param {boolean} options.allowNegativeWeights - Allow negative weights (default: true)
-     * @returns {Array} Optimal weights for minimum variance
-     */
-    function minimumVarianceWeights(covMatrix, options = {}) {
-        const n = covMatrix.length;
-        const allowNegativeWeights = options.allowNegativeWeights !== false;
-        
-        // Validate input
-        if (n === 0 || covMatrix[0].length !== n) {
-            throw new Error("Invalid covariance matrix dimensions");
-        }
-        
-        // Calculate inverse of covariance matrix
-        const invCov = matrixInverse(covMatrix);
-        if (!invCov) {
-            // If matrix inversion fails, return equal weights
-            return Array(n).fill(1/n);
-        }
-        
-        // For minimum variance, weights = (Σ^-1 * 1) / (1^T * Σ^-1 * 1)
-        const ones = Array(n).fill(1);
-        const numerator = matrixVectorMultiply(invCov, ones);
-        const denominator = vectorSum(numerator);
-        
-        // Calculate weights
-        let weights = numerator.map(num => num / denominator);
-        
-        // Apply negative weights constraint
-        if (!allowNegativeWeights) {
-            weights = weights.map(w => Math.max(0, w));
-            const newSum = vectorSum(weights);
-            weights = weights.map(w => w / newSum);
-        }
-        
-        return weights;
+    return covMatrix;
+  };
+
+  /**
+   * Mean-Variance Optimization (Markowitz Portfolio Theory)
+   * @param {number[][]} returnsData - Array of return series for each asset
+   * @param {Object} options - Optimization options
+   * @param {number} [options.riskFreeRate=0] - Risk-free rate
+   * @param {number} [options.targetReturn] - Target portfolio return
+   * @param {boolean} [options.allowNegativeWeights=true] - Allow short positions
+   * @param {number[]} [options.transactionCosts] - Transaction costs per asset
+   * @param {number[]} [options.minWeights] - Minimum weight per asset
+   * @param {number[]} [options.maxWeights] - Maximum weight per asset
+   * @returns {number[]} Optimal weights
+   */
+  function meanVarianceOptimizationWeights(returnsData, options = {}) {
+    const n = returnsData.length;
+    if (n === 0) throw new Error('Returns data cannot be empty');
+
+    const riskFreeRate = options.riskFreeRate ?? 0;
+    const allowNegativeWeights = options.allowNegativeWeights !== false;
+    const transactionCosts = options.transactionCosts ?? Array(n).fill(0);
+    const minWeights = options.minWeights ?? Array(n).fill(allowNegativeWeights ? -Infinity : 0);
+    const maxWeights = options.maxWeights ?? Array(n).fill(Infinity);
+
+    // Validate inputs
+    if (transactionCosts.length !== n || minWeights.length !== n || maxWeights.length !== n) {
+      throw new Error('Input arrays must match the number of assets');
     }
-    
-    /**
-     * Calculate risk parity portfolio weights
-     * 
-     * @param {Array} covMatrix - Covariance matrix (2D array)
-     * @param {Object} options - Optional parameters
-     * @param {boolean} options.allowNegativeWeights - Allow negative weights (default: true)
-     * @param {number} options.iterations - Number of iterations for optimization (default: 1000)
-     * @param {number} options.tolerance - Convergence tolerance (default: 1e-6)
-     * @returns {Array} Risk parity weights
-     */
-    function riskParityWeights(covMatrix, options = {}) {
-        const n = covMatrix.length;
-        const allowNegativeWeights = options.allowNegativeWeights !== false;
-        const iterations = options.iterations || 1000;
-        const tolerance = options.tolerance || 1e-6;
-        
-        // Validate input
-        if (n === 0 || covMatrix[0].length !== n) {
-            throw new Error("Invalid covariance matrix dimensions");
-        }
-        
-        // Initialize equal weights
-        let weights = Array(n).fill(1/n);
-        
-        // Iterative optimization for risk parity
-        for (let iter = 0; iter < iterations; iter++) {
-            const oldWeights = [...weights];
-            
-            // Calculate marginal risk contributions
-            const portfolioVariance = calculatePortfolioVolatility(weights, covMatrix);
-            const marginalRisks = [];
-            
-            for (let i = 0; i < n; i++) {
-                let riskContrib = 0;
-                for (let j = 0; j < n; j++) {
-                    riskContrib += weights[j] * covMatrix[i][j];
-                }
-                riskContrib *= weights[i] / portfolioVariance;
-                marginalRisks.push(riskContrib);
-            }
-            
-            // Update weights to equalize risk contributions
-            const targetRisk = vectorSum(marginalRisks) / n;
-            weights = weights.map((w, i) => w * targetRisk / marginalRisks[i]);
-            
-            // Apply negative weights constraint
-            if (!allowNegativeWeights) {
-                weights = weights.map(w => Math.max(0, w));
-            }
-            
-            // Normalize weights
-            const weightSum = vectorSum(weights);
-            weights = weights.map(w => w / weightSum);
-            
-            // Check for convergence
-            const maxDiff = Math.max(...weights.map((w, i) => Math.abs(w - oldWeights[i])));
-            if (maxDiff < tolerance) {
-                break;
-            }
-        }
-        
-        return weights;
+    if (minWeights.some((min, i) => min > maxWeights[i])) {
+      throw new Error('Minimum weights cannot exceed maximum weights');
     }
-    
-    /**
-     * Calculate portfolio statistics
-     * 
-     * @param {Array} weights - Portfolio weights
-     * @param {Array} meanReturns - Array of expected returns for each asset
-     * @param {Array} covMatrix - Covariance matrix (2D array)
-     * @param {Object} options - Optional parameters
-     * @param {number} options.riskFreeRate - Risk-free rate (default: 0)
-     * @returns {Object} Portfolio statistics {return, volatility, sharpeRatio}
-     */
-    function calculatePortfolioStats(weights, meanReturns, covMatrix, options = {}) {
-        const n = weights.length;
-        const riskFreeRate = options.riskFreeRate || 0;
-        
-        // Validate inputs
-        if (n === 0) {
-            throw new Error("Weights array cannot be empty");
-        }
-        if (meanReturns.length !== n) {
-            throw new Error("Mean returns array length must match weights");
-        }
-        if (covMatrix.length !== n || covMatrix[0].length !== n) {
-            throw new Error("Covariance matrix dimensions must match the number of assets");
-        }
-        
-        // Calculate expected return
-        const expectedReturn = vectorDot(weights, meanReturns);
-        
-        // Calculate volatility
-        const volatility = calculatePortfolioVolatility(weights, covMatrix);
-        
-        // Calculate Sharpe ratio
-        const sharpeRatio = (expectedReturn - riskFreeRate) / volatility;
-        
-        return {
-            return: expectedReturn,
-            volatility: volatility,
-            sharpeRatio: sharpeRatio
-        };
+
+    const meanReturns = computeMeanReturns(returnsData);
+    let covMatrix = computeCovMatrix(returnsData);
+
+    // Regularize covariance matrix for stability
+    const lambda = 1e-6;
+    for (let i = 0; i < n; i++) {
+      covMatrix[i][i] += lambda;
     }
-    
-    /**
-     * Calculate portfolio volatility
-     * 
-     * @param {Array} weights - Portfolio weights
-     * @param {Array} covMatrix - Covariance matrix (2D array)
-     * @returns {number} Portfolio volatility
-     */
-    function calculatePortfolioVolatility(weights, covMatrix) {
-        const n = weights.length;
-        
-        // Calculate portfolio variance
-        let variance = 0;
-        for (let i = 0; i < n; i++) {
-            for (let j = 0; j < n; j++) {
-                variance += weights[i] * weights[j] * covMatrix[i][j];
-            }
+
+    const invCov = matrixInverse(covMatrix);
+    if (!invCov) return Array(n).fill(1 / n); // Fallback to equal weights
+
+    // Adjust returns for transaction costs
+    const adjustedReturns = meanReturns.map((r, i) => r - transactionCosts[i]);
+    const excessReturns = adjustedReturns.map((r) => r - riskFreeRate);
+
+    const ones = Array(n).fill(1);
+    const A = matrixVectorMultiply(invCov, excessReturns);
+    const B = matrixVectorMultiply(invCov, ones);
+    const C = vectorDot(excessReturns, A);
+    const D = vectorDot(ones, B);
+    const E = vectorDot(ones, A);
+
+    let weights;
+    if (options.targetReturn !== undefined) {
+      const targetExcessReturn = options.targetReturn - riskFreeRate;
+      const lambda1 = (D * targetExcessReturn - E) / (C * D - E * E);
+      const lambda2 = (C - E * targetExcessReturn) / (C * D - E * E);
+
+      weights = Array(n).fill(0);
+      for (let i = 0; i < n; i++) {
+        for (let j = 0; j < n; j++) {
+          weights[i] += invCov[i][j] * (lambda1 * excessReturns[j] + lambda2);
         }
-        
-        // Return volatility (standard deviation)
-        return Math.sqrt(variance);
+      }
+    } else {
+      weights = A.map((a) => a / vectorSum(A));
     }
-    
-    /**
-     * Matrix-vector multiplication
-     * 
-     * @param {Array} matrix - 2D array representing a matrix
-     * @param {Array} vector - 1D array
-     * @returns {Array} Resulting vector
-     */
-    function matrixVectorMultiply(matrix, vector) {
-        // Handle case where matrix is a vector and vector is a scalar
-        if (!Array.isArray(matrix[0])) {
-            return vector * vectorDot(matrix, matrix);
-        }
-        
-        const result = [];
-        const n = matrix.length;
-        const m = vector.length;
-        
-        for (let i = 0; i < n; i++) {
-            let sum = 0;
-            for (let j = 0; j < m; j++) {
-                sum += matrix[i][j] * vector[j];
-            }
-            result.push(sum);
-        }
-        
-        return result;
+
+    // Apply weight constraints
+    weights = projectWeights(weights, minWeights, maxWeights);
+
+    // Normalize and enforce negative weight constraints
+    let weightSum = vectorSum(weights);
+    if (weightSum === 0) return Array(n).fill(1 / n); // Fallback
+    weights = weights.map((w) => w / weightSum);
+
+    if (!allowNegativeWeights) {
+      weights = weights.map((w) => Math.max(0, w));
+      weightSum = vectorSum(weights);
+      weights = weights.map((w) => (weightSum > 0 ? w / weightSum : 1 / n));
     }
-    
-    /**
-     * Vector dot product
-     * 
-     * @param {Array} v1 - First vector
-     * @param {Array} v2 - Second vector
-     * @returns {number} Dot product
-     */
-    function vectorDot(v1, v2) {
-        return v1.reduce((sum, x, i) => sum + x * v2[i], 0);
+
+    return weights;
+  }
+
+  /**
+   * Minimum Variance Portfolio
+   * @param {number[][]} returnsData - Array of return series for each asset
+   * @param {Object} options - Optimization options
+   * @param {boolean} [options.allowNegativeWeights=true] - Allow short positions
+   * @param {number[]} [options.minWeights] - Minimum weight per asset
+   * @param {number[]} [options.maxWeights] - Maximum weight per asset
+   * @returns {number[]} Optimal weights
+   */
+  function minimumVarianceWeights(returnsData, options = {}) {
+    const n = returnsData.length;
+    if (n === 0) throw new Error('Returns data cannot be empty');
+
+    const allowNegativeWeights = options.allowNegativeWeights !== false;
+    const minWeights = options.minWeights ?? Array(n).fill(allowNegativeWeights ? -Infinity : 0);
+    const maxWeights = options.maxWeights ?? Array(n).fill(Infinity);
+
+    let covMatrix = computeCovMatrix(returnsData);
+    const lambda = 1e-6;
+    for (let i = 0; i < n; i++) {
+      covMatrix[i][i] += lambda;
     }
-    
-    /**
-     * Sum of all elements in a vector
-     * 
-     * @param {Array} vector - Input vector
-     * @returns {number} Sum of elements
-     */
-    function vectorSum(vector) {
-        return vector.reduce((sum, x) => sum + x, 0);
+
+    const invCov = matrixInverse(covMatrix);
+    if (!invCov) return Array(n).fill(1 / n);
+
+    const ones = Array(n).fill(1);
+    const numerator = matrixVectorMultiply(invCov, ones);
+    const denominator = vectorSum(numerator);
+
+    let weights = numerator.map((num) => num / denominator);
+    weights = projectWeights(weights, minWeights, maxWeights);
+
+    if (!allowNegativeWeights) {
+      weights = weights.map((w) => Math.max(0, w));
+      const newSum = vectorSum(weights);
+      weights = weights.map((w) => (newSum > 0 ? w / newSum : 1 / n));
     }
-    
-    /**
-     * Matrix inversion using Gauss-Jordan elimination
-     * 
-     * @param {Array} matrix - Input matrix (2D array)
-     * @returns {Array} Inverse matrix or null if not invertible
-     */
-    function matrixInverse(matrix) {
-        const n = matrix.length;
-        
-        // Create augmented matrix [A|I]
-        const augmented = [];
-        for (let i = 0; i < n; i++) {
-            augmented[i] = [];
-            for (let j = 0; j < n; j++) {
-                augmented[i][j] = matrix[i][j];
-            }
-            for (let j = 0; j < n; j++) {
-                augmented[i][n + j] = (i === j) ? 1 : 0;
-            }
-        }
-        
-        // Perform Gauss-Jordan elimination
-        for (let i = 0; i < n; i++) {
-            // Find pivot
-            let maxRow = i;
-            for (let j = i + 1; j < n; j++) {
-                if (Math.abs(augmented[j][i]) > Math.abs(augmented[maxRow][i])) {
-                    maxRow = j;
-                }
-            }
-            
-            // Swap rows if needed
-            if (maxRow !== i) {
-                [augmented[i], augmented[maxRow]] = [augmented[maxRow], augmented[i]];
-            }
-            
-            // Check if matrix is invertible
-            if (Math.abs(augmented[i][i]) < 1e-10) {
-                return null; // Matrix is not invertible
-            }
-            
-            // Scale pivot row
-            const pivot = augmented[i][i];
-            for (let j = 0; j < 2 * n; j++) {
-                augmented[i][j] /= pivot;
-            }
-            
-            // Eliminate other rows
-            for (let j = 0; j < n; j++) {
-                if (j !== i) {
-                    const factor = augmented[j][i];
-                    for (let k = 0; k < 2 * n; k++) {
-                        augmented[j][k] -= factor * augmented[i][k];
-                    }
-                }
-            }
-        }
-        
-        // Extract inverse matrix
-        const inverse = [];
-        for (let i = 0; i < n; i++) {
-            inverse[i] = augmented[i].slice(n, 2 * n);
-        }
-        
-        return inverse;
+
+    return weights;
+  }
+
+  /**
+   * Risk Parity Portfolio
+   * @param {number[][]} returnsData - Array of return series for each asset
+   * @param {Object} options - Optimization options
+   * @param {boolean} [options.allowNegativeWeights=true] - Allow short positions
+   * @param {number} [options.maxIterations=1000] - Maximum iterations
+   * @param {number} [options.tolerance=1e-6] - Convergence tolerance
+   * @returns {number[]} Optimal weights
+   */
+  function riskParityWeights(returnsData, options = {}) {
+    const n = returnsData.length;
+    if (n === 0) throw new Error('Returns data cannot be empty');
+
+    const allowNegativeWeights = options.allowNegativeWeights !== false;
+    const maxIterations = options.maxIterations ?? 1000;
+    const tolerance = options.tolerance ?? 1e-6;
+
+    let covMatrix = computeCovMatrix(returnsData);
+    const lambda = 1e-6;
+    for (let i = 0; i < n; i++) {
+      covMatrix[i][i] += lambda;
     }
-    
-    // Public API
+
+    let weights = Array(n).fill(1 / n);
+    const targetRisk = 1 / n;
+
+    // Newton-Raphson optimization
+    for (let iter = 0; iter < maxIterations; iter++) {
+      const oldWeights = [...weights];
+      const portfolioVolatility = calculatePortfolioVolatility(weights, covMatrix);
+
+      // Compute marginal risk contributions
+      const marginalRisks = Array(n).fill(0);
+      for (let i = 0; i < n; i++) {
+        for (let j = 0; j < n; j++) {
+          marginalRisks[i] += weights[j] * covMatrix[i][j];
+        }
+        marginalRisks[i] *= weights[i] / portfolioVolatility;
+      }
+
+      // Compute gradient and Hessian
+      const gradient = marginalRisks.map((risk) => risk - targetRisk);
+      const hessian = Array(n)
+        .fill()
+        .map(() => Array(n).fill(0));
+
+      for (let i = 0; i < n; i++) {
+        for (let j = 0; j < n; j++) {
+          let term = covMatrix[i][j] / portfolioVolatility;
+          if (i === j) {
+            term -=
+              (weights[i] *
+                marginalRisks[i] *
+                vectorDot(weights, matrixVectorMultiply(covMatrix, weights))) /
+              (portfolioVolatility * portfolioVolatility);
+          }
+          hessian[i][j] = term;
+        }
+      }
+
+      // Update weights
+      const invHessian = matrixInverse(hessian);
+      if (!invHessian) break;
+      const deltaWeights = matrixVectorMultiply(invHessian, gradient);
+      weights = weights.map((w, i) => w - deltaWeights[i]);
+
+      if (!allowNegativeWeights) {
+        weights = weights.map((w) => Math.max(0, w));
+      }
+
+      const weightSum = vectorSum(weights);
+      weights = weights.map((w) => (weightSum > 0 ? w / weightSum : 1 / n));
+
+      if (Math.max(...weights.map((w, i) => Math.abs(w - oldWeights[i]))) < tolerance) {
+        break;
+      }
+    }
+
+    return weights;
+  }
+
+  /**
+   * Calculate portfolio statistics
+   * @param {number[][]} returnsData - Array of return series for each asset
+   * @param {number[]} weights - Portfolio weights
+   * @param {Object} options - Options
+   * @param {number} [options.riskFreeRate=0] - Risk-free rate
+   * @param {number[]} [options.transactionCosts] - Transaction costs per asset
+   * @returns {Object} {expectedReturn, volatility, sharpeRatio, riskContributions}
+   */
+  function calculatePortfolioStats(returnsData, weights, options = {}) {
+    const n = returnsData.length;
+    if (n === 0 || weights.length !== n) {
+      throw new Error('Invalid input dimensions');
+    }
+
+    const riskFreeRate = options.riskFreeRate ?? 0;
+    const transactionCosts = options.transactionCosts ?? Array(n).fill(0);
+
+    const meanReturns = computeMeanReturns(returnsData);
+    const covMatrix = computeCovMatrix(returnsData);
+
+    const adjustedReturns = meanReturns.map((r, i) => r - transactionCosts[i]);
+    const expectedReturn = vectorDot(weights, adjustedReturns);
+    const volatility = calculatePortfolioVolatility(weights, covMatrix);
+    const sharpeRatio = volatility > 0 ? (expectedReturn - riskFreeRate) / volatility : 0;
+
+    // Calculate risk contributions
+    const riskContributions = Array(n).fill(0);
+    for (let i = 0; i < n; i++) {
+      for (let j = 0; j < n; j++) {
+        riskContributions[i] += weights[j] * covMatrix[i][j];
+      }
+      riskContributions[i] *= weights[i] / (volatility || 1);
+    }
+
     return {
-        meanVarianceOptimizationWeights,
-        minimumVarianceWeights,
-        riskParityWeights,
-        calculatePortfolioStats
+      expectedReturn,
+      volatility,
+      sharpeRatio,
+      riskContributions,
     };
+  }
+
+  /**
+   * Calculate portfolio volatility
+   * @param {number[]} weights - Portfolio weights
+   * @param {number[][]} covMatrix - Covariance matrix
+   * @returns {number} Portfolio volatility
+   */
+  function calculatePortfolioVolatility(weights, covMatrix) {
+    let variance = 0;
+    for (let i = 0; i < weights.length; i++) {
+      for (let j = 0; j < weights.length; j++) {
+        variance += weights[i] * weights[j] * covMatrix[i][j];
+      }
+    }
+    return Math.sqrt(Math.max(0, variance));
+  }
+
+  /**
+   * Project weights onto constraint set
+   * @param {number[]} weights - Initial weights
+   * @param {number[]} minWeights - Minimum weights
+   * @param {number[]} maxWeights - Maximum weights
+   * @returns {number[]} Constrained weights
+   */
+  function projectWeights(weights, minWeights, maxWeights) {
+    return weights.map((w, i) => Math.min(Math.max(w, minWeights[i]), maxWeights[i]));
+  }
+
+  /**
+   * Matrix-vector multiplication
+   * @param {number[][]} matrix - Matrix
+   * @param {number[]} vector - Vector
+   * @returns {number[]} Result
+   */
+  function matrixVectorMultiply(matrix, vector) {
+    return matrix.map((row) => vectorDot(row, vector));
+  }
+
+  /**
+   * Vector dot product
+   * @param {number[]} v1 - First vector
+   * @param {number[]} v2 - Second vector
+   * @returns {number} Dot product
+   */
+  function vectorDot(v1, v2) {
+    return v1.reduce((sum, x, i) => sum + x * v2[i], 0);
+  }
+
+  /**
+   * Sum of vector elements
+   * @param {number[]} vector - Input vector
+   * @returns {number} Sum
+   */
+  function vectorSum(vector) {
+    return vector.reduce((sum, x) => sum + x, 0);
+  }
+
+  /**
+   * Matrix inversion using Gauss-Jordan elimination
+   * @param {number[][]} matrix - Input matrix
+   * @returns {number[][]|null} Inverse matrix or null if not invertible
+   */
+  function matrixInverse(matrix) {
+    const n = matrix.length;
+    const augmented = matrix.map((row, i) =>
+      [...row, ...Array(n).fill(0).map((_, j) => (i === j ? 1 : 0))],
+    );
+
+    for (let i = 0; i < n; i++) {
+      let maxRow = i;
+      for (let j = i + 1; j < n; j++) {
+        if (Math.abs(augmented[j][i]) > Math.abs(augmented[maxRow][i])) {
+          maxRow = j;
+        }
+      }
+
+      if (maxRow !== i) {
+        [augmented[i], augmented[maxRow]] = [augmented[maxRow], augmented[i]];
+      }
+
+      if (Math.abs(augmented[i][i]) < 1e-10) return null;
+
+      const pivot = augmented[i][i];
+      for (let j = 0; j < 2 * n; j++) {
+        augmented[i][j] /= pivot;
+      }
+
+      for (let j = 0; j < n; j++) {
+        if (j !== i) {
+          const factor = augmented[j][i];
+          for (let k = 0; k < 2 * n; k++) {
+            augmented[j][k] -= factor * augmented[i][k];
+          }
+        }
+      }
+    }
+
+    return augmented.map((row) => row.slice(n));
+  }
+
+  return {
+    meanVarianceOptimizationWeights,
+    minimumVarianceWeights,
+    riskParityWeights,
+    calculatePortfolioStats,
+  };
 })();
