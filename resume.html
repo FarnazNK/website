@@ -56,6 +56,9 @@
                 <li>Developed a full-stack Python application for hyperspectral imaging, integrating a responsive GUI (tkinter, Matplotlib) with backend data pipelines, featuring advanced workspace management, real-time spectral visualization, and drillcore analysis.</li>
                 <li>Optimized critical visualization components resulting in 70-85% overall performance improvement, reducing memory usage by ~65% and increasing UI responsiveness by ~90% when working with large hyperspectral datasets.</li>
                 <li>Architected scalable systems with multi-tabbed interfaces, file system explorers, and dynamic data caching (EnhancedDataManager), implementing advanced techniques including event throttling, multi-level caching, memory-mapped file access, and asynchronous rendering for scientific workflows.</li>
+                <li><strong>Designed advanced caching system:</strong> Built intelligent multi-tier caching architecture with AdvancedMemoryCache, PersistentMetadataCache, and SpectralDataCompressor, implementing weak references, intelligent eviction algorithms, and memory pressure detection to handle multi-gigabyte hyperspectral datasets efficiently.</li>
+                <li><strong>Implemented performance monitoring:</strong> Developed comprehensive cache metrics tracking including hit rates, memory usage, retrieval times, and efficiency scores, with automatic optimization based on system resources and usage patterns.</li>
+                <li><strong>Created specialized compression:</strong> Engineered custom compression algorithms for spectral data using gzip and precision reduction techniques, achieving significant memory savings while preserving data integrity for wavelength/reflectance datasets.</li>
               </ul>
             </div>
           </div>
@@ -88,6 +91,8 @@
                 <li>Created interactive dashboards with real-time spectral data visualization using Matplotlib and Tableau, incorporating custom Treeview widgets for data exploration and enhancing user decision-making in hyperspectral analysis.</li>
                 <li>Implemented performance-critical optimizations in visualization components, including throttled event handling, intelligent canvas redrawing, and weakref-based memory management, improving rendering speed by ~75% for large spectral datasets.</li>
                 <li>Engineered a high-performance spectral plotting system capable of handling multi-gigabyte datasets through innovative caching strategies and memory-mapped file access, enabling smooth real-time interaction with complex geological visualization workflows.</li>
+                <li><strong>Advanced caching implementation:</strong> Integrated HyperspectralCacheManager with specialized caches for spectral data (1.2GB), drillcore datasets (800MB), and plot data (400MB), implementing cache warming, memory pressure optimization, and SQLite-based metadata persistence.</li>
+                <li><strong>Intelligent eviction algorithms:</strong> Developed scoring-based eviction system considering time factors (40%), size factors (40%), and frequency factors (20%) to optimize cache performance under memory constraints.</li>
               </ul>
             </div>
           </div>
@@ -116,6 +121,7 @@
       <h1 class="text-center mb-5">Personal Projects</h1>
       <div class="row justify-content-center">
         <div class="col-md-10">
+          <!-- Project 1: TEF Prep App -->
           <div class="card-item" onclick="toggleDetails(this)">
             <div class="card-indicator"></div>
             <i class="fas fa-graduation-cap"></i>
@@ -133,6 +139,31 @@
                 <a href="https://github.com/FarnazNK/TEF_Prep_App" target="_blank" class="btn btn-outline-primary btn-sm">
                   <i class="fab fa-github"></i> View Repository
                 </a>
+              </p>
+            </div>
+          </div>
+          
+          <!-- Project 2: Hyperspectral Cache System -->
+          <div class="card-item" onclick="toggleDetails(this)">
+            <div class="card-indicator"></div>
+            <i class="fas fa-database"></i>
+            <h3>Hyperspectral Data Caching System</h3>
+            <div class="card-details">
+              <p class="lead text-muted">Aug 2024 – Present</p>
+              <p class="lead"><strong>Professional Project | Python, SQLite, Threading, Memory Management</strong></p>
+              <ul class="lead">
+                <li><strong>Multi-tier Architecture:</strong> Designed intelligent caching system with AdvancedMemoryCache, PersistentMetadataCache, and SpectralDataCompressor components, supporting weak references and thread-safe operations for hyperspectral data visualization.</li>
+                <li><strong>Performance Optimization:</strong> Implemented intelligent eviction algorithms based on access patterns (time, frequency, size), achieving 70-85% performance improvements and 65% memory usage reduction for large scientific datasets.</li>
+                <li><strong>System Integration:</strong> Built HyperspectralCacheManager with specialized caches for different data types (spectral: 1.2GB, drillcore: 800MB, plots: 400MB), including automatic memory pressure detection and cache warming capabilities.</li>
+                <li><strong>Monitoring & Analytics:</strong> Developed comprehensive metrics tracking system with CacheMetrics class, monitoring hit rates, retrieval times, compression ratios, and efficiency scores for continuous optimization.</li>
+                <li><strong>Advanced Features:</strong> Integrated psutil for system resource monitoring, SQLite for metadata persistence, gzip compression with precision reduction, and weakref-based memory leak prevention.</li>
+              </ul>
+              <p class="lead mt-3">
+                <span class="badge badge-success">Python</span>
+                <span class="badge badge-info">SQLite</span>
+                <span class="badge badge-warning">Threading</span>
+                <span class="badge badge-primary">Memory Optimization</span>
+                <span class="badge badge-secondary">Performance Monitoring</span>
               </p>
             </div>
           </div>
