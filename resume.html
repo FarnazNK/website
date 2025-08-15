@@ -1,20 +1,41 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Resume - Farnaz Nasehi</title>
-  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
-  <link rel="stylesheet" href="styles.css" />
-  <!-- Added particles.js library -->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Skills - Farnaz Nasehi</title>
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <!-- Font Awesome for Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <!-- Google Fonts -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Poppins:wght@400;500;600;700&display=swap">
+  <!-- Animation CSS -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+  <!-- Custom Styles -->
+  <link rel="stylesheet" href="styles.css">
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- TensorFlow.js -->
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+  <!-- ML.js -->
+  <script src="https://www.lactame.com/lib/ml/4.0.0/ml.min.js"></script>
+  <!-- jQuery and Popper.js -->
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+  <!-- Bootstrap JS -->
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  <!-- Particles.js library -->
   <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+  <!-- AOS Animation Library -->
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <link rel="stylesheet" href="https://unpkg.com/aos@2.3.1/dist/aos.css">
 </head>
 <body>
   <!-- Navbar -->
-  <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top shadow-sm">
+  <nav class="navbar navbar-expand-lg navbar-dark fixed-top shadow-sm">
     <div class="container">
-      <a class="navbar-brand" href="index.html">Farnaz Nasehi</a>
+      <a class="navbar-brand font-weight-bold" href="index.html">Farnaz Nasehi</a>
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" 
               aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
@@ -22,8 +43,8 @@
       <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav ml-auto">
           <li class="nav-item"><a class="nav-link" href="about.html">About</a></li>
-          <li class="nav-item active"><a class="nav-link" href="resume.html">Work Experience</a></li>
-          <li class="nav-item"><a class="nav-link" href="skills.html">Skills</a></li>
+          <li class="nav-item"><a class="nav-link" href="resume.html">Work Experience</a></li>
+          <li class="nav-item active"><a class="nav-link" href="skills.html">Skills</a></li>
           <li class="nav-item"><a class="nav-link" href="portfolio.html">Quantitative Investment Platform</a></li>
           <li class="nav-item"><a class="nav-link" href="contact.html">Contact</a></li>
         </ul>
@@ -31,175 +52,511 @@
     </div>
   </nav>
 
-  <!-- Added particles background container -->
+  <!-- Particles background container -->
   <div id="particles-js" class="particles-container"></div>
-
+  
   <!-- Spacer for fixed navbar -->
   <div style="padding-top: 80px;"></div>
-
-  <!-- Resume Section -->
-  <section class="resume-section bg-gradient">
-    <div class="container">
-      <h1 class="text-center mb-5">Work Experience</h1>
+  
+  <!-- Skills Section Header -->
+  <section class="skills-header bg-gradient pb-0">
+    <div class="container py-5">
       <div class="row">
-        <!-- Left Column -->
-        <div class="col-md-6">
-          <!-- Job Card 1: Software Developer -->
-          <div class="card-item" onclick="toggleDetails(this)">
-            <div class="card-indicator"></div>
-            <i class="fas fa-code-branch"></i>
-            <h3>Software Developer</h3>
-            <div class="card-details">
-              <p class="lead text-muted">Aug 2024 – Present</p>
-              <p class="lead"><strong>Hyperspectral Intelligence Inc, Gibsons, BC, Canada</strong></p>
-              <ul class="lead">
-                <li>Developed a full-stack Python application for hyperspectral imaging, integrating a responsive GUI (tkinter, Matplotlib) with backend data pipelines, featuring advanced workspace management, real-time spectral visualization, and drillcore analysis.</li>
-                <li>Optimized critical visualization components resulting in 70-85% overall performance improvement, reducing memory usage by ~65% and increasing UI responsiveness by ~90% when working with large hyperspectral datasets.</li>
-                <li>Architected scalable systems with multi-tabbed interfaces, file system explorers, and dynamic data caching (EnhancedDataManager), implementing advanced techniques including event throttling, multi-level caching, memory-mapped file access, and asynchronous rendering for scientific workflows.</li>
-                <li><strong>Designed advanced caching system:</strong> Built intelligent multi-tier caching architecture with AdvancedMemoryCache, PersistentMetadataCache, and SpectralDataCompressor, implementing weak references, intelligent eviction algorithms, and memory pressure detection to handle multi-gigabyte hyperspectral datasets efficiently.</li>
-                <li><strong>Implemented performance monitoring:</strong> Developed comprehensive cache metrics tracking including hit rates, memory usage, retrieval times, and efficiency scores, with automatic optimization based on system resources and usage patterns.</li>
-                <li><strong>Created specialized compression:</strong> Engineered custom compression algorithms for spectral data using gzip and precision reduction techniques, achieving significant memory savings while preserving data integrity for wavelength/reflectance datasets.</li>
-              </ul>
-            </div>
-          </div>
-          <!-- Job Card 2: Data Analyst (Finance Department) -->
-          <div class="card-item" onclick="toggleDetails(this)">
-            <div class="card-indicator"></div>
-            <i class="fas fa-chart-pie"></i>
-            <h3>Data Analyst</h3>
-            <div class="card-details">
-              <p class="lead text-muted">May 2023 – Aug 2023</p>
-              <p class="lead"><strong>Finance Department, University of Calgary, Calgary, AB, Canada</strong></p>
-              <ul class="lead">
-                <li>Performed wallet address labeling on Ethereum blockchain data using Julia, developing efficient scripts to categorize and analyze transaction patterns for financial insights.</li>
-                <li>Conducted web scraping to gather supplementary blockchain data, optimizing data pipelines with Julia for real-time processing and reporting, enhancing stakeholder decision-making.</li>
-              </ul>
-            </div>
+        <div class="col-lg-8 mx-auto text-center">
+          <h1 class="section-title text-center mb-4 animate__animated animate__fadeInDown">Professional Skills</h1>
+          <p class="lead text-muted mb-5 animate__animated animate__fadeInUp">Specialized expertise in system architecture, data analytics, blockchain technologies, hyperspectral processing, advanced caching systems, and modern web development.</p>
+        </div>
+      </div>
+      
+      <!-- Skill Summary Badges -->
+      <div class="row skill-summary justify-content-center mb-5">
+        <div class="col-md-2 col-sm-4 col-6 mb-4" data-aos="fade-up" data-aos-delay="100">
+          <div class="skill-metric">
+            <div class="skill-metric-value">95<span>%</span></div>
+            <div class="skill-metric-label">Caching Systems</div>
           </div>
         </div>
-        <!-- Right Column -->
-        <div class="col-md-6">
-          <!-- Job Card 3: Data Visualization Specialist -->
-          <div class="card-item" onclick="toggleDetails(this)">
-            <div class="card-indicator"></div>
-            <i class="fas fa-chart-line"></i>
-            <h3>Data Visualization Specialist</h3>
-            <div class="card-details">
-              <p class="lead text-muted">Feb 2024 – July 2024</p>
-              <p class="lead"><strong>Hyperspectral Intelligence Inc, Gibsons, BC, Canada</strong></p>
-              <ul class="lead">
-                <li>Created interactive dashboards with real-time spectral data visualization using Matplotlib and Tableau, incorporating custom Treeview widgets for data exploration and enhancing user decision-making in hyperspectral analysis.</li>
-                <li>Implemented performance-critical optimizations in visualization components, including throttled event handling, intelligent canvas redrawing, and weakref-based memory management, improving rendering speed by ~75% for large spectral datasets.</li>
-                <li>Engineered a high-performance spectral plotting system capable of handling multi-gigabyte datasets through innovative caching strategies and memory-mapped file access, enabling smooth real-time interaction with complex geological visualization workflows.</li>
-                <li><strong>Advanced caching implementation:</strong> Integrated HyperspectralCacheManager with specialized caches for spectral data (1.2GB), drillcore datasets (800MB), and plot data (400MB), implementing cache warming, memory pressure optimization, and SQLite-based metadata persistence.</li>
-                <li><strong>Intelligent eviction algorithms:</strong> Developed scoring-based eviction system considering time factors (40%), size factors (40%), and frequency factors (20%) to optimize cache performance under memory constraints.</li>
-              </ul>
-            </div>
+        <div class="col-md-2 col-sm-4 col-6 mb-4" data-aos="fade-up" data-aos-delay="200">
+          <div class="skill-metric">
+            <div class="skill-metric-value">93<span>%</span></div>
+            <div class="skill-metric-label">Python</div>
           </div>
-          <!-- Job Card 4: Data Analyst (Physics Department) -->
-          <div class="card-item" onclick="toggleDetails(this)">
-            <div class="card-indicator"></div>
-            <i class="fas fa-flask"></i>
-            <h3>Data Analyst</h3>
-            <div class="card-details">
-              <p class="lead text-muted">Sep 2014 – Sep 2020</p>
-              <p class="lead"><strong>Physics Department, University of Tabriz, Tabriz, Iran</strong></p>
-              <ul class="lead">
-                <li>Applied advanced analytical techniques to process experimental physics datasets, leveraging Python scripts for precision data handling and visualization.</li>
-                <li>Developed technical reports and presentations, utilizing optimized data workflows to communicate actionable insights derived from complex scientific data.</li>
-              </ul>
-            </div>
+        </div>
+        <div class="col-md-2 col-sm-4 col-6 mb-4" data-aos="fade-up" data-aos-delay="300">
+          <div class="skill-metric">
+            <div class="skill-metric-value">92<span>%</span></div>
+            <div class="skill-metric-label">Performance</div>
+          </div>
+        </div>
+        <div class="col-md-2 col-sm-4 col-6 mb-4" data-aos="fade-up" data-aos-delay="400">
+          <div class="skill-metric">
+            <div class="skill-metric-value">93<span>%</span></div>
+            <div class="skill-metric-label">Data Systems</div>
+          </div>
+        </div>
+        <div class="col-md-2 col-sm-4 col-6 mb-4" data-aos="fade-up" data-aos-delay="500">
+          <div class="skill-metric">
+            <div class="skill-metric-value">88<span>%</span></div>
+            <div class="skill-metric-label">ML</div>
           </div>
         </div>
       </div>
     </div>
   </section>
-
-  <!-- Personal Projects Section -->
-  <section class="projects-section bg-gradient">
+  
+  <!-- Skills Section -->
+  <section class="skills-section bg-gradient">
     <div class="container">
-      <h1 class="text-center mb-5">Personal Projects</h1>
-      <div class="row justify-content-center">
-        <div class="col-md-10">
-          <!-- Project 1: TEF Prep App -->
-          <div class="card-item" onclick="toggleDetails(this)">
+      <div class="row">
+        <!-- Technical Expertise Category -->
+        <div class="col-12 mb-4">
+          <div class="category-header">
+            <div class="category-icon">
+              <i class="fas fa-laptop-code"></i>
+            </div>
+            <h2 class="h4">Advanced System Architecture</h2>
+          </div>
+        </div>
+      
+        <!-- Left Column -->
+        <div class="col-md-6">
+          <!-- Card 1: Advanced Caching Systems -->
+          <div class="card-item" onclick="toggleDetails(this)" data-skill-level="95" data-aos="fade-right" data-aos-delay="100">
             <div class="card-indicator"></div>
-            <i class="fas fa-graduation-cap"></i>
-            <h3>TEF Prep App - Full-Stack Language Learning Platform</h3>
+            <div class="card-icon">
+              <i class="fas fa-database"></i>
+            </div>
+            <div class="card-content">
+              <h3>Advanced Caching Systems</h3>
+              <div class="skill-level">
+                <div class="skill-level-bar" style="width: 0%"></div>
+              </div>
+            </div>
             <div class="card-details">
-              <p class="lead text-muted">Sep 2024 – Present</p>
-              <p class="lead"><strong>Personal Project | React.js, Node.js, Express.js, REST API</strong></p>
-              <ul class="lead">
-                <li>Architected full-stack web application using React.js frontend and Express.js backend, implementing RESTful API architecture to serve structured educational content through 8 optimized endpoints.</li>
-                <li>Engineered scalable content management system supporting multi-level language proficiency (A1-B2 CEFR standards) with dynamic exercise generation and automated progress tracking algorithms.</li>
-                <li>Developed responsive single-page application with component-based architecture, implementing state management patterns and cross-platform compatibility for desktop and mobile environments.</li>
-                <li>Designed and implemented comprehensive testing framework with modular JSON data structures, supporting real-time user interaction analytics and performance optimization.</li>
-              </ul>
-              <p class="lead mt-3">
-                <a href="https://github.com/FarnazNK/TEF_Prep_App" target="_blank" class="btn btn-outline-primary btn-sm">
-                  <i class="fab fa-github"></i> View Repository
-                </a>
-              </p>
+              • Multi-tier caching architecture (AdvancedMemoryCache, PersistentMetadataCache, SpectralDataCompressor)<br>
+              • Intelligent eviction algorithms with access pattern analysis (time 40%, size 40%, frequency 20%)<br>
+              • Memory pressure detection and automatic optimization using psutil<br>
+              • Weak reference management and thread-safe operations with comprehensive metrics tracking<br>
+              <em>Python (threading, weakref, sqlite3), psutil, gzip compression, pickle serialization</em>
+            </div>
+          </div>
+
+          <!-- Card 2: System Design & Architecture -->
+          <div class="card-item" onclick="toggleDetails(this)" data-skill-level="90" data-aos="fade-right" data-aos-delay="200">
+            <div class="card-indicator"></div>
+            <div class="card-icon">
+              <i class="fas fa-server"></i>
+            </div>
+            <div class="card-content">
+              <h3>System Design & Architecture</h3>
+              <div class="skill-level">
+                <div class="skill-level-bar" style="width: 0%"></div>
+              </div>
+            </div>
+            <div class="card-details">
+              • Modular design with class-based separation and clear interfaces<br>
+              • State persistence and workspace management for data-intensive applications<br>
+              • Scalable architecture planning with performance optimization strategies<br>
+              • Integration of caching layers with application lifecycle management<br>
+              <em>Python (os, glob, json), tkinter, RESTful design concepts, HyperspectralCacheManager</em>
             </div>
           </div>
           
-          <!-- Project 2: Hyperspectral Cache System -->
-          <div class="card-item" onclick="toggleDetails(this)">
+          <!-- Card 3: Performance Optimization -->
+          <div class="card-item" onclick="toggleDetails(this)" data-skill-level="92" data-aos="fade-right" data-aos-delay="300">
             <div class="card-indicator"></div>
-            <i class="fas fa-database"></i>
-            <h3>Hyperspectral Data Caching System</h3>
-            <div class="card-details">
-              <p class="lead text-muted">Aug 2024 – Present</p>
-              <p class="lead"><strong>Professional Project | Python, SQLite, Threading, Memory Management</strong></p>
-              <ul class="lead">
-                <li><strong>Multi-tier Architecture:</strong> Designed intelligent caching system with AdvancedMemoryCache, PersistentMetadataCache, and SpectralDataCompressor components, supporting weak references and thread-safe operations for hyperspectral data visualization.</li>
-                <li><strong>Performance Optimization:</strong> Implemented intelligent eviction algorithms based on access patterns (time, frequency, size), achieving 70-85% performance improvements and 65% memory usage reduction for large scientific datasets.</li>
-                <li><strong>System Integration:</strong> Built HyperspectralCacheManager with specialized caches for different data types (spectral: 1.2GB, drillcore: 800MB, plots: 400MB), including automatic memory pressure detection and cache warming capabilities.</li>
-                <li><strong>Monitoring & Analytics:</strong> Developed comprehensive metrics tracking system with CacheMetrics class, monitoring hit rates, retrieval times, compression ratios, and efficiency scores for continuous optimization.</li>
-                <li><strong>Advanced Features:</strong> Integrated psutil for system resource monitoring, SQLite for metadata persistence, gzip compression with precision reduction, and weakref-based memory leak prevention.</li>
-              </ul>
-              <p class="lead mt-3">
-                <span class="badge badge-success">Python</span>
-                <span class="badge badge-info">SQLite</span>
-                <span class="badge badge-warning">Threading</span>
-                <span class="badge badge-primary">Memory Optimization</span>
-                <span class="badge badge-secondary">Performance Monitoring</span>
-              </p>
+            <div class="card-icon">
+              <i class="fas fa-tachometer-alt"></i>
             </div>
+            <div class="card-content">
+              <h3>Performance Optimization</h3>
+              <div class="skill-level">
+                <div class="skill-level-bar" style="width: 0%"></div>
+              </div>
+            </div>
+            <div class="card-details">
+              • Memory usage reduction by ~65% through intelligent caching strategies<br>
+              • UI responsiveness improvement by ~90% with throttled event handling<br>
+              • Achieved 70-85% overall performance improvements in hyperspectral applications<br>
+              • Compression ratio optimization and retrieval time monitoring<br>
+              <em>Memory profiling, event throttling, asynchronous operations, performance metrics</em>
+            </div>
+          </div>
+          
+          <!-- Card 4: Concurrency & Real-Time Processing -->
+          <div class="card-item" onclick="toggleDetails(this)" data-skill-level="85" data-aos="fade-right" data-aos-delay="400">
+            <div class="card-indicator"></div>
+            <div class="card-icon">
+              <i class="fas fa-sync-alt"></i>
+            </div>
+            <div class="card-content">
+              <h3>Concurrency & Real-Time Processing</h3>
+              <div class="skill-level">
+                <div class="skill-level-bar" style="width: 0%"></div>
+              </div>
+            </div>
+            <div class="card-details">
+             • Thread-safe caching operations with RLock synchronization<br>
+             • Cache warming with preloading callbacks and background processing<br>
+             • Real-time memory pressure monitoring and automatic cache optimization<br>
+             • Asynchronous rendering with intelligent scheduling for responsive UIs<br>
+             <em>threading.RLock, weakref callbacks, background task scheduling, real-time monitoring</em>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Right Column -->
+        <div class="col-md-6">
+          <!-- Card 5: Data Compression & Storage -->
+          <div class="card-item" onclick="toggleDetails(this)" data-skill-level="93" data-aos="fade-left" data-aos-delay="100">
+            <div class="card-indicator"></div>
+            <div class="card-icon">
+              <i class="fas fa-compress-arrows-alt"></i>
+            </div>
+            <div class="card-content">
+              <h3>Data Compression & Storage</h3>
+              <div class="skill-level">
+                <div class="skill-level-bar" style="width: 0%"></div>
+              </div>
+            </div>
+            <div class="card-details">
+              • Specialized hyperspectral data compression with precision reduction (float64→float32)<br>
+              • Gzip compression with configurable levels and metadata preservation<br>
+              • SQLite-based persistent storage with access pattern tracking<br>
+              • Memory-mapped file access for large dataset handling<br>
+              <em>gzip, SQLite, numpy dtype optimization, file I/O optimization, metadata management</em>
+            </div>
+          </div>
+
+          <!-- Card 6: Machine Learning & Data Analytics -->
+          <div class="card-item" onclick="toggleDetails(this)" data-skill-level="88" data-aos="fade-left" data-aos-delay="200">
+            <div class="card-indicator"></div>
+            <div class="card-icon">
+              <i class="fas fa-brain"></i>
+            </div>
+            <div class="card-content">
+              <h3>Machine Learning & Data Analytics</h3>
+              <div class="skill-level">
+                <div class="skill-level-bar" style="width: 0%"></div>
+              </div>
+            </div>
+            <div class="card-details">
+              • Developed models to track token balances and fee income in DeFi<br>
+              • Preprocessed hyperspectral data for statistical analysis with efficient caching<br>
+              • Predictive analytics for blockchain performance optimization<br>
+              • Integration of ML workflows with advanced caching systems<br>
+              <em>NumPy, Pandas, Julia, scikit-learn, TensorFlow.js, cache-aware ML pipelines</em>
+            </div>
+          </div>
+
+          <!-- Card 7: Web Development & JavaScript Libraries -->
+          <div class="card-item" onclick="toggleDetails(this)" data-skill-level="85" data-aos="fade-left" data-aos-delay="300">
+            <div class="card-indicator"></div>
+            <div class="card-icon">
+              <i class="fas fa-globe"></i>
+            </div>
+            <div class="card-content">
+              <h3>Web Development & JavaScript Libraries</h3>
+              <div class="skill-level">
+                <div class="skill-level-bar" style="width: 0%"></div>
+              </div>
+            </div>
+            <div class="card-details">
+              • Responsive portfolio design with HTML, CSS, and Bootstrap<br>
+              • Interactive features using jQuery, Chart.js, and TensorFlow.js<br>
+              • Frontend optimization for performance and user experience<br>
+              • RESTful API development with Express.js and Node.js<br>
+              <em>Bootstrap, Font Awesome, jQuery, Chart.js, TensorFlow.js, React.js, Express.js</em>
+            </div>
+          </div>
+
+          <!-- Card 8: Memory Management & Optimization -->
+          <div class="card-item" onclick="toggleDetails(this)" data-skill-level="94" data-aos="fade-left" data-aos-delay="400">
+            <div class="card-indicator"></div>
+            <div class="card-icon">
+              <i class="fas fa-memory"></i>
+            </div>
+            <div class="card-content">
+              <h3>Memory Management & Optimization</h3>
+              <div class="skill-level">
+                <div class="skill-level-bar" style="width: 0%"></div>
+              </div>
+            </div>
+            <div class="card-details">
+              • Intelligent memory allocation with automatic size detection (15% of available memory)<br>
+              • Weak reference implementation to prevent memory leaks<br>
+              • Object size estimation algorithms for various data types (numpy, pandas, matplotlib)<br>
+              • Garbage collection optimization and memory pressure response<br>
+              <em>weakref, psutil memory monitoring, gc module, memory profiling, leak prevention</em>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Load more cards button -->
+        <div class="col-12 text-center my-4">
+          <button id="loadMoreTechnical" class="btn btn-gradient">
+            <span>Load More Skills</span>
+            <i class="fas fa-chevron-down ml-2"></i>
+          </button>
+        </div>
+        
+        <!-- Systems Operations Category -->
+        <div class="col-12 mt-5 mb-4">
+          <div class="category-header">
+            <div class="category-icon">
+              <i class="fas fa-cogs"></i>
+            </div>
+            <h2 class="h4">Systems Operations & Monitoring</h2>
+          </div>
+        </div>
+        
+        <!-- Server Administration -->
+        <div class="col-md-6">
+          <!-- Card 9: Cache Performance Monitoring -->
+          <div class="card-item" onclick="toggleDetails(this)" data-skill-level="96" data-aos="fade-up">
+            <div class="card-indicator"></div>
+            <div class="card-icon">
+              <i class="fas fa-chart-line"></i>
+            </div>
+            <div class="card-content">
+              <h3>Cache Performance Monitoring</h3>
+              <div class="skill-level">
+                <div class="skill-level-bar" style="width: 0%"></div>
+              </div>
+            </div>
+            <div class="card-details">
+              • Comprehensive metrics tracking (hit rates, retrieval times, compression ratios)<br>
+              • Efficiency scoring algorithms combining hit rate, speed, and memory factors<br>
+              • Real-time performance analytics with rolling averages (last 100 measurements)<br>
+              • Automated cache optimization based on system resources and usage patterns<br>
+              <em>CacheMetrics class, performance profiling, statistical analysis, real-time monitoring</em>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <!-- Card 10: Server Administration -->
+          <div class="card-item" onclick="toggleDetails(this)" data-skill-level="88" data-aos="fade-up">
+            <div class="card-indicator"></div>
+            <div class="card-icon">
+              <i class="fas fa-server"></i>
+            </div>
+            <div class="card-content">
+              <h3>Server Administration</h3>
+              <div class="skill-level">
+                <div class="skill-level-bar" style="width: 0%"></div>
+              </div>
+            </div>
+            <div class="card-details">
+              • Administered Linux servers for blockchain and financial analytics<br>
+              • Optimized configurations for high-performance quantitative operations<br>
+              • Security hardening and automated backup implementation<br>
+              • System resource monitoring and cache infrastructure deployment<br>
+              <em>Linux, Bash, system configuration tools, deployment automation</em>
+            </div>
+          </div>
+        </div>
+
+        <!-- Additional Skills Category -->
+        <div class="col-12 mt-5 mb-4">
+          <div class="category-header">
+            <div class="category-icon">
+              <i class="fas fa-plus-circle"></i>
+            </div>
+            <h2 class="h4">Additional Skills</h2>
+          </div>
+        </div>
+
+        <!-- Skills tag cloud -->
+        <div class="col-12 mb-5">
+          <div class="skills-cloud" data-aos="fade-up">
+            <span class="cloud-tag" style="font-size: 1.6rem">Advanced Caching</span>
+            <span class="cloud-tag" style="font-size: 1.5rem">Python</span>
+            <span class="cloud-tag" style="font-size: 1.4rem">Memory Management</span>
+            <span class="cloud-tag" style="font-size: 1.4rem">React</span>
+            <span class="cloud-tag" style="font-size: 1.3rem">Performance Optimization</span>
+            <span class="cloud-tag" style="font-size: 1.3rem">Next.js</span>
+            <span class="cloud-tag" style="font-size: 1.25rem">Threading</span>
+            <span class="cloud-tag" style="font-size: 1.25rem">TypeScript</span>
+            <span class="cloud-tag" style="font-size: 1.2rem">SQLite</span>
+            <span class="cloud-tag" style="font-size: 1.2rem">NumPy</span>
+            <span class="cloud-tag" style="font-size: 1.3rem">Pandas</span>
+            <span class="cloud-tag" style="font-size: 1.15rem">Weakref</span>
+            <span class="cloud-tag" style="font-size: 1.1rem">Julia</span>
+            <span class="cloud-tag" style="font-size: 1.2rem">TensorFlow</span>
+            <span class="cloud-tag" style="font-size: 1.15rem">Psutil</span>
+            <span class="cloud-tag" style="font-size: 1.1rem">Node.js</span>
+            <span class="cloud-tag" style="font-size: 1rem">Express</span>
+            <span class="cloud-tag" style="font-size: 1.1rem">Gzip Compression</span>
+            <span class="cloud-tag" style="font-size: 1.25rem">JavaScript</span>
+            <span class="cloud-tag" style="font-size: 1.15rem">HTML5</span>
+            <span class="cloud-tag" style="font-size: 1.2rem">CSS3</span>
+            <span class="cloud-tag" style="font-size: 1.1rem">Matplotlib</span>
+            <span class="cloud-tag" style="font-size: 1rem">Tailwind</span>
+            <span class="cloud-tag" style="font-size: 1.05rem">Redux</span>
+            <span class="cloud-tag" style="font-size: 1.15rem">REST API</span>
+            <span class="cloud-tag" style="font-size: 1.1rem">Git</span>
+          </div>
+        </div>
+
+        <!-- Left Column for Additional Skills -->
+        <div class="col-md-6">
+          <!-- Card 11: Statistical Analysis -->
+          <div class="card-item" onclick="toggleDetails(this)" data-skill-level="89" data-aos="fade-right">
+            <div class="card-indicator"></div>
+            <div class="card-icon">
+              <i class="fas fa-chart-bar"></i>
+            </div>
+            <div class="card-content">
+              <h3>Statistical Analysis</h3>
+              <div class="skill-level">
+                <div class="skill-level-bar" style="width: 0%"></div>
+              </div>
+            </div>
+            <div class="card-details">
+              • Computed advanced statistics (mean, variance, skewness, kurtosis)<br>
+              • Performed ANOVA and outlier detection on datasets<br>
+              • Integrated statistical tools into web applications<br>
+              • Cache-aware statistical processing for large datasets<br>
+              <em>jStat, JavaScript, statistical modeling, numpy statistical functions</em>
+            </div>
+          </div>
+
+          <!-- Card 12: Data Architecture -->
+          <div class="card-item" onclick="toggleDetails(this)" data-skill-level="91" data-aos="fade-right">
+            <div class="card-indicator"></div>
+            <div class="card-icon">
+              <i class="fas fa-sitemap"></i>
+            </div>
+            <div class="card-content">
+              <h3>Data Architecture</h3>
+              <div class="skill-level">
+                <div class="skill-level-bar" style="width: 0%"></div>
+              </div>
+            </div>
+            <div class="card-details">
+              • Multi-tier data storage strategies (memory, persistent, file-based)<br>
+              • Hyperspectral data pipeline design with specialized compression<br>
+              • Cache hierarchy optimization for different data types<br>
+              • Data lifecycle management with automated cleanup and optimization<br>
+              <em>Data modeling, cache architecture, compression algorithms, lifecycle management</em>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <!-- Card 13: User Experience (UX) Design -->
+          <div class="card-item" onclick="toggleDetails(this)" data-skill-level="88" data-aos="fade-left">
+            <div class="card-indicator"></div>
+            <div class="card-icon">
+              <i class="fas fa-eye"></i>
+            </div>
+            <div class="card-content">
+              <h3>User Experience (UX) Design</h3>
+              <div class="skill-level">
+                <div class="skill-level-bar" style="width: 0%"></div>
+              </div>
+            </div>
+            <div class="card-details">
+              • Designed intuitive UIs with collapsible cards and toolbars<br>
+              • Added hover effects, transitions, and animations for polish<br>
+              • Focused on responsive and user-friendly layouts<br>
+              • Performance-aware UI design with caching integration<br>
+              <em>CSS animations, Bootstrap, UX principles, responsive design</em>
+            </div>
+          </div>
+
+          <!-- Card 14: System Integration -->
+          <div class="card-item" onclick="toggleDetails(this)" data-skill-level="92" data-aos="fade-left">
+            <div class="card-indicator"></div>
+            <div class="card-icon">
+              <i class="fas fa-puzzle-piece"></i>
+            </div>
+            <div class="card-content">
+              <h3>System Integration</h3>
+              <div class="skill-level">
+                <div class="skill-level-bar" style="width: 0%"></div>
+              </div>
+            </div>
+            <div class="card-details">
+              • Integration of caching systems with existing application architectures<br>
+              • Seamless cache warming and preloading callback systems<br>
+              • Cross-component communication and state management<br>
+              • Workspace management with persistent cache integration<br>
+              <em>API integration, callback systems, state management, architectural patterns</em>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Load more button for Additional Skills -->
+        <div class="col-12 text-center my-4">
+          <button id="loadMoreAdditional" class="btn btn-gradient">
+            <span>Load More Additional Skills</span>
+            <i class="fas fa-chevron-down ml-2"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+  
+  <!-- Skill Comparison Chart -->
+  <section class="chart-section py-5 bg-dark">
+    <div class="container">
+      <h2 class="text-center mb-5">Skills Breakdown</h2>
+      <div class="row">
+        <div class="col-lg-8 mx-auto">
+          <div class="chart-container">
+            <canvas id="skillsRadarChart"></canvas>
           </div>
         </div>
       </div>
     </div>
   </section>
-
+  
   <!-- Footer -->
-  <footer class="text-center text-light py-3" style="background-color: #333;">
-    <p>© 2025 Farnaz Nasehi. All rights reserved.</p>
+  <footer class="py-4 bg-dark text-center text-white-50">
+    <div class="container">
+      <p class="mb-2">© 2025 Farnaz Nasehi. All Rights Reserved.</p>
+      <div class="social-links mt-3">
+        <a href="https://linkedin.com/in/farnaz-nasehi" class="social-link" target="_blank">
+          <i class="fab fa-linkedin"></i>
+        </a>
+        <a href="https://github.com/FarnazNK" class="social-link" target="_blank">
+          <i class="fab fa-github"></i>
+        </a>
+        <a href="mailto:fnasehikalajahi@gmail.com" class="social-link">
+          <i class="far fa-envelope"></i>
+        </a>
+      </div>
+    </div>
   </footer>
-
-  <!-- Scripts -->
-  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
-  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  
+  <!-- Custom JS -->
   <script>
+    // Initialize AOS
+    AOS.init({
+      duration: 800,
+      once: true,
+      offset: 100
+    });
+    
     function toggleDetails(element) {
       element.classList.toggle('active');
       const details = element.querySelector('.card-details');
       details.classList.toggle('show');
+      const skillLevel = element.getAttribute('data-skill-level');
+      const skillLevelBar = element.querySelector('.skill-level-bar');
+      if (element.classList.contains('active')) {
+        setTimeout(() => {
+          skillLevelBar.style.width = skillLevel + '%';
+        }, 100);
+      } else {
+        skillLevelBar.style.width = '0%';
+      }
     }
-
-    // Initialize: No cards open on page load
+    
     document.addEventListener('DOMContentLoaded', function() {
-      const cardItems = document.querySelectorAll('.card-item.active');
-      cardItems.forEach(card => {
-        toggleDetails(card);
-      });
-    });
-  </script>
-  <!-- Added particles.js initialization script -->
-  <script>
-    // Initialize particles.js for background animation
-    document.addEventListener('DOMContentLoaded', function() {
+      // Initialize particles.js
       particlesJS("particles-js", {
         "particles": {
           "number": {
@@ -210,10 +567,10 @@
             }
           },
           "color": {
-            "value": "#ffffff"
+            "value": ["#007bff", "#6610f2", "#6f42c1", "#e83e8c", "#20c997"]
           },
           "shape": {
-            "type": "circle",
+            "type": ["circle", "triangle"],
             "stroke": {
               "width": 0,
               "color": "#000000"
@@ -224,9 +581,9 @@
           },
           "opacity": {
             "value": 0.5,
-            "random": false,
+            "random": true,
             "anim": {
-              "enable": false,
+              "enable": true,
               "speed": 1,
               "opacity_min": 0.1,
               "sync": false
@@ -236,8 +593,8 @@
             "value": 3,
             "random": true,
             "anim": {
-              "enable": false,
-              "speed": 40,
+              "enable": true,
+              "speed": 2,
               "size_min": 0.1,
               "sync": false
             }
@@ -245,20 +602,20 @@
           "line_linked": {
             "enable": true,
             "distance": 150,
-            "color": "#ffffff",
+            "color": "#6dcfe7",
             "opacity": 0.4,
             "width": 1
           },
           "move": {
             "enable": true,
-            "speed": 4,
+            "speed": 2,
             "direction": "none",
-            "random": false,
+            "random": true,
             "straight": false,
             "out_mode": "out",
             "bounce": false,
             "attract": {
-              "enable": false,
+              "enable": true,
               "rotateX": 600,
               "rotateY": 1200
             }
@@ -304,6 +661,94 @@
           }
         },
         "retina_detect": true
+      });
+      
+      // Open first cards
+      const firstCards = document.querySelectorAll('.col-md-6:first-child .card-item:first-child, .col-md-6:nth-child(2) .card-item:first-child');
+      firstCards.forEach(card => {
+        setTimeout(() => {
+          toggleDetails(card);
+        }, 800);
+      });
+      
+      // Initialize the skills radar chart
+      const ctx = document.getElementById('skillsRadarChart').getContext('2d');
+      const skillsRadarChart = new Chart(ctx, {
+        type: 'radar',
+        data: {
+          labels: [
+            'Caching Systems',
+            'Memory Management',
+            'Performance Optimization',
+            'System Architecture',
+            'Data Science',
+            'Web Development'
+          ],
+          datasets: [{
+            label: 'Technical Skills',
+            data: [95, 94, 92, 90, 93, 85],
+            backgroundColor: 'rgba(109, 207, 231, 0.2)',
+            borderColor: '#6dcfe7',
+            pointBackgroundColor: '#007bff',
+            pointBorderColor: '#fff',
+            pointHoverBackgroundColor: '#fff',
+            pointHoverBorderColor: '#007bff'
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scale: {
+            ticks: {
+              beginAtZero: true,
+              max: 100,
+              fontColor: '#adb5bd'
+            },
+            pointLabels: {
+              fontSize: 14,
+              fontColor: '#f8f9fa'
+            },
+            gridLines: {
+              color: 'rgba(255, 255, 255, 0.1)'
+            },
+            angleLines: {
+              color: 'rgba(255, 255, 255, 0.1)'
+            }
+          },
+          legend: {
+            position: 'bottom',
+            labels: {
+              fontColor: '#f8f9fa'
+            }
+          }
+        }
+      });
+      
+      // Implement load more functionality
+      document.getElementById('loadMoreTechnical').addEventListener('click', function() {
+        const hiddenCards = document.querySelectorAll('.col-md-6 .card-item:nth-child(n+5)');
+        
+        if (this.classList.contains('active')) {
+          hiddenCards.forEach(card => {
+            card.style.display = 'none';
+            card.classList.remove('animate__animated', 'animate__fadeIn');
+          });
+          this.classList.remove('active');
+          this.innerHTML = '<span>Load More Skills</span><i class="fas fa-chevron-down ml-2"></i>';
+        } else {
+          hiddenCards.forEach((card, index) => {
+            setTimeout(() => {
+              card.style.display = 'flex';
+              card.classList.add('animate__animated', 'animate__fadeIn');
+            }, index * 100);
+          });
+          this.classList.add('active');
+          this.innerHTML = '<span>Show Less</span><i class="fas fa-chevron-up ml-2"></i>';
+        }
+      });
+      
+      document.getElementById('loadMoreAdditional').addEventListener('click', function() {
+        // Similar functionality for additional skills section
       });
     });
   </script>
