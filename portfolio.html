@@ -3,81 +3,112 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="Quantitative investment platform by Farnaz Nasehi">
-  <meta name="keywords" content="Quantitative Finance, Portfolio Optimization, Trading Strategies">
+  <meta name="description" content="Enterprise-level quantitative investment platform by Farnaz Nasehi">
   <title>Quantitative Investment Platform - Farnaz Nasehi</title>
-  <!-- Bootstrap CSS -->
+  
+  <!-- CSS -->
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
-  <!-- Font Awesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
-  <!-- Google Fonts -->
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Roboto:wght@300;400;500;700&display=swap">
-  <!-- Custom CSS -->
   <link rel="stylesheet" href="styles.css" />
-  <!-- Libraries -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-financial"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.3.2/papaparse.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/portfolio-allocation@1.1.0/dist/portfolio-allocation.min.js"></script>
-  <script>
-      if (typeof PortfolioAllocation === 'undefined') {
-          document.write('<script src="portfolio-allocation-library.js"><\/script>');
-      }
-  </script>
-  <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+  
+<!-- Chart.js (use UMD build with valid .map) -->
+<script defer src="https://unpkg.com/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+<!-- Particles -->
+<script defer src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+
 </head>
 <body>
+  <!-- Error Boundary Fallback -->
+  <div id="error-boundary" class="error-boundary" style="display: none;">
+    <div class="container mt-5">
+      <div class="alert alert-danger">
+        <h4><i class="fas fa-exclamation-triangle mr-2"></i>Application Error</h4>
+        <p>Something went wrong. The application will attempt to recover automatically.</p>
+        <div class="mt-3">
+          <button class="btn btn-primary mr-2" onclick="window.location.reload()">
+            <i class="fas fa-sync-alt mr-2"></i>Reload Application
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Navbar -->
   <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top shadow-sm">
     <div class="container">
-      <a class="navbar-brand font-weight-bold" href="index.html">Farnaz Nasehi</a>
+      <a class="navbar-brand font-weight-bold" href="index.html">
+      <a class="navbar-brand" href="index.html">Farnaz Nasehi</a>
+      </a>
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav">
         <span class="navbar-toggler-icon"></span>
       </button>
       <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav ml-auto">
-          <li class="nav-item"><a class="nav-link" href="about.html" aria-label="About">About</a></li>
-          <li class="nav-item"><a class="nav-link" href="resume.html" aria-label="Work Experience">Work Experience</a></li>
+          <li class="nav-item"><a class="nav-link" href="about.html">About</a></li>
+          <li class="nav-item"><a class="nav-link" href="resume.html">Experience</a></li>
           <li class="nav-item"><a class="nav-link" href="skills.html">Skills</a></li>
-          <li class="nav-item active"><a class="nav-link" href="portfolio.html">Quantitative Investment Platform <span class="sr-only">(current)</span></a></li>
+          <li class="nav-item active">
+          <li class="nav-item"><a class="nav-link" href="portfolio.html">Quantitative Investment Platform</a></li>
+
+            </a>
+          </li>
           <li class="nav-item"><a class="nav-link" href="contact.html">Contact</a></li>
         </ul>
       </div>
     </div>
   </nav>
 
-  <!-- Particles background container -->
+  <!-- Particles background -->
   <div id="particles-js" class="particles-container"></div>
 
   <!-- Header Section -->
   <section class="header-section text-light py-4">
     <div class="container mt-5">
-      <div class="card bg-dark text-white shadow-lg border-0">
+      <div class="card bg-dark text-white shadow-lg border-0 platform-header">
         <div class="card-body text-center p-4">
-          <h1 class="card-title mb-3">Quantitative Investment Platform</h1>
-          <p class="card-text">A full-featured platform for financial data analysis, portfolio optimization, and trading strategy backtesting</p>
+          <h1 class="card-title mb-3">
+            <i class="fas fa-rocket mr-3"></i>Enterprise Quantitative Investment Platform
+          </h1>
+          <p class="card-text lead">
+            Full-featured platform for financial data analysis, portfolio optimization, 
+            trading strategy backtesting, and AI-powered insights
+          </p>
+          <div class="platform-status mt-3">
+            <span class="badge badge-success mr-2">
+              <i class="fas fa-database mr-1"></i>Data: Ready
+            </span>
+            <span class="badge badge-info mr-2">
+              <i class="fas fa-calculator mr-1"></i>Analytics: Ready
+            </span>
+            <span class="badge badge-warning">
+              <i class="fas fa-brain mr-1"></i>AI: Standby
+            </span>
+          </div>
         </div>
       </div>
       
       <!-- Interactive Toolbar -->
       <div class="toolbar-container mt-4">
         <div class="bg-dark py-3 px-4 rounded shadow-lg">
-          <div class="toolbar-buttons d-flex flex-wrap justify-content-center">
-            <button class="btn btn-tool active" id="toolbar-data">
-              <i class="fas fa-database mr-2"></i>Data
+          <div class="toolbar-buttons d-flex flex-wrap justify-content-center" id="toolbarButtons">
+            <button class="btn btn-tool active" data-module="dataManager">
+              <i class="fas fa-database mr-2"></i>Data Management
             </button>
-            <button class="btn btn-tool" id="toolbar-plots">
-              <i class="fas fa-chart-bar mr-2"></i>Plots
+            <button class="btn btn-tool" data-module="plotManager" disabled>
+              <i class="fas fa-chart-bar mr-2"></i>Visualizations
             </button>
-            <button class="btn btn-tool" id="toolbar-statistics">
-              <i class="fas fa-calculator mr-2"></i>Risk Metrics
+            <button class="btn btn-tool" data-module="riskAnalytics" disabled>
+              <i class="fas fa-calculator mr-2"></i>Risk Analytics
             </button>
-            <button class="btn btn-tool" id="toolbar-portfolio">
-              <i class="fas fa-briefcase mr-2"></i>Portfolio
+            <button class="btn btn-tool" data-module="portfolioManager" disabled>
+              <i class="fas fa-briefcase mr-2"></i>Portfolio Optimization
             </button>
-            <button class="btn btn-tool" id="toolbar-strategies">
-              <i class="fas fa-chart-line mr-2"></i>Strategies
+            <button class="btn btn-tool" data-module="strategyBacktest" disabled>
+              <i class="fas fa-chart-line mr-2"></i>Strategy Backtesting
+            </button>
+            <button class="btn btn-tool" data-module="aiInsights" disabled>
+              <i class="fas fa-brain mr-2"></i>AI Insights
             </button>
           </div>
         </div>
@@ -85,29 +116,100 @@
     </div>
   </section>
 
-  <!-- Dynamic Content Section -->
+  <!-- Content Section -->
   <section class="content-section py-4">
     <div class="container">
-      <div class="content-container bg-dark text-light p-4 rounded shadow-lg" id="dynamicMenuContent">
-        <div class="welcome-screen text-center py-5">
-          <h4 class="mb-4">Welcome to the Quantitative Investment Platform</h4>
-          <p class="mb-5">Choose from the toolbar above to start analyzing financial data.</p>
-          <div class="upload-zone p-5 mb-4 mx-auto">
-            <i class="fas fa-file-upload mb-3"></i>
-            <p>Drag and drop files here<br>or</p>
-            <button class="btn btn-primary btn-lg mt-2" id="browseFiles">
-              <i class="fas fa-folder-open mr-2"></i>Browse Files
-            </button>
+      <div class="content-container bg-dark text-light p-4 rounded shadow-lg" id="moduleContainer">
+        
+        <!-- Data Manager Module -->
+        <div class="module-content" id="dataManagerModule">
+          <div class="welcome-screen text-center py-5" id="welcomeScreen">
+            <h4 class="mb-4">
+              <i class="fas fa-upload mr-2"></i>Welcome to the Enterprise Quantitative Platform
+            </h4>
+            <p class="mb-5">Upload your financial data to begin advanced analytics and optimization.</p>
+            
+            <!-- File Upload Zone -->
+            <div class="upload-zone p-5 mb-4 mx-auto" id="uploadZone">
+              <i class="fas fa-file-upload mb-3"></i>
+              <p>Drag and drop files here<br>or</p>
+              <button class="btn btn-primary btn-lg mt-2" id="browseFiles">
+                <i class="fas fa-folder-open mr-2"></i>Browse Files
+              </button>
+              <input type="file" id="fileInput" accept=".csv,.xlsx,.xls,.json" multiple style="display: none;">
+            </div>
+            
+            <div class="supported-formats">
+              <p class="small text-muted">
+                <i class="fas fa-info-circle mr-1"></i>
+                Supported formats: CSV, Excel (.xlsx, .xls), JSON | Max size: 50MB
+              </p>
+            </div>
+            
+            <!-- Loading State -->
+            <div class="text-center mt-4" id="uploadLoading" style="display: none;">
+              <div class="spinner-border text-primary" role="status">
+                <span class="sr-only">Processing...</span>
+              </div>
+              <p class="mt-2">Processing your data...</p>
+              <div class="progress mt-2" style="height: 4px;">
+                <div class="progress-bar" id="loadingProgress" style="width: 0%"></div>
+              </div>
+            </div>
           </div>
-          <div class="supported-formats">
-            <p class="small text-muted">Supported formats: CSV, Excel (.xlsx, .xls)</p>
-          </div>
-          <div class="text-center mt-4">
-            <div class="spinner-border text-primary" role="status" id="loadingSpinner" style="display: none;">
-              <span class="sr-only">Loading...</span>
+
+          <!-- Data Preview Section -->
+          <div class="data-preview-section" id="dataPreview" style="display: none;">
+            <div class="row">
+              <div class="col-md-8">
+                <h5><i class="fas fa-table mr-2"></i>Data Preview</h5>
+                <div class="table-container" id="dataTable">
+                  <!-- Dynamic table will be inserted here -->
+                </div>
+              </div>
+              <div class="col-md-4">
+                <h5><i class="fas fa-info-circle mr-2"></i>Dataset Information</h5>
+                <div class="dataset-info" id="datasetInfo">
+                  <!-- Dataset metadata will be inserted here -->
+                </div>
+              </div>
             </div>
           </div>
         </div>
+
+        <!-- AI Insights Module -->
+        <div class="module-content" id="aiInsightsModule" style="display: none;">
+          <h4><i class="fas fa-brain mr-2"></i>AI-Powered Insights</h4>
+          <div class="ai-controls mb-4">
+            <div class="row">
+              <div class="col-md-8">
+                <label>Ask AI about your data or portfolio:</label>
+                <textarea class="form-control" id="aiQuery" rows="3" 
+                  placeholder="E.g., 'Analyze the risk profile of my portfolio' or 'What are the main trends in this data?'"></textarea>
+              </div>
+              <div class="col-md-4">
+                <label>Analysis Type:</label>
+                <select class="form-control" id="analysisType">
+                  <option value="general">General Analysis</option>
+                  <option value="risk">Risk Assessment</option>
+                  <option value="portfolio">Portfolio Review</option>
+                  <option value="market">Market Insights</option>
+                </select>
+                <button class="btn btn-primary mt-2 w-100" id="analyzeBtn">
+                  <i class="fas fa-magic mr-2"></i>Analyze with AI
+                </button>
+              </div>
+            </div>
+          </div>
+          
+          <div class="ai-insights-container" id="aiInsightsContainer">
+            <div class="insights-placeholder text-center py-5 text-muted">
+              <i class="fas fa-robot fa-3x mb-3"></i>
+              <p>AI insights will appear here after analysis</p>
+            </div>
+          </div>
+        </div>
+
       </div>
     </div>
   </section>
@@ -117,143 +219,81 @@
     <div class="container">
       <p class="mb-2">© 2025 Farnaz Nasehi. All rights reserved.</p>
       <div class="social-links mt-2">
-        <a href="https://linkedin.com/in/farnaz-nasehi" class="social-link" target="_blank" rel="noopener" aria-label="LinkedIn Profile">
+        <a href="https://linkedin.com/in/farnaz-nasehi" class="social-link" target="_blank">
           <i class="fab fa-linkedin-in"></i>
         </a>
-        <a href="https://github.com/FarnazNK" class="social-link" target="_blank" rel="noopener" aria-label="GitHub Profile">
+        <a href="https://github.com/FarnazNK" class="social-link" target="_blank">
           <i class="fab fa-github"></i>
         </a>
-        <a href="mailto:fnasehikalajahi@gmail.com" class="social-link" aria-label="Email">
+        <a href="mailto:fnasehikalajahi@gmail.com" class="social-link">
           <i class="far fa-envelope"></i>
         </a>
       </div>
     </div>
   </footer>
 
-  <!-- Scripts -->
-  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
-  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-  <script defer src="script.js"></script>
-  <script src="portfolio-allocation-library.js"></script>
+<script defer src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+
+<!-- Bootstrap 4 requires Popper v1, not v2 -->
+<script defer src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+
+<script defer src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+<!-- Excel support -->
+<script defer src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
+<!--  app -->
+<script defer src="app.js"></script>
+
   
-  <!-- Particles.js Initialization -->
+  <!-- Particles Configuration -->
   <script>
     document.addEventListener('DOMContentLoaded', function() {
-      particlesJS("particles-js", {
-        "particles": {
-          "number": {
-            "value": 80,
-            "density": {
-              "enable": true,
-              "value_area": 800
+      if (typeof particlesJS !== 'undefined') {
+        particlesJS("particles-js", {
+          particles: {
+            number: { value: 80, density: { enable: true, value_area: 800 } },
+            color: { value: ["#007bff", "#6610f2", "#6f42c1", "#e83e8c", "#20c997"] },
+            shape: { 
+              type: ["circle", "triangle"],
+              stroke: { width: 0, color: "#000000" },
+              polygon: { nb_sides: 5 }
+            },
+            opacity: {
+              value: 0.5, random: true,
+              anim: { enable: true, speed: 1, opacity_min: 0.1, sync: false }
+            },
+            size: {
+              value: 3, random: true,
+              anim: { enable: true, speed: 2, size_min: 0.1, sync: false }
+            },
+            line_linked: {
+              enable: true, distance: 150, color: "#6dcfe7", opacity: 0.4, width: 1
+            },
+            move: {
+              enable: true, speed: 2, direction: "none", random: true,
+              straight: false, out_mode: "out", bounce: false,
+              attract: { enable: true, rotateX: 600, rotateY: 1200 }
             }
           },
-          "color": {
-            "value": ["#007bff", "#6610f2", "#6f42c1", "#e83e8c", "#20c997"]
-          },
-          "shape": {
-            "type": ["circle", "triangle"],
-            "stroke": {
-              "width": 0,
-              "color": "#000000"
+          interactivity: {
+            detect_on: "canvas",
+            events: {
+              onhover: { enable: true, mode: "grab" },
+              onclick: { enable: true, mode: "push" },
+              resize: true
             },
-            "polygon": {
-              "nb_sides": 5
+            modes: {
+              grab: { distance: 140, line_linked: { opacity: 1 } },
+              bubble: { distance: 400, size: 40, duration: 2, opacity: 8, speed: 3 },
+              repulse: { distance: 200, duration: 0.4 },
+              push: { particles_nb: 4 },
+              remove: { particles_nb: 2 }
             }
           },
-          "opacity": {
-            "value": 0.5,
-            "random": true,
-            "anim": {
-              "enable": true,
-              "speed": 1,
-              "opacity_min": 0.1,
-              "sync": false
-            }
-          },
-          "size": {
-            "value": 3,
-            "random": true,
-            "anim": {
-              "enable": true,
-              "speed": 2,
-              "size_min": 0.1,
-              "sync": false
-            }
-          },
-          "line_linked": {
-            "enable": true,
-            "distance": 150,
-            "color": "#6dcfe7",
-            "opacity": 0.4,
-            "width": 1
-          },
-          "move": {
-            "enable": true,
-            "speed": 2,
-            "direction": "none",
-            "random": true,
-            "straight": false,
-            "out_mode": "out",
-            "bounce": false,
-            "attract": {
-              "enable": true,
-              "rotateX": 600,
-              "rotateY": 1200
-            }
-          }
-        },
-        "interactivity": {
-          "detect_on": "canvas",
-          "events": {
-            "onhover": {
-              "enable": true,
-              "mode": "grab"
-            },
-            "onclick": {
-              "enable": true,
-              "mode": "push"
-            },
-            "resize": true
-          },
-          "modes": {
-            "grab": {
-              "distance": 140,
-              "line_linked": {
-                "opacity": 1
-              }
-            },
-            "bubble": {
-              "distance": 400,
-              "size": 40,
-              "duration": 2,
-              "opacity": 8,
-              "speed": 3
-            },
-            "repulse": {
-              "distance": 200,
-              "duration": 0.4
-            },
-            "push": {
-              "particles_nb": 4
-            },
-            "remove": {
-              "particles_nb": 2
-            }
-          }
-        },
-        "retina_detect": true
-      });
-      
-      // Toolbar button handling
-      const toolbarButtons = document.querySelectorAll('.btn-tool');
-      toolbarButtons.forEach(button => {
-        button.addEventListener('click', function() {
-          toolbarButtons.forEach(btn => btn.classList.remove('active'));
-          this.classList.add('active');
+          retina_detect: true
         });
-      });
+      }
     });
   </script>
 </body>

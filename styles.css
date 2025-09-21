@@ -1,21 +1,117 @@
 /* CSS Variables for Consistent Theming */
-:root {
-    --primary-color: #007bff;
-    --primary-hover: #0069d9;
-    --secondary-color: #6c757d;
-    --dark-bg: #121212;
-    --card-bg: #1e1e1e;
-    --card-bg-hover: #333333;
-    --text-light: #f8f9fa;
-    --text-muted: #adb5bd;
-    --text-accent: #9f9fff;
-    --card-border: rgba(255, 255, 255, 0.1);
-    --card-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    --card-shadow-hover: 0 8px 16px rgba(0, 0, 0, 0.2);
-    --hover-transform: scale(1.03);
-    --transition-speed: 0.3s;
-    --primary-color-rgb: 0, 123, 255;
+/* ============================================================================
+   ADVANCED QUANT FINANCE PLATFORM — IMPROVED CSS
+   See chat for rationale: tokens, accessibility, motion-safety, responsiveness.
+   ============================================================================ */
+
+/* Design Tokens / Theming */
+:root{
+  --h-primary:216;--s-primary:100%;--l-primary:56%;
+  --h-success:142;--s-success:72%;--l-success:41%;
+  --h-danger:354;--s-danger:70%;--l-danger:54%;
+  --h-warning:45;--s-warning:100%;--l-warning:50%;
+  --h-info:188;--s-info:77%;--l-info:41%;
+  --surface-0:0 0% 6.5%;--surface-1:0 0% 9%;--surface-2:0 0% 12%;--surface-3:0 0% 17%;
+  --text-1:0 0% 98%;--text-2:210 12% 70%;
+  --text-accent:240 100% 80%;
+  --bd-weak:0 0% 100%/0.08;--bd:0 0% 100%/0.12;--bd-strong:0 0% 100%/0.2;
+  --radius-sm:6px;--radius-md:12px;--radius-lg:16px;--radius-xl:20px;
+  --elev-1:0 4px 12px rgba(0,0,0,.25);--elev-2:0 8px 18px rgba(0,0,0,.35);--elev-3:0 20px 40px rgba(0,0,0,.45);
+  --focus-ring:0 0 0 3px hsla(var(--h-primary), var(--s-primary), 50%, .35);
+  --ease:cubic-bezier(.4,0,.2,1);--t-fast:.18s;--t-med:.28s;
+  --grad-primary:linear-gradient(135deg,hsl(var(--h-primary) var(--s-primary) 55%),hsl(var(--h-primary) var(--s-primary) 40%));
+  --grad-success:linear-gradient(135deg,hsl(var(--h-success) var(--s-success) 45%),hsl(var(--h-success) var(--s-success) 35%));
+  --grad-danger:linear-gradient(135deg,hsl(var(--h-danger) var(--s-danger) 56%),hsl(var(--h-danger) var(--s-danger) 46%));
+  --primary-color:hsl(var(--h-primary) var(--s-primary) var(--l-primary));
+  --primary-hover:hsl(var(--h-primary) var(--s-primary) 48%);
+  --primary-dark:hsl(var(--h-primary) var(--s-primary) 40%);
+  --success-color:hsl(var(--h-success) var(--s-success) var(--l-success));
+  --danger-color:hsl(var(--h-danger) var(--s-danger) var(--l-danger));
+  --warning-color:hsl(var(--h-warning) var(--s-warning) var(--l-warning));
+  --info-color:hsl(var(--h-info) var(--s-info) var(--l-info));
+  --bg:hsl(var(--surface-0));--bg-1:hsl(var(--surface-1));--bg-2:hsl(var(--surface-2));--bg-3:hsl(var(--surface-3));
+  --gradient-background:linear-gradient(135deg,#0f0f0f 0%,#1a1a1a 100%);
+  --text-primary:hsl(var(--text-1));--text-light:hsl(var(--text-1));--text-muted:hsl(var(--text-2));
+  --card-border: color-mix(in oklab, white 12%, transparent);
+  --card-shadow: var(--elev-1);--card-shadow-hover: var(--elev-2);--card-shadow-focus: var(--elev-3);
 }
+
+@media (prefers-color-scheme: light){
+  :root{
+    --surface-0:210 20% 98%;--surface-1:210 20% 96%;--surface-2:210 18% 92%;--surface-3:210 15% 88%;
+    --text-1:210 10% 10%;--text-2:210 8% 40%;
+    --bg:hsl(var(--surface-0));--bg-1:hsl(var(--surface-1));--bg-2:hsl(var(--surface-2));--bg-3:hsl(var(--surface-3));
+    --gradient-background:linear-gradient(135deg,#f7f9fc,#eef2f7);
+    --card-border: color-mix(in oklab, black 12%, transparent);
+  }
+}
+
+/* Base */
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;color:var(--text-primary);background:var(--gradient-background);
+  font:500 16px/1.6 system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif;
+  -webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;color-scheme:dark light;overflow-x:hidden}
+h1,h2,h3,h4,h5,h6{font-family:Poppins,system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;font-weight:600;line-height:1.2;margin:0}
+a{color:inherit;text-decoration:none}
+img,svg{display:block;max-inline-size:100%;block-size:auto}
+button{cursor:pointer}
+:where(a,button,[role="button"],input,select,textarea):focus-visible{outline:none;box-shadow:var(--focus-ring);transition:box-shadow var(--t-fast) var(--ease);border-radius:var(--radius-sm)}
+
+/* Navbar */
+.navbar{padding-block:1rem;background:color-mix(in oklab,var(--bg) 92%, transparent);backdrop-filter:blur(14px);border-bottom:1px solid var(--card-border);box-shadow:0 2px 18px rgba(0,0,0,.28);transition:background var(--t-med) var(--ease),box-shadow var(--t-med) var(--ease);position:relative;z-index:100}
+.navbar.scrolled{background:color-mix(in oklab,var(--bg) 98%, transparent);box-shadow:0 6px 26px rgba(0,0,0,.35)}
+.navbar-brand{font-weight:700;font-size:1.6rem;color:var(--primary-color);transition:transform var(--t-fast) var(--ease),color var(--t-fast) var(--ease)}
+.navbar-brand:hover{color:var(--primary-hover);transform:translateY(-1px)}
+.nav-link{font-weight:500;padding:.7rem 1rem;margin-inline:.125rem;border-radius:6px;color:var(--text-muted);transition:background var(--t-fast) var(--ease),color var(--t-fast) var(--ease),transform var(--t-fast) var(--ease)}
+.nav-link:hover,.nav-link.active{color:var(--primary-color);background:color-mix(in oklab,var(--primary-color) 14%, transparent)}
+
+/* Particles */
+.particles-container{position:fixed;inset:0;z-index:-1;background:var(--gradient-background)}
+
+/* Header & Cards */
+.header-section{padding-block:3.5rem 1.5rem;position:relative;z-index:1}
+.content-container,.platform-header{background:color-mix(in oklab,var(--bg-2) 96%, transparent);backdrop-filter:blur(18px);border:1px solid var(--card-border);border-radius:16px;box-shadow:var(--card-shadow);overflow:hidden;position:relative}
+.platform-header::before,.content-container::before,.widget-container::before{content:"";position:absolute;inset-inline:0;block-size:2px;background:var(--grad-primary)}
+
+/* Toolbar */
+.toolbar-container{margin-block-start:1.2rem}
+.toolbar-buttons{display:flex;flex-wrap:wrap;justify-content:center;gap:1rem}
+.btn-tool{display:flex;align-items:center;gap:.6rem;padding:.85rem 1.1rem;border-radius:12px;background:linear-gradient(135deg,color-mix(in oklab,var(--primary-color) 12%, transparent),color-mix(in oklab,var(--primary-color) 6%, transparent));border:1px solid color-mix(in oklab,var(--primary-color) 30%, transparent);color:var(--text-primary);transition:transform var(--t-fast) var(--ease),box-shadow var(--t-fast) var(--ease),background var(--t-fast) var(--ease),border-color var(--t-fast) var(--ease)}
+.btn-tool:hover{transform:translateY(-2px);box-shadow:0 12px 24px rgba(0,123,255,.22);border-color:color-mix(in oklab,var(--primary-color) 46%, transparent)}
+.btn-tool.active{background:var(--grad-primary);box-shadow:0 10px 24px rgba(0,123,255,.35);transform:translateY(-1px) scale(1.01)}
+
+/* Content section */
+.content-section{padding-block:2rem;min-block-size:calc(100vh - 200px)}
+
+/* Welcome / Upload */
+.welcome-screen{text-align:center;padding:3rem 1.25rem;background:color-mix(in oklab,black 12%, transparent);border:1px solid var(--card-border);border-radius:16px;margin:1.5rem}
+.upload-zone{inline-size:min(520px,100%);margin-inline:auto;border:2px dashed color-mix(in oklab,var(--primary-color) 40%, transparent);border-radius:16px;background:color-mix(in oklab,black 14%, transparent);transition:transform var(--t-fast) var(--ease),border-color var(--t-fast) var(--ease),background var(--t-fast) var(--ease)}
+.upload-zone:hover{border-color:var(--primary-color);background:color-mix(in oklab,var(--primary-color) 10%, transparent);transform:translateY(-2px)}
+
+/* Tables */
+.table-container{max-block-size:500px;overflow:auto;border:1px solid var(--card-border);border-radius:12px;padding:10px;background:color-mix(in oklab,var(--bg-1) 96%, transparent);scrollbar-width:thin;scrollbar-color:color-mix(in oklab,var(--primary-color) 55%, transparent) color-mix(in oklab,white 10%, transparent)}
+.table-container::-webkit-scrollbar{inline-size:8px}
+.table-container::-webkit-scrollbar-thumb{background:color-mix(in oklab,var(--primary-color) 55%, transparent);border-radius:4px}
+
+/* Widgets */
+.widget-container{background:color-mix(in oklab,var(--bg-2) 96%, transparent);border:1px solid var(--card-border);border-radius:16px;backdrop-filter:blur(12px);box-shadow:var(--card-shadow);transition:transform var(--t-med) var(--ease),box-shadow var(--t-med) var(--ease),border-color var(--t-med) var(--ease);position:relative;overflow:hidden}
+.widget-container:hover{transform:translateY(-4px);box-shadow:var(--card-shadow-focus);border-color:color-mix(in oklab,var(--primary-color) 28%, transparent)}
+
+/* Buttons */
+.btn{border-radius:8px;font-weight:700;padding:.75rem 1.2rem;border:none;transition:transform var(--t-fast) var(--ease),box-shadow var(--t-fast) var(--ease),background var(--t-fast) var(--ease),color var(--t-fast) var(--ease)}
+.btn-primary{background:var(--grad-primary);color:#fff;box-shadow:0 6px 18px rgba(0,123,255,.28)}
+.btn-primary:hover{background:linear-gradient(135deg,var(--primary-hover),var(--primary-dark));transform:translateY(-1px);box-shadow:0 10px 26px rgba(0,123,255,.38)}
+.btn-secondary{background:linear-gradient(135deg,hsl(210 9% 60%),hsl(210 9% 48%));color:#fff;box-shadow:0 6px 16px rgba(108,117,125,.28)}
+.btn-secondary:hover{transform:translateY(-1px);box-shadow:0 10px 24px rgba(108,117,125,.36)}
+
+/* Footer */
+footer{background:linear-gradient(135deg,color-mix(in oklab,#333 95%, transparent),color-mix(in oklab,#212121 95%, transparent));backdrop-filter:blur(12px);color:var(--text-primary);padding-block:1.4rem;text-align:center;border-top:1px solid var(--card-border);font-size:.96rem}
+footer a{color:inherit}
+
+/* Motion */
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
+
 
 /* General Layout */
 * {
@@ -976,4 +1072,112 @@ html {
         padding: 8px 12px;
         font-size: 0.9rem;
     }
+}
+/* === UI FIX PACK (paste at end) =========================================== */
+
+/* 1) Bridge missing design tokens used later in the file */
+:root{
+  /* tokens referenced but not originally defined */
+  --dark-bg: var(--bg, hsl(var(--surface-0)));
+  --card-bg: color-mix(in oklab, var(--bg-1) 96%, transparent);
+  --card-bg-hover: color-mix(in oklab, var(--bg-2) 92%, transparent);
+  --secondary-color: hsl(210 9% 55%);
+  --transition-speed: var(--t-fast, .18s);
+  /* rgb for shadows/accents where you used var(--primary-color-rgb) */
+  --primary-color-rgb: 0,123,255; /* matches Bootstrap primary */
+}
+
+/* 2) Normalize duplicate selectors (keep a single source of truth) */
+.toolbar-buttons{ gap: .6rem; }
+.upload-zone{
+  max-width: 520px; padding: 2rem; border-radius: 16px;
+  border: 2px dashed color-mix(in oklab, var(--primary-color) 40%, transparent);
+  background: color-mix(in oklab, black 10%, transparent);
+}
+.upload-zone:hover{
+  border-color: var(--primary-color);
+  background: color-mix(in oklab, var(--primary-color) 8%, transparent);
+}
+
+/* 3) Buttons: disabled + focus states feel consistent */
+.btn-tool[disabled],
+.btn-tool:disabled{
+  opacity: .5; cursor: not-allowed; filter: grayscale(.2);
+  box-shadow: none; transform: none;
+}
+.btn-tool:focus-visible{
+  outline: none;
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--primary-color) 50%, transparent);
+}
+
+/* 4) Tables & data preview: stickier headers + clearer contrast */
+.table-container{
+  max-height: 520px; background: var(--card-bg); border-radius: 12px;
+  border: 1px solid var(--card-border);
+}
+.table{ color: var(--text-primary); }
+.table thead th{
+  position: sticky; top: 0; z-index: 1;
+  background: var(--bg-2);
+  border-bottom: 1px solid var(--card-border);
+}
+
+/* 5) Chart areas match dark theme */
+.chart-wrapper{
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  color: var(--text-primary);
+}
+
+/* 6) Cards/containers: subtle elevation harmony */
+.content-container,.platform-header,.widget-container{
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  box-shadow: var(--card-shadow);
+}
+
+/* 7) Navbar hover/active clarity on dark backgrounds */
+.nav-link:hover,.nav-link.active{
+  color: var(--primary-color) !important;
+  background: color-mix(in oklab, var(--primary-color) 12%, transparent);
+  border-radius: 8px;
+}
+
+/* 8) Footer contrast + links */
+footer{
+  background: linear-gradient(135deg, #1a1a1a, #121212);
+  color: var(--text-primary);
+  border-top: 1px solid var(--card-border);
+}
+footer a{ color: var(--text-muted); }
+footer a:hover{ color: var(--primary-color); }
+
+/* 9) Motion-safety also covers big hover jumps */
+@media (prefers-reduced-motion: reduce){
+  .btn,.btn-tool,.card-item,.contact-card,.skill-icon,.social-icons a{ transition: none !important; }
+}
+
+/* 10) Tiny utilities you’re already using implicitly */
+.hidden{ display: none !important; }
+.text-muted-2{ color: var(--text-muted); }
+.border-card{ border: 1px solid var(--card-border); border-radius: 12px; }
+
+/* ========================================================================== */
+/* Highlight active module buttons better */
+.btn-tool.active {
+  background: var(--grad-primary);
+  color: #fff;
+  font-weight: 600;
+  transform: translateY(-2px);
+}
+
+/* Upload zone drag-over feedback */
+.upload-zone.drag-over {
+  border-color: var(--success-color);
+  background: color-mix(in oklab, var(--success-color) 10%, transparent);
+}
+
+/* Improve muted text contrast */
+.text-muted {
+  color: hsl(var(--text-2) / 0.85);
 }

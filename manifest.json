@@ -1,0 +1,29 @@
+{
+  "name": "Farnaz Nasehi - Quantitative Investment Platform",
+  "short_name": "Portfolio Platform",
+  "description": "Enterprise-level quantitative investment platform showcasing advanced data processing and financial analytics capabilities",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#121212",
+  "theme_color": "#007bff",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "lang": "en",
+  "icons": [
+    {
+      "src": "favicon.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["finance", "productivity", "business"],
+  "screenshots": [
+    {
+      "src": "me.jpg",
+      "sizes": "1280x720",
+      "type": "image/jpeg",
+      "platform": "wide"
+    }
+  ]
+}

@@ -26,7 +26,7 @@ The website is live at: https://farnaznasehi.com/
 - **About**: Background and professional information
 - **Work Experience**: Career history and achievements
 - **Skills**: Comprehensive breakdown of technical abilities
-- **Data Analytics Tool**: Interactive data visualization tool
+- **Quantitative Investment Platform**: Interactive data visualization tool
 - **Contact**: Contact information and form
 
 ## Development
