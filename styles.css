@@ -1,48 +1,67 @@
 /* CSS Variables for Consistent Theming */
 /* ============================================================================
-   ADVANCED QUANT FINANCE PLATFORM — IMPROVED CSS
    See chat for rationale: tokens, accessibility, motion-safety, responsiveness.
    ============================================================================ */
 
-/* Design Tokens / Theming */
 :root{
-  --h-primary:216;--s-primary:100%;--l-primary:56%;
-  --h-success:142;--s-success:72%;--l-success:41%;
-  --h-danger:354;--s-danger:70%;--l-danger:54%;
-  --h-warning:45;--s-warning:100%;--l-warning:50%;
-  --h-info:188;--s-info:77%;--l-info:41%;
-  --surface-0:0 0% 6.5%;--surface-1:0 0% 9%;--surface-2:0 0% 12%;--surface-3:0 0% 17%;
-  --text-1:0 0% 98%;--text-2:210 12% 70%;
-  --text-accent:240 100% 80%;
-  --bd-weak:0 0% 100%/0.08;--bd:0 0% 100%/0.12;--bd-strong:0 0% 100%/0.2;
-  --radius-sm:6px;--radius-md:12px;--radius-lg:16px;--radius-xl:20px;
-  --elev-1:0 4px 12px rgba(0,0,0,.25);--elev-2:0 8px 18px rgba(0,0,0,.35);--elev-3:0 20px 40px rgba(0,0,0,.45);
-  --focus-ring:0 0 0 3px hsla(var(--h-primary), var(--s-primary), 50%, .35);
-  --ease:cubic-bezier(.4,0,.2,1);--t-fast:.18s;--t-med:.28s;
-  --grad-primary:linear-gradient(135deg,hsl(var(--h-primary) var(--s-primary) 55%),hsl(var(--h-primary) var(--s-primary) 40%));
-  --grad-success:linear-gradient(135deg,hsl(var(--h-success) var(--s-success) 45%),hsl(var(--h-success) var(--s-success) 35%));
-  --grad-danger:linear-gradient(135deg,hsl(var(--h-danger) var(--s-danger) 56%),hsl(var(--h-danger) var(--s-danger) 46%));
-  --primary-color:hsl(var(--h-primary) var(--s-primary) var(--l-primary));
-  --primary-hover:hsl(var(--h-primary) var(--s-primary) 48%);
-  --primary-dark:hsl(var(--h-primary) var(--s-primary) 40%);
-  --success-color:hsl(var(--h-success) var(--s-success) var(--l-success));
-  --danger-color:hsl(var(--h-danger) var(--s-danger) var(--l-danger));
-  --warning-color:hsl(var(--h-warning) var(--s-warning) var(--l-warning));
-  --info-color:hsl(var(--h-info) var(--s-info) var(--l-info));
-  --bg:hsl(var(--surface-0));--bg-1:hsl(var(--surface-1));--bg-2:hsl(var(--surface-2));--bg-3:hsl(var(--surface-3));
-  --gradient-background:linear-gradient(135deg,#0f0f0f 0%,#1a1a1a 100%);
-  --text-primary:hsl(var(--text-1));--text-light:hsl(var(--text-1));--text-muted:hsl(var(--text-2));
-  --card-border: color-mix(in oklab, white 12%, transparent);
-  --card-shadow: var(--elev-1);--card-shadow-hover: var(--elev-2);--card-shadow-focus: var(--elev-3);
+  /* primary hues (use these everywhere) */
+  --h-primary: 216;
+  --s-primary: 100%;
+  --l-primary: 56%;
+
+  --h-success: 142; --s-success: 72%; --l-success: 41%;
+  --h-danger: 354;  --s-danger: 70%; --l-danger: 54%;
+  --h-warning: 45;  --s-warning: 100%;--l-warning: 50%;
+  --h-info: 188;    --s-info: 77%;   --l-info: 41%;
+
+  /* surfaces (semantic) */
+  --surface-0: 0 0% 6.5%;
+  --surface-1: 0 0% 9%;
+  --surface-2: 0 0% 12%;
+  --surface-3: 0 0% 17%;
+
+  /* semantic tokens */
+  --bg: hsl(var(--surface-0));
+  --bg-1: hsl(var(--surface-1));
+  --bg-2: hsl(var(--surface-2));
+  --bg-3: hsl(var(--surface-3));
+
+  --text-primary: 0 0% 98%;
+  --text-muted: 210 12% 70%;
+  --text-accent: 240 100% 80%;
+
+  --radius-sm: 6px; --radius-md: 12px; --radius-lg: 16px;
+  --card-border: rgba(255,255,255,0.12);
+  --card-shadow: 0 4px 12px rgba(0,0,0,.25);
+
+  /* gradients & primary colors (include fallback hex) */
+  --primary-color: hsl(var(--h-primary) var(--s-primary) var(--l-primary));
+  --primary-color-hex: #0b63ff; /* fallback if hsl not supported */
+  --primary-color-rgb: 11,99,255; /* use where rgba() needed */
+
+  --grad-primary: linear-gradient(135deg, hsl(var(--h-primary) var(--s-primary) 55%), hsl(var(--h-primary) var(--s-primary) 40%));
+  --grad-primary-fallback: linear-gradient(135deg, var(--primary-color-hex), #0056d6);
+
+  --focus-ring: 0 0 0 3px rgba(var(--primary-color-rgb), .22);
+  --t-fast: .18s; --t-med: .28s;
+  --ease: cubic-bezier(.4,0,.2,1);
+
+  /* accessibility toggles */
+  --reduced-motion: no-preference;
 }
 
+/* light mode overrides */
 @media (prefers-color-scheme: light){
   :root{
-    --surface-0:210 20% 98%;--surface-1:210 20% 96%;--surface-2:210 18% 92%;--surface-3:210 15% 88%;
-    --text-1:210 10% 10%;--text-2:210 8% 40%;
-    --bg:hsl(var(--surface-0));--bg-1:hsl(var(--surface-1));--bg-2:hsl(var(--surface-2));--bg-3:hsl(var(--surface-3));
-    --gradient-background:linear-gradient(135deg,#f7f9fc,#eef2f7);
-    --card-border: color-mix(in oklab, black 12%, transparent);
+    --surface-0: 210 20% 98%;
+    --surface-1: 210 20% 96%;
+    --surface-2: 210 18% 92%;
+    --surface-3: 210 15% 88%;
+
+    --text-primary: 210 10% 10%;
+    --text-muted: 210 8% 40%;
+
+    --card-border: rgba(0,0,0,0.08);
   }
 }
 
@@ -90,7 +109,7 @@ button{cursor:pointer}
 .upload-zone:hover{border-color:var(--primary-color);background:color-mix(in oklab,var(--primary-color) 10%, transparent);transform:translateY(-2px)}
 
 /* Tables */
-.table-container{max-block-size:500px;overflow:auto;border:1px solid var(--card-border);border-radius:12px;padding:10px;background:color-mix(in oklab,var(--bg-1) 96%, transparent);scrollbar-width:thin;scrollbar-color:color-mix(in oklab,var(--primary-color) 55%, transparent) color-mix(in oklab,white 10%, transparent)}
+.table-container{max-block-size:500px;overflow:auto;border:1px solid var(--card-border);border-radius:12px;padding:10px;background:color-mix(in oklab,var(--bg-1) 96%, transparent);scrollbar-width:thin;scrollbar-color:color-mix(in oklab,var(--primary-color) 55%, transparent) color-mix(in oklab,rgb(5, 4, 4) 10%, transparent)}
 .table-container::-webkit-scrollbar{inline-size:8px}
 .table-container::-webkit-scrollbar-thumb{background:color-mix(in oklab,var(--primary-color) 55%, transparent);border-radius:4px}
 
@@ -100,9 +119,9 @@ button{cursor:pointer}
 
 /* Buttons */
 .btn{border-radius:8px;font-weight:700;padding:.75rem 1.2rem;border:none;transition:transform var(--t-fast) var(--ease),box-shadow var(--t-fast) var(--ease),background var(--t-fast) var(--ease),color var(--t-fast) var(--ease)}
-.btn-primary{background:var(--grad-primary);color:#fff;box-shadow:0 6px 18px rgba(0,123,255,.28)}
+.btn-primary{background:var(--grad-primary);color:#0c0b0b;box-shadow:0 6px 18px rgba(0,123,255,.28)}
 .btn-primary:hover{background:linear-gradient(135deg,var(--primary-hover),var(--primary-dark));transform:translateY(-1px);box-shadow:0 10px 26px rgba(0,123,255,.38)}
-.btn-secondary{background:linear-gradient(135deg,hsl(210 9% 60%),hsl(210 9% 48%));color:#fff;box-shadow:0 6px 16px rgba(108,117,125,.28)}
+.btn-secondary{background:linear-gradient(135deg,hsl(210 9% 60%),hsl(210 9% 48%));color:#151313;box-shadow:0 6px 16px rgba(108,117,125,.28)}
 .btn-secondary:hover{transform:translateY(-1px);box-shadow:0 10px 24px rgba(108,117,125,.36)}
 
 /* Footer */
@@ -119,6 +138,30 @@ footer a{color:inherit}
     margin: 0;
     padding: 0;
 }
+/* Global Overrides: White Text + Black Boxes */
+body, h1, h2, h3, h4, h5, h6, p, a, span, div {
+  color: #fff !important;
+}
+
+.content-container,
+.platform-header,
+.widget-container,
+.table-container,
+.welcome-screen,
+.upload-zone,
+.toolbar-container,
+.navbar,
+footer,
+.btn,
+.btn-tool,
+header,
+section {
+  background-color: #272525 !important;
+  border-color:  #272525 !important;
+  box-shadow: none !important; /* remove glowing shadows if unwanted */
+}
+
+
 
 body {
     font-family: 'Roboto', sans-serif;
@@ -132,6 +175,10 @@ h1, h2, h3, h4, h5, h6 {
     font-weight: 600;
 }
 
+/* Global Overrides: White Text + Black Boxes */
+body, h1, h2, h3, h4, h5, h6, p, a, span, div {
+  color: #fff !important;
+}
 /* Navbar */
 .navbar {
     padding: 1rem 0;
@@ -531,7 +578,7 @@ main ul.list-unstyled li i {
     height: 400px;
     margin-bottom: 20px;
     position: relative;
-    background-color: #fff;
+    background-color: #090808;
     border-radius: 10px;
     padding: 10px;
     box-shadow: var(--card-shadow);
@@ -998,7 +1045,7 @@ html {
     height: 40px;
     border-radius: 50%;
     background: rgba(0, 0, 0, 0.7);
-    color: white;
+    color: rgb(20, 2, 2);
     display: flex;
     align-items: center;
     justify-content: center;
