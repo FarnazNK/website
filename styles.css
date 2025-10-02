@@ -1,7 +1,3 @@
-/* === CONSOLIDATED COLOR & FONT SYSTEM ========================================
-   All pages now use these consistent design tokens.
-   ============================================================================ */
-
 :root{
   /* Primary brand colors */
   --h-primary: 216;
@@ -1501,3 +1497,4 @@ select {
 }
 
 /* === END OF STYLESHEET ===================================================== */
+
