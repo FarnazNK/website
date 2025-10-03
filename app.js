@@ -1,5 +1,5 @@
 // =============================================================================
-// QUANTITATIVE PLATFORM WITH DEBUG LOGGING
+// QUANTITATIVE INVESTMENT PLATFORM - COMPLETE CODE WITH MULTI-SOURCE SUPPORT
 // =============================================================================
 
 // DEBUG LOGGER
@@ -58,9 +58,7 @@ class DebugLogger {
 
 const DEBUG = new DebugLogger();
 
-// 1. BASE UTILITIES
-// =============================================================================
-
+// EVENT EMITTER
 class EventEmitter {
     constructor() {
         this.events = new Map();
@@ -102,6 +100,7 @@ class EventEmitter {
     }
 }
 
+// NOTIFICATION SYSTEM
 class Notification {
     constructor(options = {}) {
         this.type = options.type || 'info';
@@ -139,9 +138,138 @@ class Notification {
     static info(message) { return new Notification({ type: 'info', message }).show(); }
 }
 
-// 2. DATA SERVICES
-// =============================================================================
+// DATA SOURCE CONNECTOR
+class DataSourceConnector {
+    constructor() {
+        this.connections = new Map();
+    }
 
+    async connectAzureBlob(config) {
+        DEBUG.log('DataSourceConnector', 'Connecting to Azure Blob Storage...');
+        
+        const { accountName, containerName, sasToken, blobName } = config;
+        const url = `https://${accountName}.blob.core.windows.net/${containerName}/${blobName}?${sasToken}`;
+        
+        try {
+            const response = await fetch(url);
+            if (!response.ok) throw new Error(`Azure Blob fetch failed: ${response.statusText}`);
+            
+            const blob = await response.blob();
+            const file = new File([blob], blobName, { type: blob.type });
+            
+            DEBUG.log('DataSourceConnector', `Azure blob retrieved: ${blobName}`);
+            return file;
+        } catch (error) {
+            DEBUG.error('DataSourceConnector', 'Azure connection failed', error);
+            throw new Error(`Azure connection failed: ${error.message}`);
+        }
+    }
+
+    async connectAWS_S3(config) {
+        DEBUG.log('DataSourceConnector', 'Connecting to AWS S3...');
+        
+        const { presignedUrl, key } = config;
+        
+        if (presignedUrl) {
+            try {
+                const response = await fetch(presignedUrl);
+                if (!response.ok) throw new Error(`S3 fetch failed: ${response.statusText}`);
+                
+                const blob = await response.blob();
+                const file = new File([blob], key || 'data', { type: blob.type });
+                
+                DEBUG.log('DataSourceConnector', `S3 object retrieved: ${key}`);
+                return file;
+            } catch (error) {
+                DEBUG.error('DataSourceConnector', 'S3 connection failed', error);
+                throw new Error(`S3 connection failed: ${error.message}`);
+            }
+        } else {
+            throw new Error('S3 requires pre-signed URL for browser access');
+        }
+    }
+
+    async connectAPI(config) {
+        DEBUG.log('DataSourceConnector', 'Connecting to API...');
+        
+        const { url, method = 'GET', headers = {}, body = null } = config;
+        
+        try {
+            const options = {
+                method,
+                headers: {
+                    'Content-Type': 'application/json',
+                    ...headers
+                }
+            };
+            
+            if (body && method !== 'GET') {
+                options.body = JSON.stringify(body);
+            }
+            
+            const response = await fetch(url, options);
+            if (!response.ok) throw new Error(`API request failed: ${response.statusText}`);
+            
+            const data = await response.json();
+            DEBUG.log('DataSourceConnector', 'API data retrieved');
+            
+            return this.jsonToDataset(data);
+        } catch (error) {
+            DEBUG.error('DataSourceConnector', 'API connection failed', error);
+            throw new Error(`API connection failed: ${error.message}`);
+        }
+    }
+
+    async connectGoogleSheets(config) {
+        DEBUG.log('DataSourceConnector', 'Connecting to Google Sheets...');
+        
+        const { sheetId, apiKey, range = 'A:Z' } = config;
+        const url = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${range}?key=${apiKey}`;
+        
+        try {
+            const response = await fetch(url);
+            if (!response.ok) throw new Error(`Google Sheets fetch failed: ${response.statusText}`);
+            
+            const data = await response.json();
+            const values = data.values;
+            
+            if (!values || values.length === 0) {
+                throw new Error('No data found in sheet');
+            }
+            
+            const headers = values[0];
+            const rows = values.slice(1).map(row => {
+                return row.map(cell => {
+                    const num = parseFloat(cell);
+                    return isNaN(num) ? cell : num;
+                });
+            });
+            
+            DEBUG.log('DataSourceConnector', `Google Sheets data retrieved: ${rows.length} rows`);
+            return { headers, rows };
+        } catch (error) {
+            DEBUG.error('DataSourceConnector', 'Google Sheets connection failed', error);
+            throw new Error(`Google Sheets connection failed: ${error.message}`);
+        }
+    }
+
+    jsonToDataset(data) {
+        if (Array.isArray(data)) {
+            if (data.length === 0) throw new Error('Empty array');
+            
+            const headers = Object.keys(data[0]);
+            const rows = data.map(obj => headers.map(h => obj[h]));
+            
+            return { headers, rows };
+        } else if (data.headers && data.rows) {
+            return data;
+        } else {
+            throw new Error('Unsupported JSON structure');
+        }
+    }
+}
+
+// DATA SERVICE
 class DataService extends EventEmitter {
     constructor() {
         super();
@@ -152,7 +280,6 @@ class DataService extends EventEmitter {
     async initialize() {
         DEBUG.log('DataService', 'Initializing...');
         try {
-            // Add any initialization logic here
             DEBUG.log('DataService', 'Initialized successfully');
         } catch (error) {
             DEBUG.error('DataService', 'Initialization failed', error);
@@ -181,72 +308,29 @@ class DataService extends EventEmitter {
         }
     }
 
-async parseFile(file) {
-    DEBUG.log('DataService', `Parsing file: ${file.name}`);
-    
-    try {
-        const extension = file.name.split('.').pop().toLowerCase();
-        DEBUG.log('DataService', `File extension: ${extension}`);
+    async parseFile(file) {
+        DEBUG.log('DataService', `Parsing file: ${file.name}`);
         
-        if (extension === 'csv') {
-            const text = await file.text();
-            return this.parseCSV(text);
-        } else if (extension === 'json') {
-            const text = await file.text();
-            return JSON.parse(text);
-        } else if (extension === 'xlsx' || extension === 'xls') {
-            return await this.parseExcel(file);
-        } else {
-            throw new Error(`Unsupported file format: ${extension}`);
+        try {
+            const extension = file.name.split('.').pop().toLowerCase();
+            DEBUG.log('DataService', `File extension: ${extension}`);
+            
+            if (extension === 'csv') {
+                const text = await file.text();
+                return this.parseCSV(text);
+            } else if (extension === 'json') {
+                const text = await file.text();
+                return JSON.parse(text);
+            } else if (extension === 'xlsx' || extension === 'xls') {
+                return await this.parseExcel(file);
+            } else {
+                throw new Error(`Unsupported file format: ${extension}`);
+            }
+        } catch (error) {
+            DEBUG.error('DataService', 'File parsing failed', error);
+            throw error;
         }
-    } catch (error) {
-        DEBUG.error('DataService', 'File parsing failed', error);
-        throw error;
     }
-}
-
-async parseExcel(file) {
-    DEBUG.log('DataService', 'Parsing Excel file...');
-    
-    // Check if XLSX library is available
-    if (typeof XLSX === 'undefined') {
-        throw new Error('Excel support not available. XLSX library not loaded.');
-    }
-    
-    try {
-        const arrayBuffer = await file.arrayBuffer();
-        const workbook = XLSX.read(arrayBuffer, { type: 'array' });
-        
-        // Get first sheet
-        const firstSheetName = workbook.SheetNames[0];
-        DEBUG.log('DataService', `Reading sheet: ${firstSheetName}`);
-        
-        const worksheet = workbook.Sheets[firstSheetName];
-        
-        // Convert to JSON format
-        const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, raw: false });
-        
-        if (jsonData.length === 0) {
-            throw new Error('Empty Excel file');
-        }
-        
-        const headers = jsonData[0].map(h => String(h).trim());
-        const rows = jsonData.slice(1).map(row => {
-            return row.map(cell => {
-                if (cell === null || cell === undefined || cell === '') return null;
-                const num = parseFloat(cell);
-                return isNaN(num) ? String(cell) : num;
-            });
-        });
-        
-        DEBUG.log('DataService', `Parsed Excel: ${rows.length} rows, ${headers.length} columns`);
-        return { headers, rows };
-        
-    } catch (error) {
-        DEBUG.error('DataService', 'Excel parsing failed', error);
-        throw error;
-    }
-}
 
     parseCSV(text) {
         DEBUG.log('DataService', 'Parsing CSV...');
@@ -257,7 +341,6 @@ async parseExcel(file) {
             
             if (lines.length === 0) throw new Error('Empty CSV file');
 
-            // Better CSV parsing that handles quoted fields
             const parseLine = (line) => {
                 const result = [];
                 let current = '';
@@ -306,6 +389,45 @@ async parseExcel(file) {
         }
     }
 
+    async parseExcel(file) {
+        DEBUG.log('DataService', 'Parsing Excel file...');
+        
+        if (typeof XLSX === 'undefined') {
+            throw new Error('Excel support not available. XLSX library not loaded.');
+        }
+        
+        try {
+            const arrayBuffer = await file.arrayBuffer();
+            const workbook = XLSX.read(arrayBuffer, { type: 'array' });
+            
+            const firstSheetName = workbook.SheetNames[0];
+            DEBUG.log('DataService', `Reading sheet: ${firstSheetName}`);
+            
+            const worksheet = workbook.Sheets[firstSheetName];
+            const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, raw: false });
+            
+            if (jsonData.length === 0) {
+                throw new Error('Empty Excel file');
+            }
+            
+            const headers = jsonData[0].map(h => String(h).trim());
+            const rows = jsonData.slice(1).map(row => {
+                return row.map(cell => {
+                    if (cell === null || cell === undefined || cell === '') return null;
+                    const num = parseFloat(cell);
+                    return isNaN(num) ? String(cell) : num;
+                });
+            });
+            
+            DEBUG.log('DataService', `Parsed Excel: ${rows.length} rows, ${headers.length} columns`);
+            return { headers, rows };
+            
+        } catch (error) {
+            DEBUG.error('DataService', 'Excel parsing failed', error);
+            throw error;
+        }
+    }
+
     getCurrentDataset() {
         return this.currentDataset;
     }
@@ -345,6 +467,7 @@ async parseExcel(file) {
     }
 }
 
+// ANALYTICS SERVICE
 class AnalyticsService extends EventEmitter {
     constructor() {
         super();
@@ -443,20 +566,7 @@ class AnalyticsService extends EventEmitter {
         DEBUG.log('AnalyticsService', `Optimizing portfolio using ${method} for ${returns.length} assets`);
         
         const numAssets = returns.length;
-        let weights;
-
-        switch (method) {
-            case 'equalWeight':
-                weights = new Array(numAssets).fill(1 / numAssets);
-                break;
-            case 'minVolatility':
-            case 'maxSharpe':
-            case 'riskParity':
-                weights = new Array(numAssets).fill(1 / numAssets);
-                break;
-            default:
-                weights = new Array(numAssets).fill(1 / numAssets);
-        }
+        let weights = new Array(numAssets).fill(1 / numAssets);
 
         return {
             weights: weights,
@@ -489,15 +599,14 @@ class AnalyticsService extends EventEmitter {
     }
 }
 
-// 3. UI MANAGER
-// =============================================================================
-
+// UI MANAGER
 class UIManager {
     constructor(dataService, analyticsService) {
         this.dataService = dataService;
         this.analyticsService = analyticsService;
         this.activeModule = 'dataManager';
         this.currentChart = null;
+        this.dataConnector = new DataSourceConnector();
         DEBUG.log('UIManager', 'Constructor called');
         
         this.setupEventListeners();
@@ -510,6 +619,7 @@ class UIManager {
             this.setupFileUpload();
             this.setupDataListeners();
             this.createMissingModules();
+            this.setupDataSourceConnections();
             DEBUG.log('UIManager', 'Initialized successfully');
         } catch (error) {
             DEBUG.error('UIManager', 'Initialization failed', error);
@@ -629,7 +739,6 @@ class UIManager {
             DEBUG.log('UIManager', 'Modules HTML inserted');
         }
 
-        // Setup module event listeners after a short delay to ensure DOM is ready
         setTimeout(() => {
             this.setupModuleEventListeners();
         }, 100);
@@ -666,75 +775,213 @@ class UIManager {
             if (button) {
                 button.addEventListener('click', handler);
                 DEBUG.log('UIManager', `Event listener attached to: ${id}`);
-            } else {
-                DEBUG.log('UIManager', `Button not found: ${id}`);
             }
         }
     }
 
-setupFileUpload() {
-    DEBUG.log('UIManager', 'Setting up file upload...');
-    
-    const dropZone = document.getElementById('uploadZone');
-    const fileInput = document.getElementById('fileInput');
-    const browseBtn = document.getElementById('browseFiles');
+    setupFileUpload() {
+        DEBUG.log('UIManager', 'Setting up file upload...');
+        
+        const dropZone = document.getElementById('uploadZone');
+        const fileInput = document.getElementById('fileInput');
+        const browseBtn = document.getElementById('browseFiles');
 
-    if (!dropZone || !fileInput || !browseBtn) {
-        DEBUG.error('UIManager', 'File upload elements not found');
-        return;
+        if (!dropZone || !fileInput || !browseBtn) {
+            DEBUG.error('UIManager', 'File upload elements not found');
+            return;
+        }
+
+        browseBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            DEBUG.log('UIManager', 'Browse button clicked');
+            fileInput.click();
+        });
+        
+        dropZone.addEventListener('click', (e) => {
+            if (e.target === browseBtn || browseBtn.contains(e.target)) {
+                return;
+            }
+            DEBUG.log('UIManager', 'Drop zone clicked');
+            fileInput.click();
+        });
+
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.classList.add('drag-over');
+        });
+
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.classList.remove('drag-over');
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('drag-over');
+            
+            const file = e.dataTransfer.files[0];
+            if (file) {
+                DEBUG.log('UIManager', `File dropped: ${file.name}`);
+                this.handleFileUpload(file);
+            }
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                DEBUG.log('UIManager', `File selected: ${file.name}`);
+                this.handleFileUpload(file);
+            }
+            fileInput.value = '';
+        });
+        
+        DEBUG.log('UIManager', 'File upload setup complete');
     }
 
-    // Browse button - stop propagation to prevent double-trigger
-    browseBtn.addEventListener('click', (e) => {
-        e.stopPropagation(); // CRITICAL: Prevents event bubbling to dropZone
-        DEBUG.log('UIManager', 'Browse button clicked');
-        fileInput.click();
-    });
-    
-    // Drop zone - only trigger if not clicking the button
-    dropZone.addEventListener('click', (e) => {
-        // Only trigger if we didn't click the button
-        if (e.target === browseBtn || browseBtn.contains(e.target)) {
-            return; // Button will handle it
-        }
-        DEBUG.log('UIManager', 'Drop zone clicked');
-        fileInput.click();
-    });
-
-    // Drag and drop handlers
-    dropZone.addEventListener('dragover', (e) => {
-        e.preventDefault();
-        dropZone.classList.add('drag-over');
-    });
-
-    dropZone.addEventListener('dragleave', () => {
-        dropZone.classList.remove('drag-over');
-    });
-
-    dropZone.addEventListener('drop', (e) => {
-        e.preventDefault();
-        dropZone.classList.remove('drag-over');
+    setupDataSourceConnections() {
+        DEBUG.log('UIManager', 'Setting up data source connections...');
         
-        const file = e.dataTransfer.files[0];
-        if (file) {
-            DEBUG.log('UIManager', `File dropped: ${file.name}`);
-            this.handleFileUpload(file);
-        }
-    });
+        document.getElementById('azureForm')?.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            await this.handleAzureConnect();
+        });
+        
+        document.getElementById('s3Form')?.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            await this.handleS3Connect();
+        });
+        
+        document.getElementById('googleSheetsForm')?.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            await this.handleGoogleSheetsConnect();
+        });
+        
+        document.getElementById('databaseForm')?.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            await this.handleDatabaseConnect();
+        });
+        
+        document.getElementById('apiForm')?.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            await this.handleAPIConnect();
+        });
+        
+        document.getElementById('apiMethod')?.addEventListener('change', (e) => {
+            const bodyGroup = document.getElementById('apiBodyGroup');
+            if (bodyGroup) {
+                bodyGroup.style.display = e.target.value === 'POST' ? 'block' : 'none';
+            }
+        });
+    }
 
-    // File input change
-    fileInput.addEventListener('change', (e) => {
-        const file = e.target.files[0];
-        if (file) {
-            DEBUG.log('UIManager', `File selected: ${file.name}`);
-            this.handleFileUpload(file);
+    async handleAzureConnect() {
+        try {
+            this.showLoading();
+            
+            const config = {
+                accountName: document.getElementById('azureAccount').value,
+                containerName: document.getElementById('azureContainer').value,
+                blobName: document.getElementById('azureBlob').value,
+                sasToken: document.getElementById('azureSAS').value
+            };
+            
+            const file = await this.dataConnector.connectAzureBlob(config);
+            await this.dataService.loadData(file);
+            
+        } catch (error) {
+            this.showError(error.message);
         }
-        // Reset the input so the same file can be selected again
-        fileInput.value = '';
-    });
-    
-    DEBUG.log('UIManager', 'File upload setup complete');
-}
+    }
+
+    async handleS3Connect() {
+        try {
+            this.showLoading();
+            
+            const config = {
+                bucket: document.getElementById('s3Bucket').value,
+                key: document.getElementById('s3Key').value,
+                presignedUrl: document.getElementById('s3PresignedUrl').value
+            };
+            
+            const file = await this.dataConnector.connectAWS_S3(config);
+            await this.dataService.loadData(file);
+            
+        } catch (error) {
+            this.showError(error.message);
+        }
+    }
+
+    async handleGoogleSheetsConnect() {
+        try {
+            this.showLoading();
+            
+            const config = {
+                sheetId: document.getElementById('gSheetId').value,
+                apiKey: document.getElementById('gApiKey').value,
+                range: document.getElementById('gRange').value
+            };
+            
+            const dataset = await this.dataConnector.connectGoogleSheets(config);
+            this.dataService.currentDataset = dataset;
+            this.dataService.emit('data:loaded', { data: dataset });
+            
+        } catch (error) {
+            this.showError(error.message);
+        }
+    }
+
+    async handleDatabaseConnect() {
+        try {
+            this.showLoading();
+            
+            const headers = {};
+            const auth = document.getElementById('dbAuth').value;
+            if (auth) headers['Authorization'] = auth;
+            
+            const config = {
+                url: document.getElementById('dbApiUrl').value,
+                method: 'POST',
+                headers,
+                body: {
+                    dbType: document.getElementById('dbType').value,
+                    query: document.getElementById('dbQuery').value
+                }
+            };
+            
+            const dataset = await this.dataConnector.connectAPI(config);
+            this.dataService.currentDataset = dataset;
+            this.dataService.emit('data:loaded', { data: dataset });
+            
+        } catch (error) {
+            this.showError(error.message);
+        }
+    }
+
+    async handleAPIConnect() {
+        try {
+            this.showLoading();
+            
+            const headersText = document.getElementById('apiHeaders').value;
+            const headers = headersText ? JSON.parse(headersText) : {};
+            
+            const config = {
+                url: document.getElementById('apiUrl').value,
+                method: document.getElementById('apiMethod').value,
+                headers
+            };
+            
+            if (config.method === 'POST') {
+                const bodyText = document.getElementById('apiBody').value;
+                config.body = bodyText ? JSON.parse(bodyText) : null;
+            }
+            
+            const dataset = await this.dataConnector.connectAPI(config);
+            this.dataService.currentDataset = dataset;
+            this.dataService.emit('data:loaded', { data: dataset });
+            
+        } catch (error) {
+            this.showError(error.message);
+        }
+    }
 
     setupDataListeners() {
         DEBUG.log('UIManager', 'Setting up data listeners...');
@@ -784,7 +1031,6 @@ setupFileUpload() {
 
         this.activeModule = moduleId;
 
-        // Initialize module-specific functionality
         if (moduleId === 'plotManager') this.initializePlotModule();
         else if (moduleId === 'riskAnalytics') this.initializeRiskModule();
         else if (moduleId === 'portfolioManager') this.initializePortfolioModule();
@@ -882,7 +1128,7 @@ setupFileUpload() {
         DEBUG.log('UIManager', 'Rendering dataset info');
         
         const container = document.getElementById('datasetInfo');
-        if (!container) return;
+        if (!container) return ;
 
         const numericColumns = this.dataService.getNumericColumns();
         
@@ -897,11 +1143,8 @@ setupFileUpload() {
                         <div class="col-6"><strong>Columns:</strong> ${dataset.headers.length}</div>
                     </div>
                     <div class="row mt-2">
-                        <div class="col-6"><strong>Numeric:</strong> ${numericColumns.length}
-                        </div>
-                        <div class="col-6">
-                            <strong>Text:</strong> ${dataset.headers.length - numericColumns.length}
-                        </div>
+                        <div class="col-6"><strong>Numeric:</strong> ${numericColumns.length}</div>
+                        <div class="col-6"><strong>Text:</strong> ${dataset.headers.length - numericColumns.length}</div>
                     </div>
                     <hr>
                     <h6>Columns</h6>
@@ -930,7 +1173,6 @@ setupFileUpload() {
         });
     }
 
-    // MODULE INITIALIZERS
     initializePlotModule() {
         DEBUG.log('UIManager', 'Initializing plot module');
         
@@ -986,7 +1228,6 @@ setupFileUpload() {
         }
     }
 
-    // MODULE FUNCTIONALITY
     generateChart() {
         DEBUG.log('UIManager', 'Generate chart clicked');
         
@@ -1021,7 +1262,6 @@ setupFileUpload() {
             return;
         }
 
-        // Wait for Chart.js to be available
         if (typeof Chart === 'undefined') {
             DEBUG.log('UIManager', 'Chart.js not loaded yet, retrying...');
             setTimeout(() => this.createChart(data, label, type), 100);
@@ -1029,7 +1269,6 @@ setupFileUpload() {
         }
 
         try {
-            // Destroy existing chart
             if (this.currentChart) {
                 DEBUG.log('UIManager', 'Destroying existing chart');
                 this.currentChart.destroy();
@@ -1434,9 +1673,7 @@ setupFileUpload() {
     }
 }
 
-// 4. APPLICATION MAIN
-// =============================================================================
-
+// APPLICATION
 class Application {
     constructor() {
         this.dataService = new DataService();
@@ -1491,14 +1728,11 @@ class Application {
     }
 }
 
-// 5. INITIALIZATION
-// =============================================================================
-
+// INITIALIZATION
 document.addEventListener('DOMContentLoaded', async () => {
     DEBUG.log('Bootstrap', 'DOM Content Loaded');
     
     try {
-        // Initialize particles
         if (typeof particlesJS !== 'undefined') {
             DEBUG.log('Bootstrap', 'Initializing particles...');
             particlesJS("particles-js", {
@@ -1518,14 +1752,11 @@ document.addEventListener('DOMContentLoaded', async () => {
                 },
                 retina_detect: true
             });
-        } else {
-            DEBUG.log('Bootstrap', 'Particles.js not available');
         }
 
-        // Check for Chart.js
         DEBUG.log('Bootstrap', `Chart.js available: ${typeof Chart !== 'undefined'}`);
+        DEBUG.log('Bootstrap', `XLSX available: ${typeof XLSX !== 'undefined'}`);
 
-        // Initialize application
         const app = new Application();
         await app.initialize();
         
@@ -1535,7 +1766,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 });
 
-// Export for global access
 window.Application = Application;
 window.Notification = Notification;
 window.DebugLogger = DebugLogger;
