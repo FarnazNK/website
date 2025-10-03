@@ -1,5 +1,5 @@
 // =============================================================================
-// FIXED QUANTITATIVE PLATFORM - WORKING VERSION
+// QUANTITATIVE PLATFORM - WORKING VERSION
 // =============================================================================
 
 // 1. BASE UTILITIES
