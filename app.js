@@ -1,6 +1,62 @@
 // =============================================================================
-// QUANTITATIVE PLATFORM - WORKING VERSION
+// QUANTITATIVE PLATFORM WITH DEBUG LOGGING
 // =============================================================================
+
+// DEBUG LOGGER
+class DebugLogger {
+    constructor() {
+        this.logs = [];
+        this.errors = [];
+        this.enabled = true;
+    }
+
+    log(category, message, data = null) {
+        const entry = {
+            timestamp: new Date().toISOString(),
+            category,
+            message,
+            data
+        };
+        this.logs.push(entry);
+        if (this.enabled) {
+            console.log(`[${category}] ${message}`, data || '');
+        }
+    }
+
+    error(category, message, error = null) {
+        const entry = {
+            timestamp: new Date().toISOString(),
+            category,
+            message,
+            error: error ? {
+                message: error.message,
+                stack: error.stack,
+                name: error.name
+            } : null
+        };
+        this.errors.push(entry);
+        console.error(`[${category}] ERROR: ${message}`, error || '');
+    }
+
+    getLogs() {
+        return this.logs;
+    }
+
+    getErrors() {
+        return this.errors;
+    }
+
+    exportDebugInfo() {
+        return {
+            logs: this.logs,
+            errors: this.errors,
+            browser: navigator.userAgent,
+            timestamp: new Date().toISOString()
+        };
+    }
+}
+
+const DEBUG = new DebugLogger();
 
 // 1. BASE UTILITIES
 // =============================================================================
@@ -8,6 +64,7 @@
 class EventEmitter {
     constructor() {
         this.events = new Map();
+        DEBUG.log('EventEmitter', 'Initialized');
     }
 
     on(event, callback) {
@@ -15,6 +72,7 @@ class EventEmitter {
             this.events.set(event, []);
         }
         this.events.get(event).push(callback);
+        DEBUG.log('EventEmitter', `Registered listener for: ${event}`);
         return () => this.off(event, callback);
     }
 
@@ -22,16 +80,23 @@ class EventEmitter {
         if (!this.events.has(event)) return;
         const listeners = this.events.get(event);
         const index = listeners.indexOf(callback);
-        if (index > -1) listeners.splice(index, 1);
+        if (index > -1) {
+            listeners.splice(index, 1);
+            DEBUG.log('EventEmitter', `Removed listener for: ${event}`);
+        }
     }
 
     emit(event, data = null) {
-        if (!this.events.has(event)) return;
+        DEBUG.log('EventEmitter', `Emitting event: ${event}`, data);
+        if (!this.events.has(event)) {
+            DEBUG.log('EventEmitter', `No listeners for: ${event}`);
+            return;
+        }
         this.events.get(event).forEach(callback => {
             try {
                 callback(data);
             } catch (error) {
-                console.error(`Event error for ${event}:`, error);
+                DEBUG.error('EventEmitter', `Error in event listener for ${event}`, error);
             }
         });
     }
@@ -45,6 +110,7 @@ class Notification {
     }
 
     show() {
+        DEBUG.log('Notification', `Showing ${this.type}: ${this.message}`);
         const div = document.createElement('div');
         div.className = `alert alert-${this.getAlertClass()} alert-dismissible`;
         div.style.cssText = `position: fixed; top: 20px; right: 20px; z-index: 9999; max-width: 400px;`;
@@ -80,54 +146,164 @@ class DataService extends EventEmitter {
     constructor() {
         super();
         this.currentDataset = null;
+        DEBUG.log('DataService', 'Constructor called');
     }
 
     async initialize() {
-        console.log('✅ DataService initialized');
+        DEBUG.log('DataService', 'Initializing...');
+        try {
+            // Add any initialization logic here
+            DEBUG.log('DataService', 'Initialized successfully');
+        } catch (error) {
+            DEBUG.error('DataService', 'Initialization failed', error);
+            throw error;
+        }
     }
 
     async loadData(file) {
+        DEBUG.log('DataService', `Loading file: ${file.name} (${file.size} bytes, type: ${file.type})`);
+        
         try {
             this.emit('data:loading', { filename: file.name });
             
             const dataset = await this.parseFile(file);
+            DEBUG.log('DataService', `Parsed dataset: ${dataset.rows.length} rows, ${dataset.headers.length} columns`);
+            
             this.currentDataset = dataset;
             
             this.emit('data:loaded', { data: dataset });
+            DEBUG.log('DataService', 'Data loaded successfully');
             return dataset;
         } catch (error) {
+            DEBUG.error('DataService', 'Data loading failed', error);
             this.emit('data:error', { error });
             throw error;
         }
     }
 
-    async parseFile(file) {
-        const text = await file.text();
+async parseFile(file) {
+    DEBUG.log('DataService', `Parsing file: ${file.name}`);
+    
+    try {
         const extension = file.name.split('.').pop().toLowerCase();
+        DEBUG.log('DataService', `File extension: ${extension}`);
         
         if (extension === 'csv') {
+            const text = await file.text();
             return this.parseCSV(text);
         } else if (extension === 'json') {
+            const text = await file.text();
             return JSON.parse(text);
+        } else if (extension === 'xlsx' || extension === 'xls') {
+            return await this.parseExcel(file);
         } else {
-            throw new Error('Unsupported file format');
+            throw new Error(`Unsupported file format: ${extension}`);
         }
+    } catch (error) {
+        DEBUG.error('DataService', 'File parsing failed', error);
+        throw error;
     }
+}
 
-    parseCSV(text) {
-        const lines = text.split('\n').filter(line => line.trim());
-        if (lines.length === 0) throw new Error('Empty CSV file');
-
-        const headers = lines[0].split(',').map(h => h.trim().replace(/"/g, ''));
-        const rows = lines.slice(1).map(line => {
-            return line.split(',').map(cell => {
-                const trimmed = cell.trim().replace(/"/g, '');
-                const num = parseFloat(trimmed);
-                return isNaN(num) ? trimmed : num;
+async parseExcel(file) {
+    DEBUG.log('DataService', 'Parsing Excel file...');
+    
+    // Check if XLSX library is available
+    if (typeof XLSX === 'undefined') {
+        throw new Error('Excel support not available. XLSX library not loaded.');
+    }
+    
+    try {
+        const arrayBuffer = await file.arrayBuffer();
+        const workbook = XLSX.read(arrayBuffer, { type: 'array' });
+        
+        // Get first sheet
+        const firstSheetName = workbook.SheetNames[0];
+        DEBUG.log('DataService', `Reading sheet: ${firstSheetName}`);
+        
+        const worksheet = workbook.Sheets[firstSheetName];
+        
+        // Convert to JSON format
+        const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, raw: false });
+        
+        if (jsonData.length === 0) {
+            throw new Error('Empty Excel file');
+        }
+        
+        const headers = jsonData[0].map(h => String(h).trim());
+        const rows = jsonData.slice(1).map(row => {
+            return row.map(cell => {
+                if (cell === null || cell === undefined || cell === '') return null;
+                const num = parseFloat(cell);
+                return isNaN(num) ? String(cell) : num;
             });
         });
         
+        DEBUG.log('DataService', `Parsed Excel: ${rows.length} rows, ${headers.length} columns`);
         return { headers, rows };
+        
+    } catch (error) {
+        DEBUG.error('DataService', 'Excel parsing failed', error);
+        throw error;
+    }
+}
+
+    parseCSV(text) {
+        DEBUG.log('DataService', 'Parsing CSV...');
+        
+        try {
+            const lines = text.split('\n').filter(line => line.trim());
+            DEBUG.log('DataService', `CSV has ${lines.length} lines`);
+            
+            if (lines.length === 0) throw new Error('Empty CSV file');
+
+            // Better CSV parsing that handles quoted fields
+            const parseLine = (line) => {
+                const result = [];
+                let current = '';
+                let inQuotes = false;
+                
+                for (let i = 0; i < line.length; i++) {
+                    const char = line[i];
+                    
+                    if (char === '"') {
+                        inQuotes = !inQuotes;
+                    } else if (char === ',' && !inQuotes) {
+                        result.push(current.trim());
+                        current = '';
+                    } else {
+                        current += char;
+                    }
+                }
+                result.push(current.trim());
+                return result.map(cell => cell.replace(/^"|"$/g, ''));
+            };
+
+            const headers = parseLine(lines[0]);
+            DEBUG.log('DataService', `CSV headers: ${headers.join(', ')}`);
+            
+            const rows = [];
+            for (let i = 1; i < lines.length; i++) {
+                try {
+                    const parsedLine = parseLine(lines[i]);
+                    const row = parsedLine.map(cell => {
+                        const trimmed = cell.trim();
+                        const num = parseFloat(trimmed);
+                        return isNaN(num) ? trimmed : num;
+                    });
+                    rows.push(row);
+                } catch (error) {
+                    DEBUG.error('DataService', `Error parsing line ${i}`, error);
+                }
+            }
+            
+            DEBUG.log('DataService', `Parsed ${rows.length} data rows`);
+            return { headers, rows };
+            
+        } catch (error) {
+            DEBUG.error('DataService', 'CSV parsing failed', error);
+            throw error;
+        }
     }
 
     getCurrentDataset() {
@@ -135,31 +311,57 @@ class DataService extends EventEmitter {
     }
 
     getNumericColumns() {
-        if (!this.currentDataset) return [];
-        return this.currentDataset.headers.filter((header, index) => {
+        if (!this.currentDataset) {
+            DEBUG.log('DataService', 'No dataset available for getNumericColumns');
+            return [];
+        }
+        
+        const numericCols = this.currentDataset.headers.filter((header, index) => {
             return this.currentDataset.rows.some(row => typeof row[index] === 'number');
         });
+        
+        DEBUG.log('DataService', `Found ${numericCols.length} numeric columns: ${numericCols.join(', ')}`);
+        return numericCols;
     }
 
     getColumnData(columnName) {
-        if (!this.currentDataset) return [];
+        if (!this.currentDataset) {
+            DEBUG.log('DataService', 'No dataset available for getColumnData');
+            return [];
+        }
+        
         const index = this.currentDataset.headers.indexOf(columnName);
-        if (index === -1) return [];
-        return this.currentDataset.rows.map(row => row[index]).filter(val => typeof val === 'number');
+        if (index === -1) {
+            DEBUG.log('DataService', `Column not found: ${columnName}`);
+            return [];
+        }
+        
+        const data = this.currentDataset.rows
+            .map(row => row[index])
+            .filter(val => typeof val === 'number');
+        
+        DEBUG.log('DataService', `Retrieved ${data.length} numeric values from column: ${columnName}`);
+        return data;
     }
 }
 
 class AnalyticsService extends EventEmitter {
     constructor() {
         super();
+        DEBUG.log('AnalyticsService', 'Constructor called');
     }
 
     async initialize() {
-        console.log('📊 AnalyticsService initialized');
+        DEBUG.log('AnalyticsService', 'Initialized');
     }
 
     calculateReturns(prices, type = 'simple') {
-        if (!Array.isArray(prices) || prices.length < 2) return [];
+        DEBUG.log('AnalyticsService', `Calculating ${type} returns for ${prices.length} prices`);
+        
+        if (!Array.isArray(prices) || prices.length < 2) {
+            DEBUG.log('AnalyticsService', 'Insufficient data for returns calculation');
+            return [];
+        }
         
         const returns = [];
         for (let i = 1; i < prices.length; i++) {
@@ -169,30 +371,46 @@ class AnalyticsService extends EventEmitter {
                 returns.push(Math.log(prices[i] / prices[i-1]));
             }
         }
+        
+        DEBUG.log('AnalyticsService', `Calculated ${returns.length} returns`);
         return returns;
     }
 
     calculateRiskMetrics(data) {
-        if (!Array.isArray(data) || data.length < 2) return null;
+        DEBUG.log('AnalyticsService', `Calculating risk metrics for ${data.length} data points`);
         
-        const returns = this.calculateReturns(data);
-        const mean = returns.reduce((sum, val) => sum + val, 0) / returns.length;
-        const variance = returns.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) / (returns.length - 1);
-        const volatility = Math.sqrt(variance);
-        const annualizedVol = volatility * Math.sqrt(252);
+        if (!Array.isArray(data) || data.length < 2) {
+            DEBUG.log('AnalyticsService', 'Insufficient data for risk metrics');
+            return null;
+        }
         
-        const sortedReturns = [...returns].sort((a, b) => a - b);
-        const var95 = -sortedReturns[Math.floor(0.05 * sortedReturns.length)];
-        const var99 = -sortedReturns[Math.floor(0.01 * sortedReturns.length)];
-        
-        return {
-            mean: mean * 252,
-            volatility: annualizedVol,
-            var95: var95,
-            var99: var99,
-            sharpeRatio: annualizedVol > 0 ? (mean * 252) / annualizedVol : 0,
-            maxDrawdown: this.calculateMaxDrawdown(data)
-        };
+        try {
+            const returns = this.calculateReturns(data);
+            const mean = returns.reduce((sum, val) => sum + val, 0) / returns.length;
+            const variance = returns.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) / (returns.length - 1);
+            const volatility = Math.sqrt(variance);
+            const annualizedVol = volatility * Math.sqrt(252);
+            
+            const sortedReturns = [...returns].sort((a, b) => a - b);
+            const var95 = -sortedReturns[Math.floor(0.05 * sortedReturns.length)];
+            const var99 = -sortedReturns[Math.floor(0.01 * sortedReturns.length)];
+            
+            const metrics = {
+                mean: mean * 252,
+                volatility: annualizedVol,
+                var95: var95,
+                var99: var99,
+                sharpeRatio: annualizedVol > 0 ? (mean * 252) / annualizedVol : 0,
+                maxDrawdown: this.calculateMaxDrawdown(data)
+            };
+            
+            DEBUG.log('AnalyticsService', 'Risk metrics calculated', metrics);
+            return metrics;
+            
+        } catch (error) {
+            DEBUG.error('AnalyticsService', 'Risk metrics calculation failed', error);
+            return null;
+        }
     }
 
     calculateMaxDrawdown(prices) {
@@ -212,6 +430,7 @@ class AnalyticsService extends EventEmitter {
     }
 
     calculateMovingAverage(data, period) {
+        DEBUG.log('AnalyticsService', `Calculating ${period}-period moving average`);
         const result = [];
         for (let i = period - 1; i < data.length; i++) {
             const sum = data.slice(i - period + 1, i + 1).reduce((a, b) => a + b, 0);
@@ -221,6 +440,8 @@ class AnalyticsService extends EventEmitter {
     }
 
     optimizePortfolio(returns, method = 'equalWeight') {
+        DEBUG.log('AnalyticsService', `Optimizing portfolio using ${method} for ${returns.length} assets`);
+        
         const numAssets = returns.length;
         let weights;
 
@@ -229,15 +450,8 @@ class AnalyticsService extends EventEmitter {
                 weights = new Array(numAssets).fill(1 / numAssets);
                 break;
             case 'minVolatility':
-                // Simplified minimum volatility (equal weight for demo)
-                weights = new Array(numAssets).fill(1 / numAssets);
-                break;
             case 'maxSharpe':
-                // Simplified max Sharpe (equal weight for demo)
-                weights = new Array(numAssets).fill(1 / numAssets);
-                break;
             case 'riskParity':
-                // Simplified risk parity (equal weight for demo)
                 weights = new Array(numAssets).fill(1 / numAssets);
                 break;
             default:
@@ -257,11 +471,10 @@ class AnalyticsService extends EventEmitter {
             const assetMean = returns[i].reduce((sum, r) => sum + r, 0) / returns[i].length;
             portfolioReturn += weights[i] * assetMean;
         }
-        return portfolioReturn * 252; // Annualized
+        return portfolioReturn * 252;
     }
 
     calculatePortfolioVolatility(returns, weights) {
-        // Simplified volatility calculation
         let portfolioVar = 0;
         for (let i = 0; i < returns.length; i++) {
             const assetVar = this.calculateVariance(returns[i]);
@@ -276,7 +489,7 @@ class AnalyticsService extends EventEmitter {
     }
 }
 
-// 3. UI MANAGER WITH ALL MODULES
+// 3. UI MANAGER
 // =============================================================================
 
 class UIManager {
@@ -285,22 +498,34 @@ class UIManager {
         this.analyticsService = analyticsService;
         this.activeModule = 'dataManager';
         this.currentChart = null;
+        DEBUG.log('UIManager', 'Constructor called');
         
         this.setupEventListeners();
     }
 
     async initialize() {
-        this.setupFileUpload();
-        this.setupDataListeners();
-        this.createMissingModules(); // Create the missing module HTML
-        console.log('🎨 UI initialized');
+        DEBUG.log('UIManager', 'Initializing...');
+        
+        try {
+            this.setupFileUpload();
+            this.setupDataListeners();
+            this.createMissingModules();
+            DEBUG.log('UIManager', 'Initialized successfully');
+        } catch (error) {
+            DEBUG.error('UIManager', 'Initialization failed', error);
+            throw error;
+        }
     }
 
     createMissingModules() {
+        DEBUG.log('UIManager', 'Creating missing modules...');
+        
         const container = document.getElementById('moduleContainer');
-        if (!container) return;
+        if (!container) {
+            DEBUG.error('UIManager', 'Module container not found');
+            return;
+        }
 
-        // Add missing modules HTML
         const modulesHTML = `
             <!-- Visualizations Module -->
             <div class="module-content" id="plotManagerModule" style="display: none;">
@@ -317,15 +542,14 @@ class UIManager {
                         <select class="form-control" id="chartType">
                             <option value="line">Line Chart</option>
                             <option value="bar">Bar Chart</option>
-                            <option value="histogram">Histogram</option>
                         </select>
                     </div>
                 </div>
                 <button class="btn btn-primary mb-3" id="generateChart">
                     <i class="fas fa-chart-line mr-2"></i>Generate Chart
                 </button>
-                <div class="chart-container">
-                    <canvas id="dataChart" width="400" height="200"></canvas>
+                <div style="height: 400px; position: relative;">
+                    <canvas id="dataChart"></canvas>
                 </div>
             </div>
 
@@ -333,59 +557,40 @@ class UIManager {
             <div class="module-content" id="riskAnalyticsModule" style="display: none;">
                 <h4><i class="fas fa-calculator mr-2"></i>Risk Analytics</h4>
                 <div class="row mb-4">
-                    <div class="col-md-6">
+                    <div class="col-md-12">
                         <label>Price/Returns Column:</label>
                         <select class="form-control" id="riskColumn">
                             <option value="">Choose a column...</option>
-                        </select>
-                    </div>
-                    <div class="col-md-6">
-                        <label>Analysis Period:</label>
-                        <select class="form-control" id="riskPeriod">
-                            <option value="30">30 Days</option>
-                            <option value="60">60 Days</option>
-                            <option value="90" selected>90 Days</option>
-                            <option value="252">1 Year</option>
                         </select>
                     </div>
                 </div>
                 <button class="btn btn-primary mb-3" id="calculateRisk">
                     <i class="fas fa-calculator mr-2"></i>Calculate Risk Metrics
                 </button>
-                <div class="row" id="riskMetrics">
-                    <!-- Risk metrics will be populated here -->
-                </div>
+                <div class="row" id="riskMetrics"></div>
             </div>
 
             <!-- Portfolio Optimization Module -->
             <div class="module-content" id="portfolioManagerModule" style="display: none;">
                 <h4><i class="fas fa-briefcase mr-2"></i>Portfolio Optimization</h4>
-                <div class="portfolio-section">
-                    <h6>Asset Selection</h6>
-                    <div class="row mb-3">
-                        <div class="col-md-8">
-                            <label>Select Assets (hold Ctrl to select multiple):</label>
-                            <select class="form-control" id="assetSelection" multiple size="5">
-                                <!-- Will be populated with numeric columns -->
-                            </select>
-                        </div>
-                        <div class="col-md-4">
-                            <label>Optimization Method:</label>
-                            <select class="form-control" id="optimizationMethod">
-                                <option value="equalWeight">Equal Weight</option>
-                                <option value="minVolatility">Minimum Volatility</option>
-                                <option value="maxSharpe">Maximum Sharpe Ratio</option>
-                                <option value="riskParity">Risk Parity</option>
-                            </select>
-                            <button class="btn btn-success mt-3 w-100" id="optimizePortfolio">
-                                <i class="fas fa-magic mr-2"></i>Optimize Portfolio
-                            </button>
-                        </div>
+                <div class="row mb-3">
+                    <div class="col-md-8">
+                        <label>Select Assets (hold Ctrl to select multiple):</label>
+                        <select class="form-control" id="assetSelection" multiple size="5"></select>
+                    </div>
+                    <div class="col-md-4">
+                        <label>Optimization Method:</label>
+                        <select class="form-control" id="optimizationMethod">
+                            <option value="equalWeight">Equal Weight</option>
+                            <option value="minVolatility">Minimum Volatility</option>
+                            <option value="maxSharpe">Maximum Sharpe Ratio</option>
+                        </select>
+                        <button class="btn btn-success mt-3 w-100" id="optimizePortfolio">
+                            <i class="fas fa-magic mr-2"></i>Optimize Portfolio
+                        </button>
                     </div>
                 </div>
-                <div class="optimization-result" id="portfolioResults" style="display: none;">
-                    <!-- Optimization results will appear here -->
-                </div>
+                <div id="portfolioResults" style="display: none;"></div>
             </div>
 
             <!-- Strategy Backtesting Module -->
@@ -408,34 +613,36 @@ class UIManager {
                     </div>
                     <div class="col-md-4">
                         <label>Parameters:</label>
-                        <input type="number" class="form-control" id="strategyParam" placeholder="e.g., 20 for 20-day MA" value="20">
+                        <input type="number" class="form-control" id="strategyParam" value="20">
                     </div>
                 </div>
                 <button class="btn btn-primary mb-3" id="runBacktest">
                     <i class="fas fa-play mr-2"></i>Run Backtest
                 </button>
-                <div class="row" id="backtestResults">
-                    <!-- Backtest results will be populated here -->
-                </div>
+                <div class="row" id="backtestResults"></div>
             </div>
         `;
 
-        // Insert the modules before the existing aiInsightsModule
         const aiModule = document.getElementById('aiInsightsModule');
         if (aiModule) {
             aiModule.insertAdjacentHTML('beforebegin', modulesHTML);
+            DEBUG.log('UIManager', 'Modules HTML inserted');
         }
 
-        // Setup module-specific event listeners
-        this.setupModuleEventListeners();
+        // Setup module event listeners after a short delay to ensure DOM is ready
+        setTimeout(() => {
+            this.setupModuleEventListeners();
+        }, 100);
     }
 
     setupEventListeners() {
-        // Toolbar navigation
+        DEBUG.log('UIManager', 'Setting up event listeners...');
+        
         document.addEventListener('click', (e) => {
             if (e.target.closest('.btn-tool')) {
                 const button = e.target.closest('.btn-tool');
                 const module = button.dataset.module;
+                DEBUG.log('UIManager', `Toolbar button clicked: ${module}`);
                 if (!button.disabled) {
                     this.switchModule(module);
                 }
@@ -444,78 +651,125 @@ class UIManager {
     }
 
     setupModuleEventListeners() {
-        // Charts module
-        document.addEventListener('click', (e) => {
-            if (e.target.id === 'generateChart') {
-                this.generateChart();
-            } else if (e.target.id === 'calculateRisk') {
-                this.calculateRiskMetrics();
-            } else if (e.target.id === 'optimizePortfolio') {
-                this.optimizePortfolio();
-            } else if (e.target.id === 'runBacktest') {
-                this.runBacktest();
-            } else if (e.target.id === 'analyzeBtn') {
-                this.handleAIAnalysis();
+        DEBUG.log('UIManager', 'Setting up module-specific event listeners...');
+        
+        const buttons = {
+            'generateChart': () => this.generateChart(),
+            'calculateRisk': () => this.calculateRiskMetrics(),
+            'optimizePortfolio': () => this.optimizePortfolio(),
+            'runBacktest': () => this.runBacktest(),
+            'analyzeBtn': () => this.handleAIAnalysis()
+        };
+
+        for (const [id, handler] of Object.entries(buttons)) {
+            const button = document.getElementById(id);
+            if (button) {
+                button.addEventListener('click', handler);
+                DEBUG.log('UIManager', `Event listener attached to: ${id}`);
+            } else {
+                DEBUG.log('UIManager', `Button not found: ${id}`);
             }
-        });
+        }
     }
 
-    setupFileUpload() {
-        const dropZone = document.getElementById('uploadZone');
-        const fileInput = document.getElementById('fileInput');
-        const browseBtn = document.getElementById('browseFiles');
+setupFileUpload() {
+    DEBUG.log('UIManager', 'Setting up file upload...');
+    
+    const dropZone = document.getElementById('uploadZone');
+    const fileInput = document.getElementById('fileInput');
+    const browseBtn = document.getElementById('browseFiles');
 
-        if (!dropZone || !fileInput || !browseBtn) return;
-
-        // Click to browse
-        browseBtn.addEventListener('click', () => fileInput.click());
-        dropZone.addEventListener('click', () => fileInput.click());
-
-        // Drag and drop
-        dropZone.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            dropZone.classList.add('drag-over');
-        });
-
-        dropZone.addEventListener('dragleave', () => {
-            dropZone.classList.remove('drag-over');
-        });
-
-        dropZone.addEventListener('drop', (e) => {
-            e.preventDefault();
-            dropZone.classList.remove('drag-over');
-            
-            const file = e.dataTransfer.files[0];
-            if (file) this.handleFileUpload(file);
-        });
-
-        // File input change
-        fileInput.addEventListener('change', (e) => {
-            const file = e.target.files[0];
-            if (file) this.handleFileUpload(file);
-        });
+    if (!dropZone || !fileInput || !browseBtn) {
+        DEBUG.error('UIManager', 'File upload elements not found');
+        return;
     }
+
+    // Browse button - stop propagation to prevent double-trigger
+    browseBtn.addEventListener('click', (e) => {
+        e.stopPropagation(); // CRITICAL: Prevents event bubbling to dropZone
+        DEBUG.log('UIManager', 'Browse button clicked');
+        fileInput.click();
+    });
+    
+    // Drop zone - only trigger if not clicking the button
+    dropZone.addEventListener('click', (e) => {
+        // Only trigger if we didn't click the button
+        if (e.target === browseBtn || browseBtn.contains(e.target)) {
+            return; // Button will handle it
+        }
+        DEBUG.log('UIManager', 'Drop zone clicked');
+        fileInput.click();
+    });
+
+    // Drag and drop handlers
+    dropZone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        dropZone.classList.add('drag-over');
+    });
+
+    dropZone.addEventListener('dragleave', () => {
+        dropZone.classList.remove('drag-over');
+    });
+
+    dropZone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        dropZone.classList.remove('drag-over');
+        
+        const file = e.dataTransfer.files[0];
+        if (file) {
+            DEBUG.log('UIManager', `File dropped: ${file.name}`);
+            this.handleFileUpload(file);
+        }
+    });
+
+    // File input change
+    fileInput.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            DEBUG.log('UIManager', `File selected: ${file.name}`);
+            this.handleFileUpload(file);
+        }
+        // Reset the input so the same file can be selected again
+        fileInput.value = '';
+    });
+    
+    DEBUG.log('UIManager', 'File upload setup complete');
+}
 
     setupDataListeners() {
-        this.dataService.on('data:loading', () => this.showLoading());
-        this.dataService.on('data:loaded', (event) => this.handleDataLoaded(event.data));
-        this.dataService.on('data:error', (event) => this.showError(event.error.message));
+        DEBUG.log('UIManager', 'Setting up data listeners...');
+        
+        this.dataService.on('data:loading', () => {
+            DEBUG.log('UIManager', 'Data loading event received');
+            this.showLoading();
+        });
+        
+        this.dataService.on('data:loaded', (event) => {
+            DEBUG.log('UIManager', 'Data loaded event received');
+            this.handleDataLoaded(event.data);
+        });
+        
+        this.dataService.on('data:error', (event) => {
+            DEBUG.log('UIManager', 'Data error event received');
+            this.showError(event.error.message);
+        });
     }
 
     switchModule(moduleId) {
-        // Check if module requires data
+        DEBUG.log('UIManager', `Switching to module: ${moduleId}`);
+        
         const requiresData = ['plotManager', 'riskAnalytics', 'portfolioManager', 'strategyBacktest', 'aiInsights'];
         
         if (requiresData.includes(moduleId) && !this.dataService.getCurrentDataset()) {
+            DEBUG.log('UIManager', 'Module requires data but none loaded');
             Notification.warning('Please load data first before accessing this module');
             return;
         }
 
-        // Update active toolbar button
         document.querySelectorAll('.btn-tool').forEach(btn => btn.classList.remove('active'));
-        document.querySelector(`[data-module="${moduleId}"]`)?.classList.add('active');
+        const activeBtn = document.querySelector(`[data-module="${moduleId}"]`);
+        if (activeBtn) activeBtn.classList.add('active');
 
-        // Show appropriate module content
         document.querySelectorAll('.module-content').forEach(module => {
             module.style.display = 'none';
         });
@@ -523,33 +777,35 @@ class UIManager {
         const moduleElement = document.getElementById(`${moduleId}Module`);
         if (moduleElement) {
             moduleElement.style.display = 'block';
+            DEBUG.log('UIManager', `Module ${moduleId} displayed`);
+        } else {
+            DEBUG.error('UIManager', `Module element not found: ${moduleId}Module`);
         }
 
         this.activeModule = moduleId;
 
         // Initialize module-specific functionality
-        if (moduleId === 'plotManager') {
-            this.initializePlotModule();
-        } else if (moduleId === 'riskAnalytics') {
-            this.initializeRiskModule();
-        } else if (moduleId === 'portfolioManager') {
-            this.initializePortfolioModule();
-        } else if (moduleId === 'strategyBacktest') {
-            this.initializeStrategyModule();
-        } else if (moduleId === 'aiInsights') {
-            this.initializeAIModule();
-        }
+        if (moduleId === 'plotManager') this.initializePlotModule();
+        else if (moduleId === 'riskAnalytics') this.initializeRiskModule();
+        else if (moduleId === 'portfolioManager') this.initializePortfolioModule();
+        else if (moduleId === 'strategyBacktest') this.initializeStrategyModule();
+        else if (moduleId === 'aiInsights') this.initializeAIModule();
     }
 
     async handleFileUpload(file) {
+        DEBUG.log('UIManager', `Handling file upload: ${file.name}`);
+        
         try {
             await this.dataService.loadData(file);
         } catch (error) {
+            DEBUG.error('UIManager', 'File upload failed', error);
             this.showError(`Failed to load data: ${error.message}`);
         }
     }
 
     handleDataLoaded(dataset) {
+        DEBUG.log('UIManager', 'Handling data loaded');
+        
         this.hideLoading();
         this.showDataPreview(dataset);
         this.enableDataDependentModules();
@@ -557,7 +813,8 @@ class UIManager {
     }
 
     showDataPreview(dataset) {
-        // Hide welcome screen and show preview
+        DEBUG.log('UIManager', 'Showing data preview');
+        
         const welcome = document.getElementById('welcomeScreen');
         const preview = document.getElementById('dataPreview');
         
@@ -570,13 +827,17 @@ class UIManager {
     }
 
     renderDataTable(dataset) {
+        DEBUG.log('UIManager', 'Rendering data table');
+        
         const container = document.getElementById('dataTable');
-        if (!container || !dataset.headers || !dataset.rows) return;
+        if (!container || !dataset.headers || !dataset.rows) {
+            DEBUG.error('UIManager', 'Cannot render table - missing container or data');
+            return;
+        }
 
         const table = document.createElement('table');
         table.className = 'table table-dark table-sm table-striped';
         
-        // Header
         const thead = document.createElement('thead');
         const headerRow = document.createElement('tr');
         dataset.headers.forEach(header => {
@@ -590,7 +851,6 @@ class UIManager {
         thead.appendChild(headerRow);
         table.appendChild(thead);
         
-        // Body (first 50 rows)
         const tbody = document.createElement('tbody');
         const rowsToShow = dataset.rows.slice(0, 50);
         
@@ -608,16 +868,19 @@ class UIManager {
         container.innerHTML = '';
         container.appendChild(table);
         
-        // Row count info
         if (dataset.rows.length > 50) {
             const info = document.createElement('div');
             info.className = 'text-muted mt-2 small text-center';
             info.textContent = `Showing first 50 rows of ${dataset.rows.length} total rows`;
             container.appendChild(info);
         }
+        
+        DEBUG.log('UIManager', 'Data table rendered');
     }
 
     renderDatasetInfo(dataset) {
+        DEBUG.log('UIManager', 'Rendering dataset info');
+        
         const container = document.getElementById('datasetInfo');
         if (!container) return;
 
@@ -630,16 +893,11 @@ class UIManager {
                 </div>
                 <div class="card-body">
                     <div class="row">
-                        <div class="col-6">
-                            <strong>Rows:</strong> ${dataset.rows.length.toLocaleString()}
-                        </div>
-                        <div class="col-6">
-                            <strong>Columns:</strong> ${dataset.headers.length}
-                        </div>
+                        <div class="col-6"><strong>Rows:</strong> ${dataset.rows.length.toLocaleString()}</div>
+                        <div class="col-6"><strong>Columns:</strong> ${dataset.headers.length}</div>
                     </div>
                     <div class="row mt-2">
-                        <div class="col-6">
-                            <strong>Numeric:</strong> ${numericColumns.length}
+                        <div class="col-6"><strong>Numeric:</strong> ${numericColumns.length}
                         </div>
                         <div class="col-6">
                             <strong>Text:</strong> ${dataset.headers.length - numericColumns.length}
@@ -660,17 +918,22 @@ class UIManager {
     }
 
     enableDataDependentModules() {
+        DEBUG.log('UIManager', 'Enabling data-dependent modules');
+        
         const moduleIds = ['plotManager', 'riskAnalytics', 'portfolioManager', 'strategyBacktest', 'aiInsights'];
         moduleIds.forEach(id => {
             const button = document.querySelector(`[data-module="${id}"]`);
-            if (button) button.disabled = false;
+            if (button) {
+                button.disabled = false;
+                DEBUG.log('UIManager', `Enabled module: ${id}`);
+            }
         });
     }
 
     // MODULE INITIALIZERS
-    // ===================
-
     initializePlotModule() {
+        DEBUG.log('UIManager', 'Initializing plot module');
+        
         const plotColumn = document.getElementById('plotColumn');
         if (plotColumn) {
             const numericColumns = this.dataService.getNumericColumns();
@@ -680,6 +943,8 @@ class UIManager {
     }
 
     initializeRiskModule() {
+        DEBUG.log('UIManager', 'Initializing risk module');
+        
         const riskColumn = document.getElementById('riskColumn');
         if (riskColumn) {
             const numericColumns = this.dataService.getNumericColumns();
@@ -689,6 +954,8 @@ class UIManager {
     }
 
     initializePortfolioModule() {
+        DEBUG.log('UIManager', 'Initializing portfolio module');
+        
         const assetSelection = document.getElementById('assetSelection');
         if (assetSelection) {
             const numericColumns = this.dataService.getNumericColumns();
@@ -698,6 +965,8 @@ class UIManager {
     }
 
     initializeStrategyModule() {
+        DEBUG.log('UIManager', 'Initializing strategy module');
+        
         const priceColumn = document.getElementById('priceColumn');
         if (priceColumn) {
             const numericColumns = this.dataService.getNumericColumns();
@@ -707,6 +976,8 @@ class UIManager {
     }
 
     initializeAIModule() {
+        DEBUG.log('UIManager', 'Initializing AI module');
+        
         const dataset = this.dataService.getCurrentDataset();
         if (dataset) {
             this.showAIOptions();
@@ -716,11 +987,13 @@ class UIManager {
     }
 
     // MODULE FUNCTIONALITY
-    // ====================
-
     generateChart() {
+        DEBUG.log('UIManager', 'Generate chart clicked');
+        
         const columnName = document.getElementById('plotColumn')?.value;
         const chartType = document.getElementById('chartType')?.value || 'line';
+        
+        DEBUG.log('UIManager', `Chart config: column=${columnName}, type=${chartType}`);
         
         if (!columnName) {
             Notification.warning('Please select a column to plot');
@@ -728,6 +1001,8 @@ class UIManager {
         }
 
         const data = this.dataService.getColumnData(columnName);
+        DEBUG.log('UIManager', `Retrieved ${data.length} data points`);
+        
         if (data.length === 0) {
             Notification.error('No numeric data found in selected column');
             return;
@@ -737,52 +1012,76 @@ class UIManager {
     }
 
     createChart(data, label, type) {
+        DEBUG.log('UIManager', `Creating chart: ${type} chart with ${data.length} points`);
+        
         const ctx = document.getElementById('dataChart');
-        if (!ctx) return;
-
-        // Destroy existing chart
-        if (this.currentChart) {
-            this.currentChart.destroy();
+        if (!ctx) {
+            DEBUG.error('UIManager', 'Canvas element not found');
+            Notification.error('Chart canvas not found');
+            return;
         }
 
-        const chartData = {
-            labels: data.map((_, i) => i + 1),
-            datasets: [{
-                label: label,
-                data: data,
-                borderColor: '#007bff',
-                backgroundColor: type === 'bar' ? '#007bff' : 'rgba(0, 123, 255, 0.1)',
-                borderWidth: 2,
-                fill: type === 'line'
-            }]
-        };
+        // Wait for Chart.js to be available
+        if (typeof Chart === 'undefined') {
+            DEBUG.log('UIManager', 'Chart.js not loaded yet, retrying...');
+            setTimeout(() => this.createChart(data, label, type), 100);
+            return;
+        }
 
-        this.currentChart = new Chart(ctx, {
-            type: type === 'histogram' ? 'bar' : type,
-            data: chartData,
-            options: {
-                responsive: true,
-                scales: {
-                    y: {
-                        beginAtZero: false,
-                        grid: { color: 'rgba(255, 255, 255, 0.1)' },
-                        ticks: { color: '#fff' }
-                    },
-                    x: {
-                        grid: { color: 'rgba(255, 255, 255, 0.1)' },
-                        ticks: { color: '#fff' }
-                    }
-                },
-                plugins: {
-                    legend: { labels: { color: '#fff' } }
-                }
+        try {
+            // Destroy existing chart
+            if (this.currentChart) {
+                DEBUG.log('UIManager', 'Destroying existing chart');
+                this.currentChart.destroy();
             }
-        });
 
-        Notification.success('Chart generated successfully!');
+            const chartData = {
+                labels: data.map((_, i) => i + 1),
+                datasets: [{
+                    label: label,
+                    data: data,
+                    borderColor: '#007bff',
+                    backgroundColor: type === 'bar' ? '#007bff' : 'rgba(0, 123, 255, 0.1)',
+                    borderWidth: 2,
+                    fill: type === 'line'
+                }]
+            };
+
+            this.currentChart = new Chart(ctx, {
+                type: type,
+                data: chartData,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                            ticks: { color: '#fff' }
+                        },
+                        x: {
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                            ticks: { color: '#fff' }
+                        }
+                    },
+                    plugins: {
+                        legend: { labels: { color: '#fff' } }
+                    }
+                }
+            });
+
+            DEBUG.log('UIManager', 'Chart created successfully');
+            Notification.success('Chart generated successfully!');
+            
+        } catch (error) {
+            DEBUG.error('UIManager', 'Chart creation failed', error);
+            Notification.error('Failed to create chart: ' + error.message);
+        }
     }
 
     calculateRiskMetrics() {
+        DEBUG.log('UIManager', 'Calculate risk metrics clicked');
+        
         const columnName = document.getElementById('riskColumn')?.value;
         
         if (!columnName) {
@@ -806,6 +1105,8 @@ class UIManager {
     }
 
     displayRiskMetrics(metrics) {
+        DEBUG.log('UIManager', 'Displaying risk metrics', metrics);
+        
         const container = document.getElementById('riskMetrics');
         if (!container) return;
 
@@ -840,16 +1141,19 @@ class UIManager {
     }
 
     optimizePortfolio() {
+        DEBUG.log('UIManager', 'Optimize portfolio clicked');
+        
         const selectedAssets = Array.from(document.getElementById('assetSelection')?.selectedOptions || [])
             .map(option => option.value);
         const method = document.getElementById('optimizationMethod')?.value || 'equalWeight';
+
+        DEBUG.log('UIManager', `Selected assets: ${selectedAssets.join(', ')}, method: ${method}`);
 
         if (selectedAssets.length < 2) {
             Notification.warning('Please select at least 2 assets for portfolio optimization');
             return;
         }
 
-        // Get returns data for selected assets
         const returnsData = selectedAssets.map(asset => {
             const prices = this.dataService.getColumnData(asset);
             return this.analyticsService.calculateReturns(prices);
@@ -860,6 +1164,8 @@ class UIManager {
     }
 
     displayPortfolioResults(assets, result) {
+        DEBUG.log('UIManager', 'Displaying portfolio results');
+        
         const container = document.getElementById('portfolioResults');
         if (!container) return;
 
@@ -893,9 +1199,13 @@ class UIManager {
     }
 
     runBacktest() {
+        DEBUG.log('UIManager', 'Run backtest clicked');
+        
         const columnName = document.getElementById('priceColumn')?.value;
         const strategyType = document.getElementById('strategyType')?.value || 'buyhold';
         const param = parseInt(document.getElementById('strategyParam')?.value) || 20;
+
+        DEBUG.log('UIManager', `Backtest config: column=${columnName}, strategy=${strategyType}, param=${param}`);
 
         if (!columnName) {
             Notification.warning('Please select a price column for backtesting');
@@ -913,6 +1223,8 @@ class UIManager {
     }
 
     runStrategy(prices, strategyType, param) {
+        DEBUG.log('UIManager', `Running ${strategyType} strategy`);
+        
         let signals = [];
         let position = 0;
         let cash = 10000;
@@ -920,11 +1232,9 @@ class UIManager {
 
         switch (strategyType) {
             case 'buyhold':
-                // Simple buy and hold
                 signals = new Array(prices.length).fill(1);
                 break;
             case 'sma':
-                // Simple moving average crossover
                 const sma = this.analyticsService.calculateMovingAverage(prices, param);
                 signals = prices.map((price, i) => {
                     if (i < param) return 0;
@@ -932,7 +1242,6 @@ class UIManager {
                 });
                 break;
             case 'momentum':
-                // Simple momentum strategy
                 signals = prices.map((price, i) => {
                     if (i < param) return 0;
                     const pastPrice = prices[i - param];
@@ -943,17 +1252,14 @@ class UIManager {
                 signals = new Array(prices.length).fill(1);
         }
 
-        // Simulate trading
         for (let i = 0; i < prices.length; i++) {
             const signal = signals[i];
             const price = prices[i];
 
             if (signal === 1 && position === 0) {
-                // Buy
                 position = cash / price;
                 cash = 0;
             } else if (signal === 0 && position > 0) {
-                // Sell
                 cash = position * price;
                 position = 0;
             }
@@ -974,6 +1280,8 @@ class UIManager {
     }
 
     displayBacktestResults(result) {
+        DEBUG.log('UIManager', 'Displaying backtest results');
+        
         const container = document.getElementById('backtestResults');
         if (!container) return;
 
@@ -1010,6 +1318,8 @@ class UIManager {
     }
 
     async handleAIAnalysis() {
+        DEBUG.log('UIManager', 'AI analysis clicked');
+        
         const container = document.getElementById('aiInsightsContainer');
         const query = document.getElementById('aiQuery')?.value || '';
         const dataset = this.dataService.getCurrentDataset();
@@ -1019,7 +1329,6 @@ class UIManager {
             return;
         }
 
-        // Show loading
         container.innerHTML = `
             <div class="text-center py-5">
                 <div class="spinner-border text-primary mb-3"></div>
@@ -1027,7 +1336,6 @@ class UIManager {
             </div>
         `;
 
-        // Simulate AI analysis
         await new Promise(resolve => setTimeout(resolve, 2000));
 
         const numericColumns = this.dataService.getNumericColumns();
@@ -1040,9 +1348,7 @@ class UIManager {
                     <small class="text-muted">${new Date().toLocaleString()}</small>
                 </div>
                 <div class="card-body">
-                    <div class="analysis-content">
-                        ${analysis}
-                    </div>
+                    <div class="analysis-content">${analysis}</div>
                 </div>
             </div>
         `;
@@ -1051,11 +1357,9 @@ class UIManager {
     generateAdvancedAnalysis(dataset, numericColumns, query) {
         const insights = [];
         
-        // Dataset overview
         insights.push(`<h6>Dataset Overview</h6>`);
         insights.push(`<p>Your dataset contains ${dataset.rows.length.toLocaleString()} observations across ${dataset.headers.length} variables. Of these, ${numericColumns.length} are numeric and suitable for quantitative analysis.</p>`);
 
-        // Column analysis
         if (numericColumns.length > 0) {
             insights.push(`<h6>Quantitative Analysis</h6>`);
             insights.push(`<p>The numeric columns (${numericColumns.join(', ')}) can be used for:</p>`);
@@ -1067,7 +1371,6 @@ class UIManager {
             </ul>`);
         }
 
-        // Query-specific response
         if (query) {
             insights.push(`<h6>Response to Your Query</h6>`);
             insights.push(`<p><em>"${query}"</em></p>`);
@@ -1083,7 +1386,6 @@ class UIManager {
             }
         }
 
-        // Recommendations
         insights.push(`<h6>Recommendations</h6>`);
         insights.push(`<ul>
             <li>Start with basic visualizations to understand data patterns</li>
@@ -1132,50 +1434,7 @@ class UIManager {
     }
 }
 
-// 4. FILE UPLOAD MANAGER
-// =============================================================================
-
-class FileUploadManager {
-    constructor() {
-        this.options = null;
-    }
-
-    setup(options) {
-        this.options = options;
-    }
-
-    async processFile(file) {
-        try {
-            this.validateFile(file);
-            
-            if (this.options?.onProgress) this.options.onProgress(50);
-            
-            await new Promise(resolve => setTimeout(resolve, 500));
-            
-            if (this.options?.onProgress) this.options.onProgress(100);
-            if (this.options?.onComplete) this.options.onComplete(file);
-            
-        } catch (error) {
-            if (this.options?.onError) this.options.onError(error);
-        }
-    }
-
-    validateFile(file) {
-        const maxSize = 50 * 1024 * 1024; // 50MB
-        const supportedTypes = ['csv', 'json', 'xlsx'];
-        
-        if (file.size > maxSize) {
-            throw new Error('File size exceeds 50MB limit');
-        }
-
-        const extension = file.name.split('.').pop().toLowerCase();
-        if (!supportedTypes.includes(extension)) {
-            throw new Error(`Unsupported file type: ${extension}`);
-        }
-    }
-}
-
-// 5. APPLICATION MAIN
+// 4. APPLICATION MAIN
 // =============================================================================
 
 class Application {
@@ -1184,31 +1443,38 @@ class Application {
         this.analyticsService = new AnalyticsService();
         this.uiManager = null;
         this.initialized = false;
+        DEBUG.log('Application', 'Constructor called');
     }
 
     async initialize() {
-        if (this.initialized) return;
+        if (this.initialized) {
+            DEBUG.log('Application', 'Already initialized');
+            return;
+        }
 
         try {
-            console.log('🚀 Initializing Quantitative Platform...');
+            DEBUG.log('Application', 'Starting initialization...');
             
-            // Initialize services
             await this.dataService.initialize();
             await this.analyticsService.initialize();
             
-            // Initialize UI
             this.uiManager = new UIManager(this.dataService, this.analyticsService);
             await this.uiManager.initialize();
             
             this.initialized = true;
             
-            console.log('✅ Application initialized successfully');
+            DEBUG.log('Application', 'Initialization complete!');
+            console.log('%c✓ Application Ready', 'color: green; font-size: 16px; font-weight: bold');
+            console.log('%cDebug Console Available:', 'color: blue; font-weight: bold');
+            console.log('  window.DEBUG.getLogs() - View all logs');
+            console.log('  window.DEBUG.getErrors() - View all errors');
+            console.log('  window.DEBUG.exportDebugInfo() - Export debug data');
             
-            // Make available for debugging
             window.app = this;
+            window.DEBUG = DEBUG;
             
         } catch (error) {
-            console.error('❌ Application initialization failed:', error);
+            DEBUG.error('Application', 'Initialization failed', error);
             this.showErrorBoundary(error);
         }
     }
@@ -1225,13 +1491,16 @@ class Application {
     }
 }
 
-// 6. INITIALIZATION
+// 5. INITIALIZATION
 // =============================================================================
 
 document.addEventListener('DOMContentLoaded', async () => {
+    DEBUG.log('Bootstrap', 'DOM Content Loaded');
+    
     try {
-        // Initialize particles background
+        // Initialize particles
         if (typeof particlesJS !== 'undefined') {
+            DEBUG.log('Bootstrap', 'Initializing particles...');
             particlesJS("particles-js", {
                 particles: {
                     number: { value: 80, density: { enable: true, value_area: 800 } },
@@ -1249,19 +1518,24 @@ document.addEventListener('DOMContentLoaded', async () => {
                 },
                 retina_detect: true
             });
+        } else {
+            DEBUG.log('Bootstrap', 'Particles.js not available');
         }
+
+        // Check for Chart.js
+        DEBUG.log('Bootstrap', `Chart.js available: ${typeof Chart !== 'undefined'}`);
 
         // Initialize application
         const app = new Application();
         await app.initialize();
         
-        console.log('🎉 Platform ready for use!');
-        
     } catch (error) {
-        console.error('Failed to start application:', error);
+        DEBUG.error('Bootstrap', 'Failed to start application', error);
+        console.error('FATAL ERROR:', error);
     }
 });
 
 // Export for global access
 window.Application = Application;
 window.Notification = Notification;
+window.DebugLogger = DebugLogger;
