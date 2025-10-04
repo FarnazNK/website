@@ -1673,11 +1673,22 @@ class UIManager {
     }
 }
 
-// APPLICATION
 class Application {
     constructor() {
-        this.dataService = new DataService();
-        this.analyticsService = new AnalyticsService();
+        // Load backend config
+        const backendConfig = typeof BackendConfig !== 'undefined' ? BackendConfig.load() : { url: '', enabled: false };
+        
+        // Use Hybrid services if backend integration is loaded and enabled
+        if (typeof HybridDataService !== 'undefined' && backendConfig.enabled && backendConfig.url) {
+            DEBUG.log('Application', `Initializing with backend: ${backendConfig.url}`);
+            this.dataService = new HybridDataService(backendConfig.url);
+            this.analyticsService = new HybridAnalyticsService(this.dataService);
+        } else {
+            DEBUG.log('Application', 'Initializing in frontend-only mode');
+            this.dataService = new DataService();
+            this.analyticsService = new AnalyticsService();
+        }
+        
         this.uiManager = null;
         this.initialized = false;
         DEBUG.log('Application', 'Constructor called');
@@ -1700,8 +1711,15 @@ class Application {
             
             this.initialized = true;
             
-            DEBUG.log('Application', 'Initialization complete!');
-            console.log('%c✓ Application Ready', 'color: green; font-size: 16px; font-weight: bold');
+            // Show backend status
+            if (this.dataService.isUsingBackend && this.dataService.isUsingBackend()) {
+                const status = this.dataService.getBackendStatus();
+                console.log('%c✓ Application Ready (Backend Mode)', 'color: green; font-size: 16px; font-weight: bold');
+                console.log('%cBackend: ' + status.url, 'color: cyan');
+            } else {
+                console.log('%c✓ Application Ready (Frontend Mode)', 'color: green; font-size: 16px; font-weight: bold');
+            }
+            
             console.log('%cDebug Console Available:', 'color: blue; font-weight: bold');
             console.log('  window.DEBUG.getLogs() - View all logs');
             console.log('  window.DEBUG.getErrors() - View all errors');
