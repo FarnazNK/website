@@ -1,247 +1,171 @@
 # Farnaz Nasehi - Professional Portfolio
 
-This repository contains the source code for my professional portfolio website showcasing my skills, experience, and projects as a Full-Stack Developer.
+A modern, responsive portfolio website showcasing my work as a Full-Stack Developer, featuring an interactive Quantitative Investment Platform with real-time data visualization and analytics.
 
-## Live Website
+🌐 **Live Site:** [farnaznasehi.com](https://farnaznasehi.com)
 
-The website is live at: https://farnaznasehi.com/
+## Overview
 
-## Features
+This portfolio demonstrates expertise in hyperspectral imaging, financial analytics, and blockchain technologies through a clean, animated interface built with modern web technologies. The centerpiece is a fully functional quantitative investment platform with a modular, event-driven architecture that operates both standalone and with optional backend support.
 
-### Frontend
-- Responsive design that works on all devices
-- Interactive quantitative investment platform with:
-  - Data visualization with Chart.js
-  - Risk analytics and portfolio optimization
-  - Trading strategy backtesting
-  - AI-powered insights
-- Animated UI elements with particles.js background
-- Multi-source data import (Local files, Cloud storage, APIs, Databases)
-- Real-time data processing and analysis
+## Key Features
 
-### Backend Integration (Optional)
-- Hybrid architecture supporting both standalone and server-enhanced modes
-- Flask/Django backend for heavy computational tasks
-- Automatic fallback to frontend processing if backend unavailable
-- Progress tracking for large file uploads
-- Enhanced performance for big datasets
+**Quantitative Investment Platform**
+- Real-time data visualization with Chart.js
+- Risk analytics: Volatility, Sharpe Ratio, VaR (95/99%), Maximum Drawdown
+- Portfolio optimization: Equal weight, minimum volatility, maximum Sharpe
+- Strategy backtesting: Buy & Hold, SMA crossover, Momentum
+- AI-powered data insights with query-based analysis
 
-## Technologies Used
+**Multi-Source Data Connectors**
+- Local files: CSV, TSV, Excel (.xlsx/.xls), JSON, XML
+- Cloud storage: Azure Blob Storage, AWS S3 (pre-signed URLs)
+- APIs: REST endpoints with configurable headers/auth
+- Google Sheets integration
 
-### Frontend
-- HTML5, CSS3, JavaScript (ES6+)
-- Bootstrap 4.5.2 for responsive layout
-- Chart.js 3.9.1 for data visualization
-- SheetJS (XLSX) for Excel file processing
-- Particles.js for interactive background
-- FontAwesome 6.0 for icons
-
-### Backend (Optional)
-- **Flask Backend**: Python 3.8+, Flask, Flask-CORS, pandas, numpy
-- **Django Backend**: Python 3.8+, Django, Django REST Framework, pandas, numpy
-- Both support CSV, Excel, and JSON data processing
-- RESTful API with CORS enabled for browser integration
+**Modern UI/UX**
+- Fully responsive across all devices
+- Animated Particles.js background
+- Scroll animations with AOS library
+- Dynamic typewriter text effects
+- Dark theme with configurable notifications
 
 ## Architecture
 
-The platform uses a **hybrid architecture** that can operate in two modes:
+The platform uses a **layered, event-driven architecture** with 5 JavaScript modules:
 
-1. **Frontend-Only Mode** (Default)
-   - All processing happens in the browser
-   - No server required
-   - Works offline after initial load
-   - Suitable for datasets up to 50MB
+```
+┌─────────────────────────────────────────────────────────────┐
+│                        app.js                               │
+│                 (Main Application Orchestrator)             │
+├─────────────────────────────────────────────────────────────┤
+│  backend-integration.js  │  ui-modules-layer.js             │
+│  (Hybrid Services Layer) │  (Component-Based UI)            │
+├─────────────────────────────────────────────────────────────┤
+│              data-services-layer.js                         │
+│    (Parsers, Validators, Processors, Transformers)          │
+├─────────────────────────────────────────────────────────────┤
+│              utilities-config-layer.js                      │
+│  (EventEmitter, Logger, AppConfig, PerformanceMonitor)      │
+└─────────────────────────────────────────────────────────────┘
+```
 
-2. **Backend-Enhanced Mode** (Optional)
-   - Heavy computations offloaded to server
-   - Faster processing for large datasets
-   - Support for datasets over 50MB
-   - Automatic fallback to frontend if backend fails
+**Key Design Patterns:**
+- Event-driven pub/sub (`EventEmitter`) for component communication
+- Hybrid fallback: Backend → Frontend graceful degradation
+- Strategy pattern for parsers and optimization algorithms
+- Service registry for dependency injection
+
+**Hybrid Mode:**
+- Frontend-only: Works offline, handles datasets up to 50MB in-browser
+- Backend-enhanced: Offloads heavy computation to Flask/Django, supports 100MB+ datasets, automatic fallback if backend unavailable
+
+## Tech Stack
+
+| Category | Technologies |
+|----------|-------------|
+| Frontend | HTML5, CSS3, JavaScript (ES6+), Bootstrap 4.5 |
+| Visualization | Chart.js 3.9, Particles.js |
+| Data Processing | SheetJS (XLSX), custom CSV/TSV/XML parsers |
+| Backend (Optional) | Python 3.8+, Flask/Django, pandas, NumPy |
+| Animations | Animate.css, AOS |
+| State Management | Custom EventEmitter, ModuleState |
 
 ## Pages
 
-- **Home** (`index.html`): Introduction and featured projects
-- **About** (`about.html`): Background and professional information
-- **Resume** (`resume.html`): Career history and achievements
-- **Skills** (`skills.html`): Comprehensive breakdown of technical abilities
-- **Portfolio** (`portfolio.html`): Quantitative Investment Platform
-- **Contact** (`contact.html`): Contact information and form
+| Page | Description |
+|------|-------------|
+| Home | Introduction with animated hero section and featured projects |
+| About | Professional background and expertise areas |
+| Resume | Career history, achievements, and experience timeline |
+| Skills | Technical abilities with proficiency indicators |
+| Portfolio | Quantitative Investment Platform (interactive demo) |
+| Contact | Contact form and professional links |
 
-## File Structure
+## Quick Start
 
-```
-├── index.html                      # Homepage
-├── about.html                      # About page
-├── resume.html                     # Experience page
-├── skills.html                     # Skills page
-├── portfolio.html                  # Investment platform
-├── contact.html                    # Contact page
-├── styles.css                      # Global styles
-├── app.js                         # Main application logic
-├── backend-integration.js          # Backend integration layer
-├── data-services-layer.js          # Data processing utilities
-├── ui-modules-layer.js             # UI components
-├── utilities-config-layer.js       # Core utilities
-├── integration-layer.js            # Service integration
-├── flask_backend.py                # Flask backend (optional)
-├── django_backend.py               # Django backend (optional)
-└── manifest.json                   # PWA manifest
+**Frontend Only (No Setup Required)**
+
+```bash
+git clone https://github.com/FarnazNK/website.git
+cd website
+# Open index.html in your browser
 ```
 
-## Development
+**With Flask Backend**
 
-### Frontend Only
+```bash
+pip install flask flask-cors pandas numpy werkzeug
+python flask_backend.py
+# Server runs at http://localhost:5000
+```
 
-To run the frontend locally:
+**With Django Backend**
 
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/yourusername/portfolio.git
-   cd portfolio
-   ```
+```bash
+pip install django djangorestframework pandas numpy django-cors-headers
+python manage.py migrate
+python manage.py runserver
+# Server runs at http://localhost:8000
+```
 
-2. Open `portfolio.html` in your browser
-   - No build process required
-   - Works immediately
+To connect the frontend to a backend, click the settings icon (⚙️) in the navigation bar and enter your backend URL.
 
-### With Backend (Optional)
+## Project Structure
 
-#### Option 1: Flask Backend
-
-1. Install dependencies:
-   ```bash
-   pip install flask flask-cors pandas numpy werkzeug
-   ```
-
-2. Start the Flask server:
-   ```bash
-   python flask_backend.py
-   ```
-   Server runs on `http://localhost:5000`
-
-#### Option 2: Django Backend
-
-1. Install dependencies:
-   ```bash
-   pip install django djangorestframework pandas numpy django-cors-headers
-   ```
-
-2. Setup Django project:
-   ```bash
-   django-admin startproject investment_platform
-   cd investment_platform
-   python manage.py startapp api
-   ```
-
-3. Add the code from `django_backend.py` to appropriate Django files
-
-4. Run migrations and start server:
-   ```bash
-   python manage.py migrate
-   python manage.py runserver
-   ```
-   Server runs on `http://localhost:8000`
-
-#### Configure Frontend to Use Backend
-
-1. Open the portfolio page in your browser
-2. Click the settings icon (⚙️) in the navigation bar
-3. Enter your backend URL:
-   - Flask: `http://localhost:5000`
-   - Django: `http://localhost:8000`
-4. Check "Enable backend integration"
-5. Click "Save & Reload"
-
-The application will now use the backend for heavy computations while maintaining responsive UI.
+```
+├── index.html                  # Homepage with hero section and featured projects
+├── about.html                  # Professional background
+├── resume.html                 # Work experience timeline
+├── skills.html                 # Technical skills with proficiency indicators
+├── portfolio.html              # Quantitative Investment Platform (main app)
+├── contact.html                # Contact form and links
+├── styles.css                  # Global styles (dark theme, animations)
+│
+├── app.js                      # Main orchestrator: Application, UIManager,
+│                               # DataService, AnalyticsService, Notification
+├── utilities-config-layer.js   # Core: EventEmitter, AppConfig, Logger,
+│                               # PerformanceMonitor, ModuleState
+├── data-services-layer.js      # Parsers (CSV/TSV/XML/Excel), validators,
+│                               # processors, transformers, batch processing
+├── ui-modules-layer.js         # BaseModule, BaseView, ToolbarView,
+│                               # component lifecycle management
+├── backend-integration.js      # BackendService, HybridDataService,
+│                               # HybridAnalyticsService, BackendConfig
+├── integration-layer.js        # ApplicationBootstrap, dependency injection
+│
+├── flask_backend.py            # Flask REST API (optional backend)
+├── django_backend.py           # Django REST API (optional backend)
+└── manifest.json               # PWA manifest
+```
 
 ## API Endpoints
 
-When using the backend, the following endpoints are available:
+When using the optional backend:
 
-### Flask/Django Common Endpoints
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/` | Health check |
+| POST | `/api/upload` | Upload data file |
+| GET | `/api/datasets` | List all datasets |
+| GET | `/api/datasets/<id>` | Get specific dataset |
+| DELETE | `/api/datasets/<id>` | Delete dataset |
+| POST | `/api/datasets/<id>/risk-metrics` | Calculate risk metrics |
+| POST | `/api/datasets/<id>/optimize-portfolio` | Portfolio optimization |
+| POST | `/api/datasets/<id>/backtest` | Strategy backtesting |
 
-- `GET /` - Health check
-- `POST /api/upload` - Upload data file
-- `GET /api/datasets` - List all datasets
-- `GET /api/datasets/<id>` - Get specific dataset
-- `DELETE /api/datasets/<id>` - Delete dataset
-- `POST /api/datasets/<id>/risk-metrics` - Calculate risk metrics
-- `POST /api/datasets/<id>/optimize-portfolio` - Optimize portfolio
-- `POST /api/datasets/<id>/backtest` - Backtest strategy
-- `GET /api/datasets/<id>/column-stats/<column>` - Get column statistics
+## Data Sources Supported
 
-## Features in Detail
+- **Local Files:** CSV (auto-delimiter detection), TSV, Excel (.xlsx/.xls), JSON, XML, plain text
+- **Cloud Storage:** Azure Blob Storage (SAS token auth), AWS S3 (pre-signed URLs)
+- **APIs:** REST endpoints with configurable method, headers, and body
+- **Google Sheets:** Direct integration via public/shared sheet URLs
 
-### Data Import
-- **Local Files**: CSV, Excel (.xlsx, .xls), JSON
-- **Cloud Storage**: Azure Blob Storage, AWS S3, Google Sheets
-- **Databases**: PostgreSQL, MySQL, MongoDB, SQL Server, Oracle, DynamoDB, Cosmos DB (via API)
-- **REST APIs**: Custom API endpoints with configurable headers and authentication
+## Browser Support
 
-### Analytics Capabilities
-- **Risk Analysis**: Volatility, Sharpe Ratio, Value at Risk (VaR), Maximum Drawdown
-- **Portfolio Optimization**: Equal weight, Minimum volatility, Maximum Sharpe ratio
-- **Strategy Backtesting**: Buy & Hold, Simple Moving Average (SMA), Momentum strategies
-- **Visualizations**: Line charts, Bar charts, Time series analysis
-- **AI Insights**: Pattern recognition and data analysis recommendations
-
-## Browser Compatibility
-
-- Chrome 90+
-- Firefox 88+
-- Safari 14+
-- Edge 90+
-
-## Performance
-
-- **Frontend Mode**: Handles datasets up to 50MB efficiently
-- **Backend Mode**: Supports datasets over 100MB with streaming
-- All operations are non-blocking with progress indicators
-- Automatic timeout and retry mechanisms
-- Graceful degradation on errors
-
-## Security Considerations
-
-- CORS configured for backend endpoints
-- No sensitive data stored in browser localStorage (except user preferences)
-- File size limits enforced (50MB frontend, configurable backend)
-- Input validation on all data sources
-- XSS protection through content sanitization
+Chrome 90+ • Firefox 88+ • Safari 14+ • Edge 90+
 
 ## Deployment
 
-### Frontend Deployment
-Deploy to any static hosting service:
-- GitHub Pages
-- Netlify
-- Vercel
-- AWS S3 + CloudFront
+The frontend can be deployed to any static hosting service (GitHub Pages, Netlify, Vercel, AWS S3 + CloudFront). The optional backend can be deployed to Heroku, AWS, Google Cloud, or DigitalOcean.
 
-### Backend Deployment
-Deploy backend to:
-- **Flask**: Heroku, AWS Elastic Beanstalk, Google Cloud Run
-- **Django**: Heroku, AWS EC2, Google App Engine, DigitalOcean
-
-Update the backend URL in the settings after deployment.
-
-## Contributing
-
-This is a personal portfolio project. However, suggestions and feedback are welcome through the contact form on the website.
-
-## License
-
-© 2025 Farnaz Nasehi. All Rights Reserved.
-
-## Contact
-
-- **Website**: https://farnaznasehi.com
-- **Email**: fnasehikalajahi@gmail.com
-- **LinkedIn**: [linkedin.com/in/farnaz-nasehi](https://linkedin.com/in/farnaz-nasehi)
-- **GitHub**: [github.com/FarnazNK](https://github.com/FarnazNK)
-
-## Acknowledgments
-
-- Bootstrap team for the responsive framework
-- Chart.js team for visualization library
-- Particles.js for background effects
-- All open-source contributors whose libraries made this possible
